@@ -1,0 +1,15 @@
+schema_version: "1"
+description: "Node-pool create / scale / update / delete specialist. HITL strict — never autonomous."
+agent_instructions: agents.md
+system_prompt: system-prompt.md
+
+env:
+  GKE_PROJECT: ""
+  GKE_LOCATION: ""
+  GKE_CLUSTER: ""
+  GKE_NAMESPACES_IN_SCOPE: ""
+
+mcp_servers:
+  gke-remote-mcp:
+    transport: streamable-http
+    url: "http://host.docker.internal:8081/mcp"

@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Scion runtime artifacts (each demo project will create these)
+**/.scion/agents/
+.scion_worktrees/
+
+# Demo bootstrap output (rendered from templates with cluster-specific values)
+demos/*/MEMORY.md
+demos/*/opening-prompt.rendered.md
+demos/*/.scion/templates/
+
+# OS / editor
+.DS_Store
+*.swp

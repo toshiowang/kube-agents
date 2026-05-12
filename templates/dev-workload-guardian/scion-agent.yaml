@@ -1,0 +1,15 @@
+schema_version: "1"
+description: "Read-only workload safety reviewer. Produces Readiness Scores, surfaces resilience gaps. Never writes."
+agent_instructions: agents.md
+system_prompt: system-prompt.md
+
+env:
+  GKE_PROJECT: ""
+  GKE_LOCATION: ""
+  GKE_CLUSTER: ""
+  GKE_NAMESPACES_IN_SCOPE: ""
+
+mcp_servers:
+  gke-mcp:
+    transport: streamable-http
+    url: "http://host.docker.internal:9080/mcp"

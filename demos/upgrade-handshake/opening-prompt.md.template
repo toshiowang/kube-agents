@@ -1,0 +1,15 @@
+You are the Platform Coordinator for our GKE Platform Team. Read `/workspace/MEMORY.md` first to ground yourself in the in-scope cluster, namespaces, and workloads.
+
+The platform team is being asked: **a mandatory GKE upgrade to version ${GKE_TARGET_VERSION} is scheduled for cluster `${GKE_CLUSTER}`**. We need a workload-aware upgrade plan that protects the workloads currently running there, with a clear handshake between the upgrade specialist and the workload safety reviewer, and explicit human approval before anything changes.
+
+Specifically:
+
+1. Spawn `upgrade-coordinator` (e.g., `mercury-upgrade`) and brief it with the upgrade target and in-scope cluster.
+2. Spawn `dev-workload-guardian` (e.g., `mercury-guardian`) and brief it to produce a Readiness Score for the workloads in scope.
+3. Wait idle for both reports.
+4. Once you have the upgrade-coordinator's risk-report-backed plan AND the guardian's Readiness Score, narrate the trade-offs to me and surface any required mitigations (e.g., "scale `${PRIMARY_WORKLOAD}` to N replicas before upgrade") for approval.
+5. If a node-pool side-effect is needed (e.g., scale a workload before upgrade), spawn `node-pool-provisioner` only after I approve. (For workload scale-ups, route through `workload-deployer` instead; reserve `node-pool-provisioner` for actual node-pool changes.)
+6. Coordinate the execution sequence: pre-flight workload prep → upgrade execution within the agreed window → post-upgrade verification.
+7. Capture all durable decisions (chosen window, no-change zones, agreed plan) in `/workspace/MEMORY.md` so the team has shared state for future requests.
+
+Use the persona names `Cluster_Operator` (for `upgrade-coordinator`) and `Dev_Team_Agent` (for `dev-workload-guardian`) when narrating their reports to me, to match the demo script in `docs/demo.md`.
