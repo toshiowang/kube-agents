@@ -16,9 +16,21 @@ A production-safety coach and application workload custodian configured with a p
 
 Choose how you want to deploy the Kubernetes agentic capabilities.
 
-### Use in OpenClaw (Recommended)
+### Run on Scion (preferred, in development)
 
-You can install the specialized **Kubernetes Operator** agent and its bundled skills directly into your [OpenClaw](https://openclaw.ai/) workspace using a single command:
+The active direction for kube-agents is a **GKE Platform Team** of focused, narrow-blast-radius role agents (cluster upgrade, workload safety, node-pool provisioning, cost optimization, workload deployment) coordinated by a `platform-coordinator`, hosted on [Scion](https://github.com/GoogleCloudPlatform/scion). The first runnable scenario lives at:
+
+- **[demos/upgrade-handshake/](demos/upgrade-handshake/README.md)** — Scenario 1 (Collaborative Upgrade Handshake) end-to-end on local Scion against a real GKE cluster, using both the local `gke-mcp` binary and the remote `container.googleapis.com/mcp` server (with a token-refreshing proxy).
+
+Reusable building blocks live at:
+
+- **[templates/](templates/README.md)** — pure role templates (the library)
+- **[skills/](skills/README.md)** — shared GKE skills, vendored from `GoogleCloudPlatform/gke-mcp`
+- **[tools/](tools/README.md)** — host-side MCP infrastructure scripts
+
+### Use in OpenClaw (legacy)
+
+The earlier prototype is still installable into [OpenClaw](https://openclaw.ai/) via a single command:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gke-labs/kube-agents/main/openclaw/scripts/install.sh | bash
@@ -27,7 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/gke-labs/kube-agents/main/openclaw/
 For more details, see the [OpenClaw Integration Guide](openclaw/README.md).
 
 ### Showcasing in Action
-To immediately test and demonstrate the harness's dynamic routing, automated remediation, and cross-agent negotiations, follow our step-by-step [Showcase & Demo Scenarios guide](openclaw/README.md#showcasing-the-harness-in-action-demo-scenarios).
+To test the OpenClaw harness's dynamic routing, automated remediation, and cross-agent negotiations, follow the step-by-step [Showcase & Demo Scenarios guide](openclaw/README.md#showcasing-the-harness-in-action-demo-scenarios).
 
 #### Installing from a Custom Branch or Fork
 
