@@ -85,12 +85,14 @@ else
     exit 1
   fi
 
-  # Extract ONLY agents (contains bundled skills)
+  # Extract openclaw/agents/ AND the shared top-level skills/ so the
+  # relative symlinks under agents/<role>/skills/ resolve correctly.
   echo "[kube-agent] Extracting assets..."
-  mkdir -p "$TMP_DIR/agents"
-  tar -xzf "$REPO_TARBALL" -C "$TMP_DIR/agents" "$REPO_NAME/openclaw/agents" --strip-components=3 2>/dev/null || true
-  
-  SRC_AGENTS_DIR="$TMP_DIR/agents"
+  mkdir -p "$TMP_DIR/repo"
+  tar -xzf "$REPO_TARBALL" -C "$TMP_DIR/repo" \
+    "$REPO_NAME/openclaw/agents" "$REPO_NAME/skills" --strip-components=1 2>/dev/null || true
+
+  SRC_AGENTS_DIR="$TMP_DIR/repo/openclaw/agents"
 fi
 
 # --- Phase 1: Install gke-mcp Binary ---
@@ -150,8 +152,10 @@ if [ -d "$SRC_AGENTS_DIR" ]; then
       echo "[kube-agent] Copying agent assets to workspace ($WORKSPACE_DIR)..."
       mkdir -p "$WORKSPACE_DIR"
       
-      # Copy all agent files from temp extraction
-      cp -a "$AGENT_DIR/." "$WORKSPACE_DIR/"
+      # Copy all agent files. Use -L to dereference skill symlinks
+      # (skills are stored once at the repo's top-level skills/ tree
+      # and referenced from each agent's skills/ via relative symlinks).
+      cp -aL "$AGENT_DIR/." "$WORKSPACE_DIR/"
 
 
       # Identity setup assumes files are present in the workspace
