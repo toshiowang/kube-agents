@@ -49,20 +49,34 @@ else
   echo "[bootstrap] .scion/ already present, skipping init"
 fi
 
-# 2. Symlink the templates this demo uses
-mkdir -p "$DEMO_DIR/.scion/templates"
+# 2. Import role templates from the top-level templates/ directory.
+#
+# We import from the source dir directly rather than symlinking into
+# .scion/templates/ because the import walker uses os.ReadDir + e.IsDir(),
+# which returns false for symlinks pointing to directories — symlinked
+# templates look invisible to it ("no importable agent definitions found").
+# The import copies each template into the project's template registry,
+# so updates require re-running bootstrap (which uses --force).
 DEMO_TEMPLATES=(platform-coordinator upgrade-coordinator dev-workload-guardian node-pool-provisioner workload-deployer)
 for t in "${DEMO_TEMPLATES[@]}"; do
-  link="$DEMO_DIR/.scion/templates/$t"
-  target="../../../templates/$t"
-  if [ ! -d "$TEMPLATES_DIR/$t" ]; then
-    echo "Error: template '$t' missing at $TEMPLATES_DIR/$t" >&2
+  if [ ! -f "$TEMPLATES_DIR/$t/scion-agent.yaml" ]; then
+    echo "Error: template '$t' missing scion-agent.yaml at $TEMPLATES_DIR/$t/" >&2
     exit 1
   fi
-  rm -rf "$link"
-  ln -s "$target" "$link"
-  echo "[bootstrap] linked template: $t"
 done
+
+echo "[bootstrap] importing templates from $TEMPLATES_DIR..."
+( cd "$DEMO_DIR" && scion templates import --all --force "$TEMPLATES_DIR" )
+
+# Sanity check: confirm all expected templates are now registered.
+if scion templates list >/tmp/scion-tpl-list.$$ 2>&1; then
+  for t in "${DEMO_TEMPLATES[@]}"; do
+    if ! grep -q -E "(^|[[:space:]])${t}([[:space:]]|$)" /tmp/scion-tpl-list.$$; then
+      echo "[bootstrap] WARN template '$t' not visible in 'scion templates list' after import" >&2
+    fi
+  done
+  rm -f /tmp/scion-tpl-list.$$
+fi
 
 # 3. Render workspace-seed -> ./MEMORY.md and opening-prompt.md
 # Pure bash to avoid the envsubst dependency.

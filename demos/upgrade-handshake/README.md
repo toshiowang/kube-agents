@@ -45,9 +45,11 @@ export GKE_TARGET_VERSION=1.29.x            # upgrade target
 
 `bootstrap.sh` will:
 - run `scion init` if needed
-- symlink the role templates from `../../templates/` into `.scion/templates/`
+- run `scion templates import --all --force ../../templates/` to register the role templates with the local Hub. (We import from the top-level `templates/` source rather than symlinking into `.scion/templates/` because Scion's import walker doesn't follow symlinks — `os.ReadDir` + `e.IsDir()` returns false for symlinked directories.)
 - render `MEMORY.md` and `opening-prompt.rendered.md` with your env vars filled in
 - best-effort check that the host MCP services are reachable
+
+After editing any template under `templates/`, re-run `./bootstrap.sh` to re-import (the `--force` overwrites the previously-imported copy).
 
 Then start the coordinator:
 
