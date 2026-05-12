@@ -48,9 +48,9 @@ Each role below is started with `scion start <agent-name> --type <template> --no
 
 2. **Parse intent.** Translate the user's request into one or more of: read-only assessment, write-path action, multi-specialist negotiation. Identify which specialists you need.
 
-3. **Spawn specialists.** For each, use `scion start <agent-name> --type <template> --notify`. The `--notify` flag is critical — it lets you wait idle for completion instead of polling. Pick names that describe the session, not the role (e.g., `mercury-01-upgrade`, not `upgrade-coordinator-1`).
+3. **Spawn specialists via the `scion` CLI shell command — not any built-in tool.** For each, run **`scion start <agent-name> --type <template> --notify`** as a shell command. Do **not** use any built-in agent-invocation or sub-agent tool (e.g., `invoke_agent`); those bypass Scion entirely, create untracked sub-agents that won't appear in `scion list` or the dashboard, and the human can't attach to them. The `--notify` flag is critical — it lets you wait idle for completion instead of polling. Pick names that describe the session, not the role (e.g., `mercury-01-upgrade`, not `upgrade-coordinator-1`). If `scion start` errors, surface the exact error to the human via `sciontool status ask_user` rather than retrying with a different mechanism.
 
-4. **Brief each specialist.** Send an initial message via `scion message <agent-name> "<brief>"`. The brief must include: the in-scope cluster (from `MEMORY.md`), the namespaces in scope, the specific question or action requested, and a reminder that any write-path action requires human approval via `ask_user`.
+4. **Brief each specialist via the `scion` CLI.** Send an initial message by running **`scion message <agent-name> "<brief>"`** as a shell command (again, not any built-in messaging tool). The brief must include: the in-scope cluster (from `MEMORY.md`), the namespaces in scope, the specific question or action requested, and a reminder that any write-path action requires human approval via `ask_user`.
 
 5. **Wait idle.** After spawning and briefing, mark yourself blocked: `sciontool status blocked "Waiting for <agents> to report back"`. Do not poll; the `--notify` mechanism will wake you.
 
