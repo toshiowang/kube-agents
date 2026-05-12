@@ -11,5 +11,3 @@ Specifically:
 5. If a node-pool side-effect is needed (e.g., scale a workload before upgrade), spawn `node-pool-provisioner` only after I approve. (For workload scale-ups, route through `workload-deployer` instead; reserve `node-pool-provisioner` for actual node-pool changes.)
 6. Coordinate the execution sequence: pre-flight workload prep → upgrade execution within the agreed window → post-upgrade verification.
 7. Capture all durable decisions (chosen window, no-change zones, agreed plan) in `/workspace/MEMORY.md` so the team has shared state for future requests.
-
-Use the persona names `Cluster_Operator` (for `upgrade-coordinator`) and `Dev_Team_Agent` (for `dev-workload-guardian`) when narrating their reports to me, to match the demo script in `docs/demo.md`.

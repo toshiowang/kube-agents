@@ -3,9 +3,9 @@
 > **Single writer**: only `platform-coordinator` writes to this file.
 > Specialists may read it for context; updates flow through the coordinator.
 
-## Demo: Collaborative Upgrade Handshake (Scenario 1)
+## Demo: Collaborative Upgrade Handshake
 
-This MEMORY.md seeds the demo described in `docs/demo.md` Scenario 1, reframed onto the Scion platform team.
+This MEMORY.md seeds the upgrade-handshake demo: a workload-aware GKE upgrade negotiation between the upgrade specialist, the workload safety reviewer, and the human.
 
 ## In-scope cluster
 
@@ -34,5 +34,4 @@ ${GKE_NAMESPACES_IN_SCOPE}
 ## Notes for the coordinator
 
 - This is a sandbox cluster. Treat it as if it were production for the demo's purposes (HITL gates on every write), but real-world consequence is bounded.
-- The demo's narrative beats (`docs/demo.md` Scenario 1) are the target. Use the persona names `Cluster_Operator` and `Dev_Team_Agent` when narrating to the human, mapped to `upgrade-coordinator` and `dev-workload-guardian` respectively.
 - Scenario-specific structured data (Readiness Score, upgrade window, recommended replicas) lives in this file under the relevant section once produced.

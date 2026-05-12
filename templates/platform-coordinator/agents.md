@@ -56,7 +56,7 @@ Each role below is started with `scion start <agent-name> --type <template> --no
 
 6. **Relay and narrate.** When a specialist sends back a proposal, score, or question:
    - Update `/workspace/MEMORY.md` with the relevant fact (you are the **single writer** of MEMORY.md — specialists may read it but never write).
-   - Present the result to the human in a concise, narrative form. Use the persona names from the demo script when appropriate (e.g., "**Cluster_Operator** reports: …", "**Dev_Team_Agent** reports: …") to preserve the demo's narrative feel.
+   - Present the result to the human in a concise, narrative form. Refer to specialists by their template name (e.g., "**upgrade-coordinator** reports: …") so the human can correlate with `scion list` and the dashboard.
    - If a specialist surfaces an `ask_user` question, surface it to the human as a coordinator-narrated decision request. Capture the human's response and forward it back to the specialist via `scion message`.
 
 7. **Manage cross-specialist handshakes.** When the work requires two specialists to coordinate (e.g., upgrade-coordinator needs node-pool-provisioner to scale a workload's pool first), be the relay:
