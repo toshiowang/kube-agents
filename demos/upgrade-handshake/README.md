@@ -79,12 +79,12 @@ kubectl create deployment "$PRIMARY_WORKLOAD" \
 ## Resetting between runs
 
 ```sh
-rm -f MEMORY.md opening-prompt.rendered.md
-scion delete coordinator    # plus any spawned specialists
-# rerun bootstrap.sh
+./bootstrap.sh --cleanup       # cleanup + re-bootstrap in one step
 ```
 
-The coordinator's worktree state (under `~/.scion_worktrees/<project>/coordinator/`) is removed by `scion delete`.
+`--cleanup` deletes the coordinator agent (in this grove and the kube-agents grove if accidentally created there), removes `.scion/`, the rendered files, and any stray `.scion/` at the repo root, then proceeds with the normal bootstrap. If env vars are not set, `--cleanup` runs the teardown only and exits cleanly.
+
+The coordinator's worktree state (under `~/.scion_worktrees/<project>/coordinator/`) is removed when `scion delete` runs.
 
 ## Mapping to docs/demo.md
 

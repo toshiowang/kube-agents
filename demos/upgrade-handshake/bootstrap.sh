@@ -2,9 +2,87 @@
 # Bootstrap the upgrade-handshake demo project.
 # Idempotent: rerunning re-renders MEMORY.md and opening-prompt.md
 # from the current env vars and re-symlinks templates.
+#
+# Flags:
+#   --cleanup   Delete previously-bootstrapped state before running:
+#               stop+delete the coordinator agent (in this grove and
+#               the kube-agents grove if accidentally created there),
+#               remove .scion/, the rendered MEMORY.md and opening-
+#               prompt.rendered.md, and any stray .scion/ at the repo
+#               root. Then continues with the normal bootstrap (which
+#               will exit on missing env vars). Run with --cleanup
+#               alone (no env vars set) to do cleanup-only.
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Bootstrap the upgrade-handshake demo project.
+
+Usage: ./bootstrap.sh [--cleanup] [--help]
+
+Flags:
+  --cleanup   Delete previously-bootstrapped state before running.
+              Stops + deletes the coordinator agent (in this grove
+              and the kube-agents grove if it was accidentally created
+              there); removes .scion/, the rendered MEMORY.md and
+              opening-prompt.rendered.md, and any stray .scion/ at the
+              repo root; removes orphan docker containers from prior
+              runs. Then continues with the normal bootstrap. If env
+              vars are not set, --cleanup runs cleanup and exits
+              cleanly (cleanup-only mode).
+  -h, --help  Show this help.
+
+Required env vars (for full bootstrap, not for --cleanup-only):
+  GKE_PROJECT, GKE_LOCATION, GKE_CLUSTER, GKE_NAMESPACES_IN_SCOPE,
+  PROD_NAMESPACE, PRIMARY_WORKLOAD, GKE_TARGET_VERSION
+EOF
+}
+
+CLEANUP=false
+for arg in "$@"; do
+  case "$arg" in
+    --cleanup) CLEANUP=true ;;
+    -h|--help) usage; exit 0 ;;
+    *)
+      echo "Unknown argument: $arg (use --help)" >&2
+      exit 1
+      ;;
+  esac
+done
+
+DEMO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$DEMO_DIR/../.." && pwd)"
+TEMPLATES_DIR="$REPO_ROOT/templates"
+
+echo "[bootstrap] demo dir:   $DEMO_DIR"
+echo "[bootstrap] repo root:  $REPO_ROOT"
+
+# --- Optional cleanup of previous bootstrap state ----------------------
+if [ "$CLEANUP" = "true" ]; then
+  echo "[bootstrap] --cleanup requested; tearing down previous env..."
+  # Delete agent records (best-effort; failures suppressed since the
+  # Hub may be down or the agent may not exist). We try both the demo
+  # grove and the repo-root grove because past invocations have
+  # accidentally created agents in the kube-agents grove.
+  ( cd "$DEMO_DIR"  && scion delete coordinator --yes >/dev/null 2>&1 ) || true
+  ( cd "$REPO_ROOT" && scion delete coordinator --yes >/dev/null 2>&1 ) || true
+  # On-disk state in the demo project
+  rm -rf "$DEMO_DIR/.scion"
+  rm -f  "$DEMO_DIR/MEMORY.md"
+  rm -f  "$DEMO_DIR/opening-prompt.rendered.md"
+  # Stray repo-root .scion (left by accidental scion init from the wrong cwd)
+  rm -rf "$REPO_ROOT/.scion"
+  # Orphan docker containers from prior runs (project-name-prefixed)
+  docker ps -aq --filter "name=upgrade-handshake--" \
+                --filter "name=kube-agents--" 2>/dev/null \
+    | xargs -r docker rm -f >/dev/null 2>&1 || true
+  echo "[bootstrap] cleanup complete"
+fi
+
+# --- Required env vars (skipped only by cleanup-only invocation that
+#     followed the early exit; if we reach here with cleanup-only we
+#     simply exit clean). ----------------------------------------------
 REQUIRED=(GKE_PROJECT GKE_LOCATION GKE_CLUSTER GKE_NAMESPACES_IN_SCOPE PROD_NAMESPACE PRIMARY_WORKLOAD GKE_TARGET_VERSION)
 missing=()
 for v in "${REQUIRED[@]}"; do
@@ -14,6 +92,10 @@ for v in "${REQUIRED[@]}"; do
 done
 
 if [ ${#missing[@]} -gt 0 ]; then
+  if [ "$CLEANUP" = "true" ]; then
+    echo "[bootstrap] env vars not set; cleanup-only mode, exiting cleanly."
+    exit 0
+  fi
   cat >&2 <<EOF
 Error: required environment variables not set: ${missing[*]}
 
@@ -29,13 +111,6 @@ Set them before running, e.g.:
 EOF
   exit 1
 fi
-
-DEMO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$DEMO_DIR/../.." && pwd)"
-TEMPLATES_DIR="$REPO_ROOT/templates"
-
-echo "[bootstrap] demo dir:   $DEMO_DIR"
-echo "[bootstrap] repo root:  $REPO_ROOT"
 
 # Safety check: a stray .scion/ at the repo root will be picked up by
 # Scion's project resolution ahead of the demo's own .scion/, so any
