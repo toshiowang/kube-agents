@@ -8,7 +8,7 @@ These templates are intentionally **pure roles** — no cluster IDs, no namespac
 
 | Template | MCP wiring | Skills | Blast radius |
 |---|---|---|---|
-| `platform-coordinator` | none — pure router | scion (Scion's own skill — teaches the orchestrator how to use `scion start`/`message`/`list` and steers it away from harness-built-in agent-invocation tools) | tiny: never touches GKE |
+| `platform-coordinator` | none — pure router | none | tiny: never touches GKE |
 | `upgrade-coordinator` | local gke-mcp HTTP (host:9080) | gke-cluster-lifecycle, gke-reliability | medium: cluster + node-pool upgrades, HITL gate before writes |
 | `dev-workload-guardian` | local gke-mcp HTTP (host:9080) + remote read-only (host:8082) | gke-observability, gke-reliability, gke-workload-security | tiny: read-only by skill discipline |
 | `node-pool-provisioner` | remote MCP full (host:8081) | gke-cluster-creator, gke-workload-scaling | high: HITL strict, never autonomous |

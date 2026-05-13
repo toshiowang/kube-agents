@@ -34,4 +34,3 @@ This is intentionally manual for phase 1 — automate when the cadence justifies
 | gke-reliability | OpenClaw operator, devteam; Scion upgrade-coordinator, dev-workload-guardian |
 | gke-workload-scaling | OpenClaw operator, devteam; Scion node-pool-provisioner, workload-deployer |
 | gke-workload-security | OpenClaw operator, devteam; Scion dev-workload-guardian |
-| scion | Scion platform-coordinator (vendored from `GoogleCloudPlatform/scion/skills/scion/`; teaches the agent how to use the `scion` CLI to spawn, message, and inspect peer agents — required for the orchestrator pattern) |

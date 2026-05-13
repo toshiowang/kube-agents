@@ -16,3 +16,7 @@ demos/*/.scion/templates/
 # OS / editor
 .DS_Store
 *.swp
+
+# Local secrets and per-developer files (must never be committed)
+token
+*.pat
