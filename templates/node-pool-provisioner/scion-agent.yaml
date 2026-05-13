@@ -12,4 +12,4 @@ env:
 mcp_servers:
   gke-remote-mcp:
     transport: streamable-http
-    url: "http://host.docker.internal:8081/mcp"
+    url: "http://127.0.0.1:8081/mcp"
