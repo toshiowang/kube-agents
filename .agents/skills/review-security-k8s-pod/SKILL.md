@@ -12,8 +12,8 @@ Review Pod configurations (`PodSecurityContext`, `SecurityContext`) for workload
 - **Privilege Escalation**: Require `allowPrivilegeEscalation: false`.
 
 ## 2. Capabilities & Isolation
-- **Root Execution**: Require `runAsNonRoot: true`. Flag `runAsUser: 0`.
-- **Linux Capabilities**: Require `capabilities.drop: ["ALL"]`. Flag permissive additions (`CAP_SYS_ADMIN`, `CAP_NET_ADMIN`).
+- **Root Execution**: Require `runAsNonRoot: true`. Flag `runAsUser: 0` or `runAsGroup: 0`.
+- **Linux Capabilities**: Require `capabilities.drop: ["ALL"]`. Flag highly privileged additions (e.g., `CAP_SYS_ADMIN`, `CAP_NET_ADMIN`, `CAP_NET_RAW`, `CAP_SYS_MODULE`, `CAP_SYS_PTRACE`, `CAP_DAC_OVERRIDE`).
 - **Filesystem**: Require `readOnlyRootFilesystem: true` where applicable.
 - **Seccomp**: Require seccomp profiles (e.g., `seccompProfile.type: RuntimeDefault`).
 
