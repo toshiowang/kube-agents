@@ -9,6 +9,7 @@ Review Pod configurations (`PodSecurityContext`, `SecurityContext`) for workload
 ## 1. Privilege Escalation & Host Breakout
 - **Privileged**: Flag `privileged: true`.
 - **Host Namespaces**: Flag `hostNetwork: true`, `hostPID: true`, `hostIPC: true`.
+- **Host Volumes**: Flag any use of `hostPath` volumes (direct node filesystem access).
 - **Privilege Escalation**: Require `allowPrivilegeEscalation: false`.
 
 ## 2. Capabilities & Isolation
