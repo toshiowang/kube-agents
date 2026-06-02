@@ -18,7 +18,7 @@ This procedure outlines the steps for conducting the hourly container image vuln
 2. **Enumerate Running Images**:
    - Query all Pods in all namespaces to extract the list of unique container images:
      ```bash
-     kubectl get pods --all-namespaces -o jsonpath="{.items[*].spec.containers[*].image}"
+     kubectl get pods --all-namespaces -o jsonpath="{.items[*].spec.containers[*].image}" | tr ' ' '\\n' | sort -u
      ```
 
 3. **Check Vulnerability Status**:
