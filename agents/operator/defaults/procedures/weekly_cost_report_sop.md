@@ -21,4 +21,4 @@ This procedure outlines the steps for generating the weekly cost optimization re
 
 4. **Compile and Save Report**:
    - Summarize total cost and top spenders in a clean markdown report.
-   - Write the detailed report to `memory/reports/cost-report-$(date +%Y%m%d).md`.
+   - Write the detailed report to `memory/reports/cost-report-YYYYMMDD.md` (replacing YYYYMMDD with the current date).
