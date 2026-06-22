@@ -16,6 +16,11 @@ mcp_servers:
     args:
       - "/opt/mcp-remote/dist/proxy.js"
       - "https://developerknowledge.googleapis.com/mcp"
+  worker_control:
+    command: "/opt/hermes/.venv/bin/python3"
+    args: ["/opt/data/scripts/worker_mcp_server.py"]
+    connect_timeout: 120
+    timeout: 1800
 
 # Explicitly list platform_toolsets to bypass the upstream Hermes CLI/API loader prefix mapping bug.
 # platform_toolsets is a reserved framework key in Hermes. Other reserved top-level keys
@@ -28,10 +33,12 @@ platform_toolsets:
     - hermes-cli
     - mcp-agent_common
     - mcp-developer_knowledge
+    - mcp-worker_control
   api_server:
     - hermes-api-server
     - mcp-agent_common
     - mcp-developer_knowledge
+    - mcp-worker_control
 
 # Approval settings. Allow dangerous commands to execute autonomously in cron watchdogs.
 approvals:
