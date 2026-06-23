@@ -113,6 +113,11 @@ func (r *DevTeamAgentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
+	// Reconcile Target Namespace Read-Only RBAC
+	if err := r.reconcileTargetNamespaceRBAC(ctx, instance); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	// 8. Update status phase to Ready
 	return ctrl.Result{}, r.updateStatusReady(ctx, instance)
 }
@@ -201,6 +206,24 @@ func (r *DevTeamAgentReconciler) reconcileService(ctx context.Context, agent *ag
 		return err
 	}
 	return r.Patch(ctx, svc, client.Apply, client.ForceOwnership, client.FieldOwner("devteamagent-controller"))
+}
+
+func (r *DevTeamAgentReconciler) reconcileTargetNamespaceRBAC(ctx context.Context, agent *agentv1alpha1.DevTeamAgent) error {
+	targetNamespace := ""
+	if agent.Spec.Harness != nil && agent.Spec.Harness.Namespace != "" {
+		targetNamespace = agent.Spec.Harness.Namespace
+	}
+	if targetNamespace == "" || targetNamespace == agent.Namespace {
+		return nil
+	}
+
+	role := buildDevTeamTargetRole(agent, targetNamespace)
+	if err := r.Patch(ctx, role, client.Apply, client.ForceOwnership, client.FieldOwner("devteamagent-controller")); err != nil {
+		return err
+	}
+
+	binding := buildDevTeamTargetRoleBinding(agent, targetNamespace)
+	return r.Patch(ctx, binding, client.Apply, client.ForceOwnership, client.FieldOwner("devteamagent-controller"))
 }
 
 func (r *DevTeamAgentReconciler) updateStatusReady(ctx context.Context, agent *agentv1alpha1.DevTeamAgent) error {

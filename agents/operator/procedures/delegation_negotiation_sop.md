@@ -19,11 +19,13 @@ This procedure eliminates middleman routing hops and consolidates cross-boundary
 
 ## 2. Direct Peer-to-Peer 2-Step Handshake Protocol
 
-All inter-agent delegation negotiation occurs directly between peer workloads formatted as clear Markdown request blocks. Do NOT route negotiation turns through the Platform Agent.
+All inter-agent delegation negotiation occurs directly between peer workloads formatted as clear Markdown request blocks. To dispatch a negotiation turn to a peer persistent agent pod, you MUST execute the `delegate_workload` custom tool. Do NOT route negotiation turns through the Platform Agent.
 
 ### 2.1 Step 1: Direct Delegation Request (Operator -> DevTeam)
 
-Before executing any infrastructure operation impacting a workload namespace, Operator dispatches a concise request directly to the target `@devteam`:
+Whenever Operator receives an operational query concerning cluster headroom, capacity tuning, cost optimization, cluster upgrades, or surge preparation involving application namespaces (e.g., cluster upgrade risk assessment, daily payment surge), Operator automatically coordinates with all target workload agents before finishing its assessment.
+
+Operator executes `delegate_workload(target_agent="devteam-payment", query="[Delegation Request] " + <operation_details_and_specifications>)` (or targeting `"devteam-<namespace>"`). Do not ask questions; dispatch the custom tool immediately:
 
 ```markdown
 **[Delegation Request]**

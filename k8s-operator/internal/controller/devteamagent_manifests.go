@@ -22,6 +22,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -100,9 +101,9 @@ func renderDevTeamSettingsMD(agent *agentv1alpha1.DevTeamAgent) string {
 		namespace = agent.Spec.Harness.Namespace
 	}
 	return fmt.Sprintf(`# GKE Scope Configuration
-- **Cluster Name:** %s
-- **Cluster Location:** %s
-- **Namespace:** %s
+CLUSTER_NAME="%s"
+CLUSTER_LOCATION="%s"
+NAMESPACE="%s"
 `, clusterName, location, namespace)
 }
 
@@ -507,3 +508,66 @@ func buildDevTeamService(agent *agentv1alpha1.DevTeamAgent) *corev1.Service {
 		},
 	}
 }
+
+// buildDevTeamTargetRole generates the read-only Role manifest in the target developer namespace
+func buildDevTeamTargetRole(agent *agentv1alpha1.DevTeamAgent, targetNamespace string) *rbacv1.Role {
+	return &rbacv1.Role{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "rbac.authorization.k8s.io/v1",
+			Kind:       "Role",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      agent.Name + "-read-role",
+			Namespace: targetNamespace,
+		},
+		Rules: []rbacv1.PolicyRule{
+			{
+				APIGroups: []string{"", "apps", "autoscaling", "networking.k8s.io", "policy"},
+				Resources: []string{
+					"deployments",
+					"services",
+					"configmaps",
+					"pods",
+					"pods/log",
+					"events",
+					"endpoints",
+					"horizontalpodautoscalers",
+					"networkpolicies",
+					"poddisruptionbudgets",
+				},
+				Verbs: []string{"get", "list", "watch"},
+			},
+		},
+	}
+}
+
+// buildDevTeamTargetRoleBinding generates the RoleBinding manifest in the target developer namespace
+func buildDevTeamTargetRoleBinding(agent *agentv1alpha1.DevTeamAgent, targetNamespace string) *rbacv1.RoleBinding {
+	saName := "kubeagents-devteam-agent"
+	if agent.Spec.Security != nil && agent.Spec.Security.ServiceAccountName != "" {
+		saName = agent.Spec.Security.ServiceAccountName
+	}
+	return &rbacv1.RoleBinding{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "rbac.authorization.k8s.io/v1",
+			Kind:       "RoleBinding",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      agent.Name + "-read-rolebinding",
+			Namespace: targetNamespace,
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Name:      saName,
+				Namespace: agent.Namespace,
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "Role",
+			Name:     agent.Name + "-read-role",
+		},
+	}
+}
+

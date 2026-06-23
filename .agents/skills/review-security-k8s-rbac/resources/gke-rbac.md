@@ -11,7 +11,7 @@ document assumes that you know about the following:
 
 RBAC is a core security feature in Kubernetes that lets you create fine-grained
 permissions to manage what actions users and workloads can perform on resources
-in your clusters. You create RBAC *roles* and *bind* those roles to *subjects*,
+in your clusters. You create RBAC _roles_ and _bind_ those roles to _subjects_,
 which are authenticated users such as service accounts or Google Groups.
 
 This document is for Security specialists and Operators who plan and
@@ -93,13 +93,13 @@ recommend that you avoid interacting with these roles, users, and groups unless
 you've carefully evaluated them, because interacting with these resources can have
 unintended consequences to your cluster's security posture.
 
-| Name | Type | Description |
-|---|---|---|
-| `cluster-admin` | ClusterRole | Grants a subject permission to do anything on any resource in the cluster. |
-| `system:anonymous` | User | Kubernetes assigns this user to API server requests that have no authentication information provided. Binding a role to this user gives any unauthenticated user the permissions granted by that role. |
-| `system:unauthenticated` | Group | Kubernetes assigns this group to API server requests that have no authentication information provided. Binding a role to this group gives any unauthenticated user the permissions granted by that role. |
-| `system:authenticated` | Group | GKE assigns this group to API server requests made by any user who is signed in with a Google Account, including all Gmail accounts. In practice, this isn't meaningfully different from `system:unauthenticated` because anyone can create a Google Account. Binding a role to this group gives any user with a Google Account, including all Gmail accounts, the permissions granted by that role. |
-| `system:masters` | Group | Kubernetes assigns the `cluster-admin` ClusterRole to this group by default to enable system functionality. Adding your own subjects to this group gives those subjects access to do anything to any resource in your cluster. |
+| Name                     | Type        | Description                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cluster-admin`          | ClusterRole | Grants a subject permission to do anything on any resource in the cluster.                                                                                                                                                                                                                                                                                                                           |
+| `system:anonymous`       | User        | Kubernetes assigns this user to API server requests that have no authentication information provided. Binding a role to this user gives any unauthenticated user the permissions granted by that role.                                                                                                                                                                                               |
+| `system:unauthenticated` | Group       | Kubernetes assigns this group to API server requests that have no authentication information provided. Binding a role to this group gives any unauthenticated user the permissions granted by that role.                                                                                                                                                                                             |
+| `system:authenticated`   | Group       | GKE assigns this group to API server requests made by any user who is signed in with a Google Account, including all Gmail accounts. In practice, this isn't meaningfully different from `system:unauthenticated` because anyone can create a Google Account. Binding a role to this group gives any user with a Google Account, including all Gmail accounts, the permissions granted by that role. |
+| `system:masters`         | Group       | Kubernetes assigns the `cluster-admin` ClusterRole to this group by default to enable system functionality. Adding your own subjects to this group gives those subjects access to do anything to any resource in your cluster.                                                                                                                                                                       |
 
 **If possible, avoid creating bindings that involve the default users, roles,
 and groups.** This can have unintended consequences to your cluster's security
@@ -152,123 +152,126 @@ those resources.
 
 ##### ClusterRoleBindings
 
-1. List the names of any ClusterRoleBindings with the subject
-   `system:anonymous`, `system:unauthenticated`, or `system:authenticated`:
+1.  List the names of any ClusterRoleBindings with the subject
+    `system:anonymous`, `system:unauthenticated`, or `system:authenticated`:
 
-       kubectl get clusterrolebindings -o json \
-         | jq -r '["Name"], ["---"], (.items[] | select((.subjects | length) > 0) | select(any(.subjects[]; .name == "system:anonymous" or .name == "system:unauthenticated" or .name == "system:authenticated")) | [.metadata.namespace, .metadata.name]) | @tsv'
+        kubectl get clusterrolebindings -o json \
+          | jq -r '["Name"], ["---"], (.items[] | select((.subjects | length) > 0) | select(any(.subjects[]; .name == "system:anonymous" or .name == "system:unauthenticated" or .name == "system:authenticated")) | [.metadata.namespace, .metadata.name]) | @tsv'
 
-   The output should list only the following ClusterRoleBindings:
+    The output should list only the following ClusterRoleBindings:
 
-       Name
-       ---
-       "system:basic-user"
-       "system:discovery"
-       "system:public-info-viewer"
+        Name
+        ---
+        "system:basic-user"
+        "system:discovery"
+        "system:public-info-viewer"
 
-   If the output contains additional non-default bindings, do the following
-   for *each additional binding*. If your output doesn't contain non-default
-   bindings, skip the following steps.
+    If the output contains additional non-default bindings, do the following
+    for _each additional binding_. If your output doesn't contain non-default
+    bindings, skip the following steps.
 
-   > [!CAUTION]
-   > **Caution:** Don't delete the default system ClusterRoleBindings listed in the previous output. For details, see [Don't delete system RBAC roles and bindings](https://docs.cloud.google.com/kubernetes-engine/docs/best-practices/rbac#dont-delete-system-rbac).
+    > [!CAUTION]
+    > **Caution:** Don't delete the default system ClusterRoleBindings listed in the previous output. For details, see [Don't delete system RBAC roles and bindings](https://docs.cloud.google.com/kubernetes-engine/docs/best-practices/rbac#dont-delete-system-rbac).
 
-2. List the permissions of the role associated with the binding:
+2.  List the permissions of the role associated with the binding:
 
-       kubectl get clusterrolebinding CLUSTER_ROLE_BINDING_NAME -o json \
-           | jq ' .roleRef.name +" " + .roleRef.kind' \
-           | sed -e 's/"//g' \
-           | xargs -l bash -c 'kubectl get $1 $0 -o yaml'
+        kubectl get clusterrolebinding CLUSTER_ROLE_BINDING_NAME -o json \
+            | jq ' .roleRef.name +" " + .roleRef.kind' \
+            | sed -e 's/"//g' \
+            | xargs -l bash -c 'kubectl get $1 $0 -o yaml'
 
-   Replace `CLUSTER_ROLE_BINDING_NAME` with the name of
-   the non-default ClusterRoleBinding.
+    Replace `CLUSTER_ROLE_BINDING_NAME` with the name of
+    the non-default ClusterRoleBinding.
 
-   The output is similar to the following:
+    The output is similar to the following:
 
-       apiVersion: rbac.authorization.k8s.io/v1
-       kind: ClusterRole
-       metadata:
-       ...
-       rules:
-       - apiGroups:
-         - ""
-         resources:
-         - secrets
-         verbs:
-         - get
-         - watch
-         - list
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRole
+        metadata:
+        ...
+        rules:
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - get
+          - watch
+          - list
 
-   If you determine that the permissions in the output are safe to grant to the
-   default users or groups, no further action is required. If you determine
-   that the permissions granted by the binding are unsafe, proceed to the next
-   step.
-3. Delete an unsafe binding from your cluster:
+    If you determine that the permissions in the output are safe to grant to the
+    default users or groups, no further action is required. If you determine
+    that the permissions granted by the binding are unsafe, proceed to the next
+    step.
 
-       kubectl delete clusterrolebinding CLUSTER_ROLE_BINDING_NAME
+3.  Delete an unsafe binding from your cluster:
 
-   Replace `CLUSTER_ROLE_BINDING_NAME` with the name of
-   the ClusterRoleBinding to delete.
+        kubectl delete clusterrolebinding CLUSTER_ROLE_BINDING_NAME
+
+    Replace `CLUSTER_ROLE_BINDING_NAME` with the name of
+    the ClusterRoleBinding to delete.
 
 ##### RoleBindings
 
-1. List the namespace and name of any RoleBindings with the subject
-   `system:anonymous`, `system:unauthenticated`, or `system:authenticated`:
+1.  List the namespace and name of any RoleBindings with the subject
+    `system:anonymous`, `system:unauthenticated`, or `system:authenticated`:
 
-       kubectl get rolebindings -A -o json \
-         | jq -r '["Namespace", "Name"], ["---", "---"], (.items[] | select((.subjects | length) > 0) | select(any(.subjects[]; .name == "system:anonymous" or .name == "system:unauthenticated" or .name == "system:authenticated")) | [.metadata.namespace, .metadata.name]) | @tsv'
+        kubectl get rolebindings -A -o json \
+          | jq -r '["Namespace", "Name"], ["---", "---"], (.items[] | select((.subjects | length) > 0) | select(any(.subjects[]; .name == "system:anonymous" or .name == "system:unauthenticated" or .name == "system:authenticated")) | [.metadata.namespace, .metadata.name]) | @tsv'
 
-   If your cluster is configured correctly, the output should be **blank** .
-   If the output contains any non-default bindings, do the following
-   steps for *each additional binding*. If your output is blank, skip the
-   following steps.
+    If your cluster is configured correctly, the output should be **blank** .
+    If the output contains any non-default bindings, do the following
+    steps for _each additional binding_. If your output is blank, skip the
+    following steps.
 
-   If you only know the name of the RoleBinding then you can use the
-   following command to find matching rolebindings across all namespaces:
+    If you only know the name of the RoleBinding then you can use the
+    following command to find matching rolebindings across all namespaces:
 
-       kubectl get rolebindings -A -o json \
-         | jq -r '["Namespace", "Name"], ["---", "---"], (.items[] | select((.subjects | length) > 0) | select(.metadata.name == "ROLE_BINDING_NAME") | [.metadata.namespace, .metadata.name]) | @tsv'
+        kubectl get rolebindings -A -o json \
+          | jq -r '["Namespace", "Name"], ["---", "---"], (.items[] | select((.subjects | length) > 0) | select(.metadata.name == "ROLE_BINDING_NAME") | [.metadata.namespace, .metadata.name]) | @tsv'
 
-   Replace `ROLE_BINDING_NAME` with the name of the
-   non-default RoleBinding.
-2. List the permissions of the Role associated with the binding:
+    Replace `ROLE_BINDING_NAME` with the name of the
+    non-default RoleBinding.
 
-       kubectl get rolebinding ROLE_BINDING_NAME --namespace ROLE_BINDING_NAMESPACE -o json \
-           | jq ' .roleRef.name +" " + .roleRef.kind' \
-           | sed -e 's/"//g' \
-           | xargs -l bash -c 'kubectl get $1 $0 -o yaml --namespace ROLE_BINDING_NAMESPACE'
+2.  List the permissions of the Role associated with the binding:
 
-   Replace the following:
-   - `ROLE_BINDING_NAME`: the name of the non-default RoleBinding.
-   - `ROLE_BINDING_NAMESPACE`: the namespace of the non-default RoleBinding.
+        kubectl get rolebinding ROLE_BINDING_NAME --namespace ROLE_BINDING_NAMESPACE -o json \
+            | jq ' .roleRef.name +" " + .roleRef.kind' \
+            | sed -e 's/"//g' \
+            | xargs -l bash -c 'kubectl get $1 $0 -o yaml --namespace ROLE_BINDING_NAMESPACE'
 
-   The output is similar to the following:
+    Replace the following:
+    - `ROLE_BINDING_NAME`: the name of the non-default RoleBinding.
+    - `ROLE_BINDING_NAMESPACE`: the namespace of the non-default RoleBinding.
 
-       apiVersion: rbac.authorization.k8s.io/v1
-       kind: Role
-       metadata:
-       ...
-       rules:
-       - apiGroups:
-         - ""
-         resources:
-         - secrets
-         verbs:
-         - get
-         - watch
-         - list
+    The output is similar to the following:
 
-   If you determine that the permissions in the output are safe to grant to the
-   default users or groups, no further action is required. If you determine
-   that the permissions granted by the binding are unsafe, proceed to the next
-   step.
-3. Delete an unsafe binding from your cluster:
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: Role
+        metadata:
+        ...
+        rules:
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - get
+          - watch
+          - list
 
-       kubectl delete rolebinding ROLE_BINDING_NAME --namespace ROLE_BINDING_NAMESPACE
+    If you determine that the permissions in the output are safe to grant to the
+    default users or groups, no further action is required. If you determine
+    that the permissions granted by the binding are unsafe, proceed to the next
+    step.
 
-   Replace the following:
-   - `ROLE_BINDING_NAME`: the name of the RoleBinding to delete.
-   - `ROLE_BINDING_NAMESPACE`: the namespace of the RoleBinding to delete.
+3.  Delete an unsafe binding from your cluster:
+
+        kubectl delete rolebinding ROLE_BINDING_NAME --namespace ROLE_BINDING_NAMESPACE
+
+    Replace the following:
+    - `ROLE_BINDING_NAME`: the name of the RoleBinding to delete.
+    - `ROLE_BINDING_NAMESPACE`: the namespace of the RoleBinding to delete.
 
 ### Scope permissions to the namespace level
 
@@ -283,17 +286,17 @@ Grant permissions in as few namespaces as possible.
 
 ### Don't use wildcards
 
-The `*` character is a *wildcard* that applies to everything. Avoid using
+The `*` character is a _wildcard_ that applies to everything. Avoid using
 wildcards in your rules. Explicitly specify API groups, resources, and verbs in
 RBAC rules. For example, specifying `*` in the `verbs` field would grant `get`,
 `list`, `watch`, `patch`, `update`, `deletecollection`, and `delete` permissions
 on the resources. The following table shows examples of avoiding wildcards in
 your rules:
 
-| Recommended | Not recommended |
-|---|---|
-| ```yaml - rules: apiGroups: ["apps","extensions"] resources: ["deployments"] verbs: ["get","list","watch"] ``` Grants `get`, `list`, and `watch` verbs specifically to the `apps` and `extensions` API groups. | ```yaml - rules: apiGroups: ["*"] resources: ["deployments"] verbs: ["get","list","watch"] ``` Grants the verbs to `deployments` in any API group. |
-| ```yaml - rules: apiGroups: ["apps", "extensions"] resources: ["deployments"] verbs: ["get", "list", "watch"] ``` Grants only `get`, `list`, and `watch` verbs to deployments in the `apps` and `extensions` API groups. | ```yaml - rules: apiGroups: ["apps", "extensions"] resources: ["deployments"] verbs: ["*"] ``` Grants all verbs, including `patch` or `delete`. |
+| Recommended                                                                                                                                                                                                          | Not recommended                                                                                                                                |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `yaml - rules: apiGroups: ["apps","extensions"] resources: ["deployments"] verbs: ["get","list","watch"] ` Grants `get`, `list`, and `watch` verbs specifically to the `apps` and `extensions` API groups.           | `yaml - rules: apiGroups: ["*"] resources: ["deployments"] verbs: ["get","list","watch"] ` Grants the verbs to `deployments` in any API group. |
+| `yaml - rules: apiGroups: ["apps", "extensions"] resources: ["deployments"] verbs: ["get", "list", "watch"] ` Grants only `get`, `list`, and `watch` verbs to deployments in the `apps` and `extensions` API groups. | `yaml - rules: apiGroups: ["apps", "extensions"] resources: ["deployments"] verbs: ["*"] ` Grants all verbs, including `patch` or `delete`.    |
 
 ### Use separate rules to grant least-privilege access to specific resources
 
@@ -320,10 +323,10 @@ rule, because the workload needs the same verbs on both resources.
 In the following table, both rule designs work, but the split rules more
 granularly restrict resource access based on your needs:
 
-| Recommended | Not recommended |
-|---|---|
-| ```yaml - rules: apiGroups: ["apps"] resources: ["deployments"] verbs: ["get"] - rules: apiGroups: ["apps"] resources: ["daemonsets"] verbs: ["list", "watch"] ``` Grants `get` access for Deployments and `watch` and `list` access for DaemonSets. Subjects can't list Deployments. | ```yaml - rules: apiGroups: ["apps"] resources: ["deployments", "daemonsets"] verbs: ["get","list","watch"] ``` Grants the verbs to both Deployments and DaemonSets. A subject who might not require `list` access on `deployments` objects would still get that access. |
-| ```yaml - rules: apiGroups: ["apps"] resources: ["daemonsets", "deployments"] verbs: ["list", "watch"] ``` Combines two rules because the subject needs the same verbs for both the `daemonsets` and `deployments` resources. | ```yaml - rules: apiGroups: ["apps"] resources: ["daemonsets"] verbs: ["list", "watch"] - rules: apiGroups: ["apps"] resources: ["deployments"] verbs: ["list", "watch"] ``` These split rules would have the same result as the combined rule, but would create unnecessary clutter in your role manifest |
+| Recommended                                                                                                                                                                                                                                                                       | Not recommended                                                                                                                                                                                                                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `yaml - rules: apiGroups: ["apps"] resources: ["deployments"] verbs: ["get"] - rules: apiGroups: ["apps"] resources: ["daemonsets"] verbs: ["list", "watch"] ` Grants `get` access for Deployments and `watch` and `list` access for DaemonSets. Subjects can't list Deployments. | `yaml - rules: apiGroups: ["apps"] resources: ["deployments", "daemonsets"] verbs: ["get","list","watch"] ` Grants the verbs to both Deployments and DaemonSets. A subject who might not require `list` access on `deployments` objects would still get that access.                                   |
+| `yaml - rules: apiGroups: ["apps"] resources: ["daemonsets", "deployments"] verbs: ["list", "watch"] ` Combines two rules because the subject needs the same verbs for both the `daemonsets` and `deployments` resources.                                                         | `yaml - rules: apiGroups: ["apps"] resources: ["daemonsets"] verbs: ["list", "watch"] - rules: apiGroups: ["apps"] resources: ["deployments"] verbs: ["list", "watch"] ` These split rules would have the same result as the combined rule, but would create unnecessary clutter in your role manifest |
 
 ### Restrict access to specific resource instances
 
@@ -336,10 +339,10 @@ whenever possible.
 > [!NOTE]
 > **Note:** You can't use `resourceNames` for `list` and `create` verbs. For example, if you're writing a role that needs to `list` all ConfigMaps in addition to updating the `seccomp-high` ConfigMap, you need to split the rules.
 
-| Recommended | Not recommended |
-|---|---|
-| ```yaml - rules: apiGroups: [""] resources: ["configmaps"] resourceNames: ["seccomp-high"] verbs: ["update"] ``` Restricts the subject to only update the `seccomp-high` ConfigMap. The subject can't update any other ConfigMaps in the namespace. | ```yaml - rules: apiGroups: [""] resources: ["configmaps"] verbs: ["update"] ``` The subject can update the `seccomp-high` ConfigMap and any other ConfigMap in the namespace. |
-| ```yaml - rules: apiGroups: [""] resources: ["configmaps"] verbs: ["list"] - rules: apiGroups: [""] resources: ["configmaps"] resourceNames: ["seccomp-high"] verbs: ["update"] ``` Grants `list` access to all ConfigMaps in the namespace, including `seccomp-high`. Restricts `update` access to only the `seccomp-high` ConfigMap. The rules are split because you can't grant `list` for named resources. | ```yaml - rules: apiGroups: [""] resources: ["configmaps"] verbs: ["update", "list"] ``` Grants `update` access for all ConfigMaps, along with `list` access. |
+| Recommended                                                                                                                                                                                                                                                                                                                                                                                                | Not recommended                                                                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `yaml - rules: apiGroups: [""] resources: ["configmaps"] resourceNames: ["seccomp-high"] verbs: ["update"] ` Restricts the subject to only update the `seccomp-high` ConfigMap. The subject can't update any other ConfigMaps in the namespace.                                                                                                                                                            | `yaml - rules: apiGroups: [""] resources: ["configmaps"] verbs: ["update"] ` The subject can update the `seccomp-high` ConfigMap and any other ConfigMap in the namespace. |
+| `yaml - rules: apiGroups: [""] resources: ["configmaps"] verbs: ["list"] - rules: apiGroups: [""] resources: ["configmaps"] resourceNames: ["seccomp-high"] verbs: ["update"] ` Grants `list` access to all ConfigMaps in the namespace, including `seccomp-high`. Restricts `update` access to only the `seccomp-high` ConfigMap. The rules are split because you can't grant `list` for named resources. | `yaml - rules: apiGroups: [""] resources: ["configmaps"] verbs: ["update", "list"] ` Grants `update` access for all ConfigMaps, along with `list` access.                  |
 
 ### Don't let service accounts modify RBAC resources
 
