@@ -580,6 +580,11 @@ func buildDevTeamTargetRoleBinding(agent *agentv1alpha1.DevTeamAgent, targetName
 				Name:      saName,
 				Namespace: agent.Namespace,
 			},
+			{
+				Kind:     "User",
+				Name:     "kubeagents-devteam-gsa@toshiowang-gkedemos.iam.gserviceaccount.com",
+				APIGroup: "rbac.authorization.k8s.io",
+			},
 		},
 		RoleRef: rbacv1.RoleRef{
 			APIGroup: "rbac.authorization.k8s.io",
