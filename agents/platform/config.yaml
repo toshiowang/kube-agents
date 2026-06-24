@@ -24,9 +24,13 @@ platform_toolsets:
     - mcp-platform_control
     - mcp-developer_knowledge
     - mcp-worker_control
+    - delegate_workload
+    - custom
   api_server:
     - hermes-api-server
     - mcp-agent_common
     - mcp-platform_control
     - mcp-developer_knowledge
     - mcp-worker_control
+    - delegate_workload
+    - custom
