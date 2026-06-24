@@ -21,6 +21,10 @@ rules:
     resources:
       - nodes
     verbs: ["get", "list"]
+  - apiGroups: ["kubeagents.x-k8s.io"]
+    resources:
+      - devteamagents
+    verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
