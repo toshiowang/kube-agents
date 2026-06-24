@@ -78,6 +78,10 @@ func renderConfigYAML(agent *agentv1alpha1.PlatformAgent) string {
 		Plugins struct {
 			Enabled []string `json:"enabled"`
 		} `json:"plugins"`
+		PlatformToolsets struct {
+			CLI       []string `json:"cli"`
+			APIServer []string `json:"api_server"`
+		} `json:"platform_toolsets"`
 	}{}
 
 	cfg.Model.Provider = "custom"
@@ -88,6 +92,15 @@ func renderConfigYAML(agent *agentv1alpha1.PlatformAgent) string {
 	cfg.Terminal.Backend = "local"
 	cfg.Terminal.Cwd = cwd
 	cfg.Plugins.Enabled = []string{"hermes_otel"}
+	toolsets := []string{
+		"hermes-cli",
+		"mcp-agent_common",
+		"mcp-developer_knowledge",
+		"mcp-worker_control",
+		"custom",
+	}
+	cfg.PlatformToolsets.CLI = toolsets
+	cfg.PlatformToolsets.APIServer = toolsets
 
 	if agent.Spec.Integration != nil && agent.Spec.Integration.GoogleChat != nil {
 		gchat := agent.Spec.Integration.GoogleChat

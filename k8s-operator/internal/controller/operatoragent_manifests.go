@@ -70,6 +70,10 @@ func renderOperatorConfigYAML(agent *agentv1alpha1.OperatorAgent) string {
 		Plugins struct {
 			Enabled []string `json:"enabled"`
 		} `json:"plugins"`
+		PlatformToolsets struct {
+			CLI       []string `json:"cli"`
+			APIServer []string `json:"api_server"`
+		} `json:"platform_toolsets"`
 	}{}
 
 	cfg.Model.Provider = "custom"
@@ -80,6 +84,15 @@ func renderOperatorConfigYAML(agent *agentv1alpha1.OperatorAgent) string {
 	cfg.Terminal.Backend = "local"
 	cfg.Terminal.Cwd = cwd
 	cfg.Plugins.Enabled = []string{"hermes_otel"}
+	toolsets := []string{
+		"hermes-cli",
+		"mcp-agent_common",
+		"mcp-developer_knowledge",
+		"mcp-worker_control",
+		"custom",
+	}
+	cfg.PlatformToolsets.CLI = toolsets
+	cfg.PlatformToolsets.APIServer = toolsets
 
 	data, err := yaml.Marshal(cfg)
 	if err != nil {
