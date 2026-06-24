@@ -85,7 +85,7 @@ func renderDevTeamConfigYAML(agent *agentv1alpha1.DevTeamAgent) string {
 	cfg.Model.APIKey = "none"
 	cfg.Terminal.Backend = "local"
 	cfg.Terminal.Cwd = cwd
-	cfg.Plugins.Enabled = []string{"hermes_otel"}
+	cfg.Plugins.Enabled = []string{"hermes_otel", "delegate_workload"}
 	toolsets := []string{
 		"hermes-cli",
 		"mcp-agent_common",
