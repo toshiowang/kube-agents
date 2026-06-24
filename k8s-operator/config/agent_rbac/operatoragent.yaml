@@ -16,10 +16,12 @@ rules:
       - namespaces
       - events
       - persistentvolumes
+      - pods
     verbs: ["get", "list", "watch"]
   - apiGroups: ["metrics.k8s.io"]
     resources:
       - nodes
+      - pods
     verbs: ["get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -30,6 +32,9 @@ subjects:
   - kind: ServiceAccount
     name: kubeagents-operator-agent
     namespace: kubeagents-system
+  - kind: User
+    name: kubeagents-operator-gsa@toshiowang-gkedemos.iam.gserviceaccount.com
+    apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
   name: operator-agent-clusterrole
