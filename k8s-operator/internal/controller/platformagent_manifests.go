@@ -369,6 +369,12 @@ func buildDeployment(agent *agentv1alpha1.PlatformAgent, configHash, fluentBitHa
 									ReadOnly:  true,
 								},
 								{
+									Name:      "fluent-bit-config",
+									MountPath: "/fluent-bit/etc/parsers.conf",
+									SubPath:   "parsers.conf",
+									ReadOnly:  true,
+								},
+								{
 									Name:      "fluent-bit-state",
 									MountPath: "/fluent-bit/state",
 								},
@@ -519,6 +525,14 @@ func buildFluentBitConfigMap(agent *agentv1alpha1.PlatformAgent) *corev1.ConfigM
     Path_Key          file_path
 
 [FILTER]
+    Name          parser
+    Match         agent.logs
+    Key_Name      log
+    Parser        gchat_event
+    Reserve_Data  On
+    Preserve_Key  On
+
+[FILTER]
     Name              record_modifier
     Match             agent.logs
     Record            app agent
@@ -528,6 +542,11 @@ func buildFluentBitConfigMap(agent *agentv1alpha1.PlatformAgent) *corev1.ConfigM
     Name              stdout
     Match             agent.logs
     Format            json_lines
+`,
+			"parsers.conf": `[PARSER]
+    Name    gchat_event
+    Format  regex
+    Regex   User=(?<gchat_user>[^,\s]+),\s*Session=(?<gchat_session>[^,\s]+)
 `,
 		},
 	}
