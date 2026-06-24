@@ -537,6 +537,11 @@ func buildDevTeamTargetRole(agent *agentv1alpha1.DevTeamAgent, targetNamespace s
 				},
 				Verbs: []string{"get", "list", "watch"},
 			},
+			{
+				APIGroups: []string{"metrics.k8s.io"},
+				Resources: []string{"pods"},
+				Verbs:     []string{"get", "list"},
+			},
 		},
 	}
 }
