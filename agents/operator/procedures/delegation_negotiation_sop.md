@@ -21,20 +21,21 @@ This procedure eliminates middleman routing hops and consolidates cross-boundary
 
 All inter-agent delegation negotiation occurs directly between peer workloads formatted as clear Markdown request blocks. To dispatch a negotiation turn to a peer persistent agent pod, you MUST execute the `delegate_workload` custom tool. Do NOT route negotiation turns through the Platform Agent.
 
-### 2.1 Step 1: Direct Delegation Request (Operator -> DevTeam)
+### 2.1 Step 1: Dynamic Fleet Discovery & Universal Delegation Request (Operator -> DevTeam)
 
-Whenever Operator receives an operational query concerning cluster headroom, capacity tuning, cost optimization, cluster upgrades, or surge preparation involving application namespaces (e.g., cluster upgrade risk assessment, daily payment surge), Operator automatically coordinates with all target workload agents before finishing its assessment.
+Whenever Operator receives an operational query concerning cluster headroom, capacity tuning, cost optimization, cluster upgrades, or surge preparation across a multi-tenant cluster, Operator MUST NOT inspect workload resources (`deployments`, `pods`, `PDBs`) directly using `kubectl`.
 
-Operator executes `delegate_workload(target_agent="devteam-payment", query="[Delegation Request] " + <operation_details_and_specifications>)` (or targeting `"devteam-<namespace>"`). Do not ask questions; dispatch the custom tool immediately:
+Operator MUST execute a 2-step discovery and delegation sequence:
+1. **Discover Active Developer Workloads:** Dynamically discover all active registered developer workloads across the cluster by listing `DevTeamAgent` custom resources (`kubectl get devteamagents.kubeagents.x-k8s.io -A`) or listing non-system cluster namespaces (`kubectl get ns`).
+2. **Universal Handoff:** For **every single discovered workload namespace** (e.g., `payment` AND `dice-app`), execute `delegate_workload(target_agent="devteam-<namespace>", query="[Delegation Request] " + <operation_details>)`. You MUST dispatch the custom tool targeting all active DevTeam agents before concluding your assessment:
 
 ```markdown
 **[Delegation Request]**
 
-- **Target:** @devteam-checkout
-- **Operation:** Spike Polling _(or Node Drain, NetPol Enforcement, Quota Expansion)_
-- **Proposed Specs:** `interval=5m` (stagger offset `+2m`) for `1h` _(or drain_window=15m)_
-- **Proposed Resources:** Temporarily boost container CPU request to `2000m`
-- **Reason:** Sustained traffic surge hit 92% CPU _(or CVE-2026-9123 kernel patch)_
+- **Target:** @devteam-payment _(and @devteam-dice-app)_
+- **Operation:** Cluster Version Upgrade _(or Spike Polling, Node Drain, Quota Expansion)_
+- **Proposed Specs:** Rolling upgrade to `v1.36.1-gke.1000`
+- **Reason:** Routine cluster maintenance and security patching
 ```
 
 ### 2.2 Step 2: Direct Confirmation (DevTeam -> Operator)
