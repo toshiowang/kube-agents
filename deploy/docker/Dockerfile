@@ -81,6 +81,9 @@ COPY --chown=hermes:hermes agents/shared/skills/ /opt/hermes/skills/
 COPY --chown=hermes:hermes agents/shared/plugins/ /opt/defaults/plugins/
 COPY --chown=hermes:hermes agents/shared/scripts/ /opt/defaults/scripts/
 
+# Copy custom overrides for core hermes packages
+COPY --chown=hermes:hermes deploy/shared/overrides/google_chat/adapter.py /opt/hermes/plugins/platforms/google_chat/adapter.py
+
 
 
 # 5.8. Copy custom agent startup script
