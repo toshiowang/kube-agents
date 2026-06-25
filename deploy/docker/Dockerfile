@@ -153,6 +153,7 @@ COPY agents/platform/governance/ /opt/defaults/governance/
 COPY agents/platform/SOUL.md /opt/defaults/SOUL.md
 COPY agents/platform/AGENTS.md /opt/defaults/AGENTS.md
 COPY agents/platform/ROUTING.md /opt/defaults/ROUTING.md
+COPY agents/platform/defaults/plugins/ /opt/defaults/plugins/
 
 # Copy platform skills
 COPY agents/platform/skills/ /opt/hermes/skills/
@@ -166,12 +167,16 @@ COPY deploy/kustomize/devteam/deployment.yaml /opt/defaults/templates/devteam/de
 # Copy operator deployment template
 COPY deploy/kustomize/operator/deployment.yaml /opt/defaults/templates/operator/deployment.yaml
 
-# Copy config merge helper script
+# Copy config merge helper script and patch scripts
 COPY deploy/docker/merge_configs.py /tmp/merge_configs.py
+COPY deploy/docker/patch_run_py.py /tmp/patch_run_py.py
+COPY deploy/docker/patch_send_message_tool_py.py /tmp/patch_send_message_tool_py.py
 
-# Dynamically merge config.yamls using helper script
+# Dynamically merge config.yamls and execute patches
 RUN /opt/hermes/.venv/bin/python3 /tmp/merge_configs.py /opt/defaults/config.yaml /tmp/platform-config.yaml && \
-    rm -f /tmp/merge_configs.py /tmp/platform-config.yaml
+    /opt/hermes/.venv/bin/python3 /tmp/patch_run_py.py && \
+    /opt/hermes/.venv/bin/python3 /tmp/patch_send_message_tool_py.py && \
+    rm -f /tmp/merge_configs.py /tmp/platform-config.yaml /tmp/patch_run_py.py /tmp/patch_send_message_tool_py.py
 
 # Normalize ownership and permissions at the end of build
 RUN chown -R hermes:hermes /opt/defaults /opt/hermes/skills && \
