@@ -24,6 +24,7 @@ import (
 	"sync"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/googleapi"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -106,6 +107,11 @@ func (v *PlatformAgentCustomValidator) ValidateUpdate(ctx context.Context, oldOb
 }
 
 func (v *PlatformAgentCustomValidator) validatePlatformAgent(ctx context.Context, platformAgent *agentv1alpha1.PlatformAgent) (admission.Warnings, error) {
+	// Skip validation for terminating agents to avoid deadlocks during deletion (e.g. finalizer removal)
+	if platformAgent.DeletionTimestamp != nil {
+		return nil, nil
+	}
+
 	// 1. Enforce 1 PlatformAgent per project limit (enforced at cluster level on the Hub/Management cluster)
 	if v.Client != nil {
 		var list agentv1alpha1.PlatformAgentList
@@ -213,13 +219,16 @@ func (c *RealGCSClient) GetLock(ctx context.Context, projectID string) (*Platfor
 
 	// 1. Verify GCS lock bucket exists
 	if _, err := c.client.Bucket(bucketName).Attrs(ctx); err != nil {
+		if isGCSNotFound(err) {
+			return nil, nil // Lock bucket does not exist, so no lock exists
+		}
 		return nil, fmt.Errorf("failed to verify GCS lock bucket: %w", err)
 	}
 
 	// 2. Read GCS lock object
 	rc, err := c.client.Bucket(bucketName).Object("platform-agent-lock.json").NewReader(ctx)
 	if err != nil {
-		if errors.Is(err, storage.ErrObjectNotExist) {
+		if isGCSNotFound(err) {
 			return nil, nil // Lock does not exist
 		}
 		return nil, fmt.Errorf("failed to read GCS lock: %w", err)
@@ -231,6 +240,20 @@ func (c *RealGCSClient) GetLock(ctx context.Context, projectID string) (*Platfor
 		return nil, fmt.Errorf("failed to decode GCS lock: %w", err)
 	}
 	return &lock, nil
+}
+
+func isGCSNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, storage.ErrBucketNotExist) || errors.Is(err, storage.ErrObjectNotExist) {
+		return true
+	}
+	var apiErr *googleapi.Error
+	if errors.As(err, &apiErr) && apiErr.Code == 404 {
+		return true
+	}
+	return false
 }
 
 func getProjectID(agent *agentv1alpha1.PlatformAgent) string {
