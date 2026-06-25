@@ -26,13 +26,14 @@ All inter-agent delegation negotiation occurs directly between peer workloads fo
 Whenever Operator receives an operational query concerning cluster headroom, capacity tuning, cost optimization, cluster upgrades, or surge preparation across a multi-tenant cluster, Operator MUST NOT inspect workload resources (`deployments`, `pods`, `PDBs`) directly using `kubectl`.
 
 Operator MUST execute a 2-step discovery and delegation sequence:
+
 1. **Discover Active Developer Workloads:** Dynamically discover all active registered developer workloads across the cluster by listing `DevTeamAgent` custom resources (`kubectl get devteamagents.kubeagents.x-k8s.io -A`) or listing non-system cluster namespaces (`kubectl get ns`).
-2. **Universal Handoff:** For **every single discovered workload namespace** (e.g., `payment` AND `dice-app`), execute `delegate_workload(target_agent="devteam-<namespace>", query="[Delegation Request] " + <operation_details>)`. You MUST dispatch the custom tool targeting all active DevTeam agents before concluding your assessment:
+2. **Universal Handoff:** For **every single discovered workload namespace** (e.g., all active developer namespaces), execute `delegate_workload(target_agent="devteam-<namespace>", query="[Delegation Request] " + <operation_details>)`. You MUST dispatch the custom tool targeting all active DevTeam agents before concluding your assessment:
 
 ```markdown
 **[Delegation Request]**
 
-- **Target:** @devteam-payment _(and @devteam-dice-app)_
+- **Target:** @devteam-<namespace*a> *(and @devteam-<namespace*b>)*
 - **Operation:** Cluster Version Upgrade _(or Spike Polling, Node Drain, Quota Expansion)_
 - **Proposed Specs:** Rolling upgrade to `v1.36.1-gke.1000`
 - **Reason:** Routine cluster maintenance and security patching
