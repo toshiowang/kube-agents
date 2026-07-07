@@ -70,7 +70,7 @@ This procedure outlines the steps for the Platform Agent to autonomously detect 
        - Post a comprehensive closing comment with **verifiable command + raw stdout proof**:
          ```bash
          gh issue comment <number> -R "$GH_REPO" --body "🤖 **Issue Resolved:** A correction has been implemented and verified.
-         
+
          ### Verification Proof & Findings:
          - **Diagnosis:** <detailed root cause>
          - **Resolution:** <what was changed / PR #<pr-num>>
@@ -91,7 +91,7 @@ This procedure outlines the steps for the Platform Agent to autonomously detect 
        - Post the closing comment with **explicit command + raw stdout diagnostic proof**:
          ```bash
          gh issue comment <number> -R "$GH_REPO" --body "🤖 **Closing Issue (No Action Required):** Investigation confirmed that no modifications are necessary.
-         
+
          ### Diagnostic Ground Truth Command & Output Proof:
          \`\`\`text
          $ <EXACT COMMAND EXECUTED, e.g. kubectl get pods -n kube-system -l k8s-app=kube-dns>
