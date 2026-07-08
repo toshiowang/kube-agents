@@ -1,0 +1,10 @@
+per-file:
+  staging-redeploy-agent.yml:
+    approvers:
+    - k8s-operator-owners
+  staging-redeploy-controller.yml:
+    approvers:
+    - k8s-operator-owners
+  staging-redeploy-integrations.yml:
+    approvers:
+    - k8s-operator-owners
