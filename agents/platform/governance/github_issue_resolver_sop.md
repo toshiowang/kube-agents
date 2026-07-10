@@ -69,101 +69,125 @@ This procedure outlines the steps for the Platform Agent to autonomously detect 
    - Once investigation or repair proposals are complete, evaluate the outcome and format your GitHub issue comment strictly according to the executive structured templates below:
      - **Case 1: Fix Available / PR Created / Issue Resolved**
        - Post a comprehensive closing comment using this structured executive format:
-         ```markdown
+
+         ````markdown
          🤖 **Platform Agent Triage Report — Issue Resolved**
 
          > [!NOTE]
          > **Resolution:** <Concise 1-2 sentence executive summary of fix applied / PR created>
 
          ### 📌 Resolution Overview
-         | Attribute | Value |
-         | :--- | :--- |
-         | **Target Resource** | `<resource name>` |
-         | **Resolution Type** | Code/Manifest Correction |
-         | **Pull Request** | `PR #<pr-num>` |
-         | **Final Action** | Resolved (`status:resolved`) |
+
+         | Attribute           | Value                        |
+         | :------------------ | :--------------------------- |
+         | **Target Resource** | `<resource name>`            |
+         | **Resolution Type** | Code/Manifest Correction     |
+         | **Pull Request**    | `PR #<pr-num>`               |
+         | **Final Action**    | Resolved (`status:resolved`) |
 
          ---
 
          ### 🔍 Ground-Truth Verification Proof
+
          ```text
          $ <EXACT TERMINAL COMMAND EXECUTED>
          <PASTE EXACT RAW STDOUT PROVING FIX>
          ```
+         ````
+
          ```
+
+         ```
+
        - Apply label `status:resolved`, remove `status:in-progress`, and close the issue (`gh issue close <number> -R "$GH_REPO" --reason "completed"`).
 
      - **Case 2: No Change Needed / False Alarm / Decommissioned Cluster (Auto-Close)**
        - Post the closing comment using this structured executive format:
-         ```markdown
+
+         ````markdown
          🤖 **Platform Agent Triage Report — Auto-Closed (False Alarm / No Action Required)**
 
          > [!NOTE]
          > **Resolution:** <Concise summary explaining why no action is needed, e.g. decommissioned cluster 404 Not Found>
 
          ### 📌 Verification Summary
-         | Attribute | Value |
-         | :--- | :--- |
-         | **Target Resource** | `<resource name>` |
-         | **Diagnostic State** | `<e.g. NOT_FOUND / HEALTHY>` |
-         | **Final Action** | Auto-Closed (`status:resolved`) |
+
+         | Attribute            | Value                           |
+         | :------------------- | :------------------------------ |
+         | **Target Resource**  | `<resource name>`               |
+         | **Diagnostic State** | `<e.g. NOT_FOUND / HEALTHY>`    |
+         | **Final Action**     | Auto-Closed (`status:resolved`) |
 
          ---
 
          ### 🔍 Ground-Truth Verification Proof
+
          ```text
          $ <EXACT TERMINAL COMMAND EXECUTED, e.g. gcloud container clusters describe ...>
          <PASTE EXACT RAW STDOUT PROVING HEALTHY/DECOMMISSIONED STATE>
          ```
+         ````
 
-         ---
+         ***
 
          ### 💡 Recommendation
+
          <Suggested operational step, e.g. silencing stale monitoring alert policy>
+
          ```
+
+         ```
+
        - Apply label `status:resolved`, remove `status:in-progress`, and close the issue (`gh issue close <number> -R "$GH_REPO" --reason "not planned"`).
 
      - **Case 3: Human Decision or Escalation Required**
        - Post the escalation comment using this structured executive format:
-         ```markdown
+
+         ````markdown
          🚨 **Platform Agent Triage Report — Human Escalation Required**
 
          > [!CAUTION]
          > **Executive Summary:** <Concise 1-2 sentence statement of active infrastructure degradation or user deletion>
 
          ### 📌 Incident Overview
-         | Attribute | Diagnosed Value |
-         | :--- | :--- |
-         | **Target Cluster** | `<cluster_name>` (`<location>`) |
-         | **Affected Namespace** | `<namespace>` |
-         | **Degraded Component** | `<resource_name>` |
-         | **Automated Status** | Escalated (`status:escalation-needed`) |
+
+         | Attribute              | Diagnosed Value                        |
+         | :--------------------- | :------------------------------------- |
+         | **Target Cluster**     | `<cluster_name>` (`<location>`)        |
+         | **Affected Namespace** | `<namespace>`                          |
+         | **Degraded Component** | `<resource_name>`                      |
+         | **Automated Status**   | Escalated (`status:escalation-needed`) |
 
          ---
 
          ### 🔍 Forensic Audit Trace & Diagnostic Evidence
+
          ```yaml
          # Paste structured audit trace or failure stack trace
          Principal: <actor email>
          Timestamp: <timestamp>
-         Method:    <API operation>
-         Client:    <user agent / client>
+         Method: <API operation>
+         Client: <user agent / client>
          ```
+         ````
 
-         ---
+         ***
 
          ### 🛠️ Recommended Remediation
+
          <Actionable remediation steps and verification commands>
          *Note: Adding label `agent:ignore` permanently excludes this issue from automated monitoring.*
          ```
+
        - Apply custom status label `status:escalation-needed`, remove `status:in-progress`, and LEAVE THE ISSUE OPEN for human review.
 
 6. **Log to Memory**:
    - Record the issue triage and final state transition in the daily memory log (`memory/YYYY-MM-DD.md`).
 
 ## MANDATORY ISSUE TURN COMPLETION CHECKLIST (PRE-RESPONSE ENFORCEMENT)
+
 Before you generate any final text output or stop calling tools on any turn where you triaged an issue `#<number>`, you MUST verify that you have completed both of the following CLI commands:
+
 1. **Comment on Issue:** Post your full diagnostic report directly to the issue via `gh issue comment <number> -R "$GH_REPO" -F <file>` (always using a single-quoted heredoc `cat << 'EOF' > /tmp/msg.md` to avoid shell backtick interpolation).
 2. **Transition Issue Label:** Apply either `status:resolved` (if false alarm/repaired) or `status:escalation-needed` (if human review/SRE action needed) (`gh issue edit <number> -R "$GH_REPO" --add-label <label> --remove-label status:in-progress`).
-Do NOT stop tool execution or respond in chat until BOTH commands have successfully executed against the ticket.
-
+   Do NOT stop tool execution or respond in chat until BOTH commands have successfully executed against the ticket.
