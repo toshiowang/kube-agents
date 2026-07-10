@@ -65,7 +65,11 @@ This procedure outlines the steps for the Platform Agent to autonomously detect 
      - Perform direct cluster inspection (`kubectl get`, log queries, telemetry checks). If an operational adjustment or ConfigMap/ResourceQuota fix is required, propose it declaratively via PR.
 
 5. **Evaluate Findings & Transition State**:
-   - **CRITICAL SHELL ESCAPE RULE:** NEVER pass Markdown containing backticks (` `code` `) inside `--body "..."` (Bash executes backticks inside double quotes as subshells). Always use a single-quoted heredoc (`cat << 'EOF' | gh issue comment <num> -F -`) or write to a file (`-F /tmp/msg.md`).
+   - **CRITICAL FILE WRITING & SHELL ESCAPE RULES:**
+     1. **Unique Issue Comment Paths (`/tmp/report_<number>.md`):** NEVER write issue comments to a generic `/tmp/report.md`. Always write to an issue-scoped temporary file (`/tmp/report_<number>.md`, e.g., `/tmp/report_50.md`). This guarantees you never post stale leftover text from a previous issue turn if a file-writing step fails.
+     2. **Sanitize Backgrounding Tokens (`&&` / `&`):** NEVER include naked `&` or `&&` tokens inside terminal commands or heredoc blocks when writing files (`cat << 'EOF' > ...`), as terminal safety guardrails mistake `&` for process backgrounding syntax (`Foreground command uses "&" backgrounding`) and abort execution. Replace literal `&&` or `&` symbols with `;` or `AND` inside markdown text/blocks.
+     3. **Safe Comment Posting:** Always post your formatted report from disk (`gh issue comment <number> -R "$GH_REPO" -F /tmp/report_<number>.md`). NEVER pass inline backticks inside `--body "..."`.
+
    - Once investigation or repair proposals are complete, evaluate the outcome and format your GitHub issue comment strictly according to the executive structured templates below:
      - **Case 1: Fix Available / PR Created / Issue Resolved**
        - Post a comprehensive closing comment using this structured executive format:
