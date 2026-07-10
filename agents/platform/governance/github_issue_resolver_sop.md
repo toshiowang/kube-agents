@@ -190,8 +190,12 @@ This procedure outlines the steps for the Platform Agent to autonomously detect 
 
 ## MANDATORY ISSUE TURN COMPLETION CHECKLIST (PRE-RESPONSE ENFORCEMENT)
 
-Before you generate any final text output or stop calling tools on any turn where you triaged an issue `#<number>`, you MUST verify that you have completed both of the following CLI commands:
+Before you generate any final text output or stop calling tools on any turn where you triaged an issue `#<number>`, you MUST verify that you have completed all three of the following requirements:
 
 1. **Comment on Issue:** Post your full diagnostic report directly to the issue via `gh issue comment <number> -R "$GH_REPO" -F <file>` (always using a single-quoted heredoc `cat << 'EOF' > /tmp/msg.md` to avoid shell backtick interpolation).
 2. **Transition Issue Label:** Apply either `status:resolved` (if false alarm/repaired) or `status:escalation-needed` (if human review/SRE action needed) (`gh issue edit <number> -R "$GH_REPO" --add-label <label> --remove-label status:in-progress`).
-   Do NOT stop tool execution or respond in chat until BOTH commands have successfully executed against the ticket.
+3. **MANDATORY HUMAN ESCALATION CHAT ALERT (SILENT ON FALSE ALARMS):**
+   - **False Alarms / Auto-Closed Issues (`status:resolved` with no human intervention needed):** Your final turn response MUST BE exactly `[SILENT]` to suppress chat noise.
+   - **Human Escalations (`status:escalation-needed`):** Whenever an issue requires human review or intervention, your final turn response MUST NEVER be `[SILENT]`. You MUST output a clean Markdown alert in chat to notify the on-call engineer:
+     `🚨 **Human Escalation Required — Action Needed:**`
+     `- [#<number> (<Title>)](https://github.com/<owner>/<repo>/issues/<number>) — *<1-sentence summary of root cause requiring human intervention>*`
