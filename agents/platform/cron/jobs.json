@@ -120,6 +120,19 @@
       "skills": ["github-issue-resolver"],
       "enabled": true,
       "deliver": "all"
+    },
+    {
+      "id": "daily-fleet-recap",
+      "name": "Daily Fleet Health Digest",
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 0 * * *",
+        "display": "0 0 * * *"
+      },
+      "prompt": "Run the daily-fleet-recap skill to synthesize a formatted Executive Daily Fleet Health Digest.",
+      "skills": ["daily-fleet-recap"],
+      "enabled": true,
+      "deliver": "all"
     }
   ]
 }

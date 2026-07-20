@@ -29,4 +29,4 @@ If rigid allocations are identified:
 1.  **Synthesize YAML patches:** Dynamically generate the recommended K8s YAML patches:
     - Remove static node selectors and replace them with standard `ComputeClass` node tolerations.
     - Generate an `HorizontalPodAutoscaler` (HPA) spec for the rigid deployment.
-2.  **Log in daily report:** Document the list of audited workloads and generated patches in the daily Obtainability Report.
+2.  **Log in daily report:** Document the list of audited workloads and generated patches in the daily Obtainability Report, and append findings to `memory/YYYY-MM-DD.md` under section `## Obtainability Audit`.

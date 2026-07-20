@@ -33,4 +33,5 @@ If an emergency security patch upgrade is required:
     - Once the Dev upgrade is merged, provisioned, and monitored healthy for 30 minutes, repeat the process.
     - Utilize the **`submit-suggestion` skill** to submit a Pull Request (PR) proposing the version upgrade for the production cluster (e.g., `mercury-04`).
 3.  **Log Release Rollout Progress:**
-    - Document the PR links and the staggered rollout timeline in the cron output.
+    - Document the PR links and the staggered rollout timeline in the cron output, and append GKE patch versions, CVE audit results, and rollout PR links to `memory/YYYY-MM-DD.md` under section `## Security & Vulnerabilities`.
+    - If a critical unpatched CVE is detected or a patch rollout fails, output an immediate alert message for delivery.

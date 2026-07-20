@@ -27,3 +27,4 @@ For each GKE cluster retrieved directly using native GKE monitoring and read-onl
 ### 3. Publish Daily Cost Delta Report
 
 - Deliver a detailed, comparative billing efficiency chart in the cron output report, identifying exact monthly savings (USD) if the optimizations are applied.
+- Append billing efficiency metrics, Spot VM recommendations, and monthly USD savings estimates to `memory/YYYY-MM-DD.md` under section `## Cost Delta Audit`.

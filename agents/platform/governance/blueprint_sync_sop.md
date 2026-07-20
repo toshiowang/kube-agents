@@ -28,4 +28,5 @@ If any discrepancies or configuration drifts are identified:
 1.  Generate the corrected GKE cluster Custom Resource YAML file.
 2.  **Do NOT apply the changes directly to the cluster control plane.**
 3.  Exclusively utilize your **`submit-suggestion` skill** to commit the corrected manifest to a GitOps branch and **submit a GitHub Pull Request (PR)** for human review and approval.
-4.  Log a detailed summary of the drift and the submitted PR link in your session output.
+4.  Log a detailed summary of the drift and the submitted PR link in your session output, and append a 1-2 line summary to `memory/YYYY-MM-DD.md` under section `## Blueprint Sync`.
+5.  If an unrecoverable audit error or critical drift occurs, output an immediate alert message for delivery.
