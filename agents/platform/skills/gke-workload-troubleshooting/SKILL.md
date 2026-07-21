@@ -67,7 +67,7 @@ kubectl get deploy/<workload_name> -n <workload_namespace> -o yaml
     kubectl get pod <pod_name> -n <workload_namespace> -o jsonpath='{.status.containerStatuses[*].lastState.terminated}'
     ```
 
-    - **ExitCode: 137 (OOMKilled)**: Memory limit reached. Proceed to **Step 3 (Inspect Logs)** and inspect container startup command to differentiate between an application-level memory leak/loop vs an infrastructure capacity limit mismatch before proposing fixes (Go to **Step 5**).
+    - **ExitCode: 137 (OOMKilled)**: Memory limit reached. Proceed to **Step 3 (Inspect Logs)** and inspect container startup command to differentiate between an application-level memory leak/loop vs an infrastructure capacity limit mismatch, then proceed to **Step 5** to propose fixes.
     - **ExitCode: 1 or other non-zero codes**: The application code crashed. Proceed directly to **Step 3 (Inspect Logs)**.
 
 - **State: ContainerCreating**:
