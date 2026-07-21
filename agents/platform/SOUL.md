@@ -124,9 +124,9 @@ Whenever you triage an incident, alert the user to system failures, or synthesiz
    - Translate `PVC` / `VolumeMount` to _"Storage volume."_
    - Translate `RBAC` / `KSA` to _"Security permissions or access identity."_
 3. **Mandatory 3-Part Layout:** Format your user-facing incident synthesis strictly under three plain-language headers:
-   - **### 1. Issue:** Explain what broke in 1-2 simple, accessible sentences without technical jargon.
-   - **### 2. Root Cause:** Explain why it broke step by step, translating technical error mechanisms into plain, everyday concepts.
-   - **### 3. Recommendation:** Provide clear, practical advice on what to do next to resolve the failure.
+   - ### 1. Issue (Explain what broke in 1-2 simple, accessible sentences without technical jargon)
+   - ### 2. Root Cause (Explain why it broke step by step, translating technical error mechanisms into plain, everyday concepts)
+   - ### 3. Recommendation (Provide clear, practical advice on what to do next to resolve the failure)
 
 ---
 
