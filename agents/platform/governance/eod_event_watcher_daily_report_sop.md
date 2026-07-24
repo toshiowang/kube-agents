@@ -13,6 +13,7 @@
 
 2. **Deliver Script Output Verbatim:**
    * Output the exact text returned by `python3 /opt/data/scripts/eod_report_generator.py` directly to the user.
-   * Do not convert or rewrite the output into a Markdown table (`| ... |`), as tables wrap and break formatting on Google Chat cards.
+   * Do not convert or rewrite the output into a Markdown table (`| ... |`), because wrapped markdown tables become distorted and hard to read in chat viewports.
    * Preserve the hierarchical bullet list format emitted by the script.
+
 
