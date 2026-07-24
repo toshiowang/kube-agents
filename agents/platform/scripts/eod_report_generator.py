@@ -94,8 +94,11 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
                 content = p.read_text(encoding="utf-8")
                 if yaml:
                     loaded = yaml.safe_load(content)
+                elif path_str.endswith((".yaml", ".yml")):
+                    raise ImportError("PyYAML is required to parse YAML configuration files. Please install 'pyyaml'.")
                 else:
                     loaded = json.loads(content)
+
                 if isinstance(loaded, dict):
                     for k, v in loaded.items():
                         if isinstance(v, dict) and isinstance(default_config.get(k), dict):
@@ -136,10 +139,12 @@ def load_incident_records(db_path: Optional[str] = None) -> List[Dict[str, Any]]
         if p.exists():
             try:
                 conn = sqlite3.connect(str(p), timeout=2.0)
-                cursor = conn.cursor()
-                cursor.execute("SELECT chat_id, thread_id, report, created_at FROM incidents ORDER BY created_at DESC")
-                rows = cursor.fetchall()
-                conn.close()
+                try:
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT chat_id, thread_id, report, created_at FROM incidents ORDER BY created_at DESC")
+                    rows = cursor.fetchall()
+                finally:
+                    conn.close()
                 return [
                     {"chat_id": r[0], "thread_id": r[1], "report": r[2], "created_at": r[3]}
                     for r in rows
@@ -147,6 +152,7 @@ def load_incident_records(db_path: Optional[str] = None) -> List[Dict[str, Any]]
                 ]
             except Exception:
                 pass
+
     return []
 
 
@@ -181,7 +187,10 @@ def extract_actionable_fix_from_triage(
         report_text = inc.get("report", "")
         if not report_text:
             continue
-        if workload.lower() in report_text.lower() or workload.lower() in inc.get("thread_id", "").lower():
+        thread_id = inc.get("thread_id", "")
+        thread_workload = thread_id.split("/")[-1] if "/" in thread_id else thread_id
+        if thread_workload.lower() == workload.lower() or re.search(rf"\b{re.escape(workload)}\b", report_text, re.I):
+
             lines = report_text.splitlines()
             capture = False
             for line in lines:
@@ -231,7 +240,6 @@ def filter_and_aggregate_events(
         uid = key_str.split("|", 1)[0] if "|" in key_str else key_str
         reason = key_str.split("|", 1)[1] if "|" in key_str else "Unknown"
         count = int(entry.get("count", 1))
-        total_seen += count
 
         ns = entry.get("namespace", "")
         pod_name = entry.get("name", uid[:12] if uid else "unknown-pod")
@@ -244,6 +252,9 @@ def filter_and_aggregate_events(
             continue
         if count < min_count:
             continue
+
+        total_seen += count
+
 
         session_id = entry.get("session_id", "")
         if session_id:
@@ -327,11 +338,12 @@ def generate_markdown_report(
             lines.append("---")
 
         if sections.get("action_items", True):
-            action_entries = [e for e in entries[:5] if e.get("actionable_fix")]
+            action_entries = [e for e in entries if e.get("actionable_fix")][:5]
             if action_entries:
                 lines.append("### 🛠️ Action Items for SRE")
                 for idx, e in enumerate(action_entries, start=1):
                     lines.append(f"{idx}. **`{e['namespace']}/{e['workload']}`:** {e['actionable_fix']}")
+
                 lines.append("")
 
     else:
