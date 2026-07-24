@@ -37,4 +37,4 @@ sections:
 # 3. Presentation & Formatting
 formatting:
   verbosity: "detailed" # Options: "detailed" (tables + details) or "compact" (bullet summary)
-  show_healthy_badge: true # Show 🟢 Fleet Status header badge
+
