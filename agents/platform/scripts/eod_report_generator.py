@@ -63,7 +63,6 @@ def resolve_cluster_name(cli_cluster: Optional[str] = None, config: Optional[Dic
     return os.getenv("GKE_CLUSTER_NAME") or os.getenv("CLUSTER_NAME") or "kubernetes-cluster"
 
 
-
 def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     """Loads the YAML configuration with fallback defaults."""
     default_config: Dict[str, Any] = {
@@ -128,7 +127,6 @@ def load_dedup_data(dedup_path: Optional[str] = None) -> Dict[str, Any]:
     return {}
 
 
-
 def load_incident_records(db_path: Optional[str] = None) -> List[Dict[str, Any]]:
     """Loads completed diagnostic triage reports from SQLite incidents table."""
     candidates = [db_path] if db_path else DEFAULT_DB_PATHS
@@ -152,7 +150,6 @@ def load_incident_records(db_path: Optional[str] = None) -> List[Dict[str, Any]]
                 ]
             except Exception:
                 pass
-
     return []
 
 
@@ -190,7 +187,6 @@ def extract_actionable_fix_from_triage(
         thread_id = inc.get("thread_id", "")
         thread_workload = thread_id.split("/")[-1] if "/" in thread_id else thread_id
         if thread_workload.lower() == workload.lower() or re.search(rf"\b{re.escape(workload)}\b", report_text, re.I):
-
             lines = report_text.splitlines()
             capture = False
             for line in lines:
@@ -213,8 +209,6 @@ def extract_actionable_fix_from_triage(
                         return clean_text[:140]
 
     return ""
-
-
 
 
 def filter_and_aggregate_events(
@@ -243,7 +237,7 @@ def filter_and_aggregate_events(
 
         ns = entry.get("namespace", "")
         pod_name = entry.get("name", uid[:12] if uid else "unknown-pod")
-        
+
         if ns and ns in exclude_ns:
             continue
         if include_ns and ns not in include_ns:
@@ -255,8 +249,6 @@ def filter_and_aggregate_events(
 
         if count < min_count:
             continue
-
-
 
         session_id = entry.get("session_id", "")
         if session_id:
@@ -327,7 +319,7 @@ def generate_markdown_report(
         )
         lines.append("")
         lines.append("---")
-        
+
         if sections.get("workload_breakdown", True):
             lines.append("### 🚨 Incidents Intercepted by Watcher")
             for idx, e in enumerate(entries[:5], start=1):
@@ -345,7 +337,6 @@ def generate_markdown_report(
                 lines.append("### 🛠️ Action Items for SRE")
                 for idx, e in enumerate(action_entries, start=1):
                     lines.append(f"{idx}. **`{e['namespace']}/{e['workload']}`:** {e['actionable_fix']}")
-
                 lines.append("")
 
     else:
