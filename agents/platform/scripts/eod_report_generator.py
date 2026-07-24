@@ -53,7 +53,7 @@ DEFAULT_DB_PATHS = [
 
 
 def resolve_cluster_name(cli_cluster: Optional[str] = None, config: Optional[Dict[str, Any]] = None) -> str:
-    """Dynamically resolves the active Kubernetes/GKE cluster name without hardcoding."""
+    """Resolves the active cluster name using GKE_CLUSTER_NAME environment variable or config."""
     if cli_cluster:
         return cli_cluster
 
@@ -62,40 +62,8 @@ def resolve_cluster_name(cli_cluster: Optional[str] = None, config: Optional[Dic
         if cfg_name:
             return cfg_name
 
-    env_name = os.getenv("GKE_CLUSTER_NAME") or os.getenv("CLUSTER_NAME") or os.getenv("K8S_CLUSTER_NAME")
-    if env_name:
-        return env_name
+    return os.getenv("GKE_CLUSTER_NAME") or os.getenv("CLUSTER_NAME") or "kubernetes-cluster"
 
-    # GKE Compute Metadata Server
-    try:
-        req = urllib.request.Request(
-            "http://metadata.google.internal/computeMetadata/v1/instance/attributes/cluster-name",
-            headers={"Metadata-Flavor": "Google"},
-        )
-        with urllib.request.urlopen(req, timeout=1) as resp:
-            meta_name = resp.read().decode("utf-8").strip()
-            if meta_name:
-                return meta_name
-    except Exception:
-        pass
-
-    # kubectl current-context
-    try:
-        res = subprocess.run(
-            ["kubectl", "config", "current-context"],
-            capture_output=True,
-            text=True,
-            timeout=3,
-        )
-        if res.returncode == 0 and res.stdout.strip():
-            ctx = res.stdout.strip()
-            if ctx.startswith("gke_") and "_" in ctx:
-                return ctx.split("_")[-1]
-            return ctx
-    except Exception:
-        pass
-
-    return "kubernetes-cluster"
 
 
 def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
