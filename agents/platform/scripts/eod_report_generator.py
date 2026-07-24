@@ -21,8 +21,6 @@ import json
 import os
 import re
 import sqlite3
-import ssl
-import subprocess
 import sys
 import urllib.request
 from pathlib import Path
@@ -110,30 +108,8 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     return default_config
 
 
-def fetch_events_from_in_cluster_api() -> List[Dict[str, Any]]:
-    """Queries the Kubernetes API server directly using in-cluster ServiceAccount token."""
-    token_path = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-    ca_path = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-    if not os.path.exists(token_path):
-        return []
-
-    try:
-        with open(token_path, "r", encoding="utf-8") as f:
-            token = f.read().strip()
-        ctx = ssl.create_default_context(cafile=ca_path) if os.path.exists(ca_path) else ssl._create_unverified_context()
-        req = urllib.request.Request(
-            "https://kubernetes.default.svc/api/v1/events",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        with urllib.request.urlopen(req, context=ctx, timeout=5) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data.get("items", [])
-    except Exception:
-        return []
-
-
 def load_dedup_data(dedup_path: Optional[str] = None) -> Dict[str, Any]:
-    """Loads the k8s-event-watcher dedup snapshot file, falling back to in-cluster API / kubectl."""
+    """Loads the k8s-event-watcher processed dedup snapshot file."""
     candidates = [dedup_path] if dedup_path else DEFAULT_DEDUP_PATHS
     for path_str in candidates:
         if not path_str:
@@ -142,45 +118,12 @@ def load_dedup_data(dedup_path: Optional[str] = None) -> Dict[str, Any]:
         if p.exists():
             try:
                 data = json.loads(p.read_text(encoding="utf-8"))
-                if data:
+                if isinstance(data, dict) and data:
                     return data
             except Exception as e:
                 sys.stderr.write(f"Warning: Failed to read dedup snapshot from {path_str}: {e}\n")
+    return {}
 
-    events_data: Dict[str, Any] = {}
-    items = fetch_events_from_in_cluster_api()
-
-    if not items:
-        try:
-            res = subprocess.run(
-                ["kubectl", "get", "events", "-A", "-o", "json"],
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
-            if res.returncode == 0 and res.stdout:
-                items = json.loads(res.stdout).get("items", [])
-        except Exception:
-            pass
-
-    for ev in items:
-        if ev.get("type") != "Warning":
-            continue
-        inv = ev.get("involvedObject", {})
-        name = inv.get("name", "unknown")
-        uid = inv.get("uid") or name
-        reason = ev.get("reason", "Warning")
-        key = f"{uid}|{reason}"
-        events_data[key] = {
-            "namespace": inv.get("namespace", "default"),
-            "name": name,
-            "count": ev.get("count", 1),
-            "message": ev.get("message", ""),
-            "first_seen": ev.get("firstTimestamp", ""),
-            "last_seen": ev.get("lastTimestamp", ""),
-            "session_id": f"k8s-evt-{uid[:8]}",
-        }
-    return events_data
 
 
 def load_incident_records(db_path: Optional[str] = None) -> List[Dict[str, Any]]:
