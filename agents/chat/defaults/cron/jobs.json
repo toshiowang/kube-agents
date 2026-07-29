@@ -30,6 +30,21 @@
       "deliver": "local"
     },
     {
+      "id": "github-issue-poll",
+      "name": "GitHub Issue Poll & Triage Dispatch",
+      "schedule": {
+        "kind": "interval",
+        "minutes": 5,
+        "display": "every 5m"
+      },
+      "prompt": "",
+      "no_agent": true,
+      "script": "github_issue_gate.py",
+      "skills": [],
+      "enabled": true,
+      "deliver": "local"
+    },
+    {
       "id": "bootstrap-inventory-delivery",
       "name": "First-Time Onboarding Inventory Chat Delivery",
       "schedule": {

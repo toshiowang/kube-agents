@@ -26,10 +26,31 @@ Generated from [`agents/platform/cron/jobs.json`](https://github.com/gke-labs/ku
 | `lifecycle-deprecation-manager` | `0 9 1 * *` | Monthly, 1st 09:00 | yes | Execute monthly toolchain lifecycle audit. Read '/opt/defaults/governance/lifecycle_deprecation_manager_sop... |
 | `standardization-validator` | `0 10 * * 0` | Weekly, Sunday 10:00 | yes | Run weekly structural GKE alignment audit. Read '/opt/defaults/governance/standardization_validator_sop.md'... |
 | `obtainability-audit` | `0 12 * * *` | Daily 12:00 | yes | Execute dynamic capacity pool alignment audit. Read '/opt/defaults/governance/obtainability_audit_sop.md' t... |
-| `github-issue-resolver` | `*/30 * * * *` | Every 30 minutes | yes | Run the github-issue-resolver skill to poll, triage, investigate, and resolve unaddressed open issues on ou... |
+| `github-issue-resolver` | `*/30 * * * *` | Every 30 minutes | no | Superseded by the github-issue-poll job on the default profile, which polls deterministically and files a k... |
 
 <!-- prettier-ignore-end -->
 <!-- END GENERATED: cron-jobs -->
+
+## The Chat Agent's jobs
+
+Only the `default` (Chat Agent) profile's cron actually ticks. A job placed on
+the `platform` profile never fires — silently, with `enabled: true` and
+`last_run: None` forever. The Platform Agent still does the work; it is just
+reached through the kanban board rather than through its own schedule.
+
+So a second, smaller set of jobs lives in
+[`agents/chat/defaults/cron/jobs.json`](https://github.com/gke-labs/kube-agents/blob/main/agents/chat/defaults/cron/jobs.json).
+Every one of them sets `no_agent: true`: they run as plain subprocesses rather
+than model turns, decide whether there is anything to do, and file a kanban card
+assigned to `platform` when there is. Nothing is spent on a tick that finds
+nothing.
+
+`github-issue-poll` is the reason `github-issue-resolver` above is disabled.
+Discovering that an issue exists is one `gh issue list` call, so it no longer
+costs a Platform Agent turn every thirty minutes; `github_issue_gate.py` runs
+the same `resolver.py poll` the skill has always used and files a triage card
+only when the poll returns an issue. The skill itself is unchanged — the worker
+picks it up at Step 2.
 
 ## Job schema
 
@@ -50,17 +71,19 @@ Each entry follows this shape:
 }
 ```
 
-| Field                | Type            | Purpose                                                                                      |
-| -------------------- | --------------- | -------------------------------------------------------------------------------------------- |
-| `id`                 | string          | Stable identifier used in observability and enable/disable ops.                              |
-| `name`               | string          | Human-readable name for logs and Chat replies.                                               |
-| `schedule.kind`      | string          | Only `"cron"` is used today.                                                                 |
-| `schedule.expr`      | string          | Standard 5-field cron expression, evaluated in the pod's time zone (UTC unless overridden).  |
-| `schedule.display`   | string          | Display form (usually equal to `expr`).                                                      |
-| `prompt`             | string          | The literal message sent to the agent when the schedule fires.                               |
-| `skills`             | array of string | Optional: skills to preload. Most jobs leave empty (the SOP loads what it needs).            |
-| `enabled`            | bool            | Set `false` to disable without deleting the entry.                                           |
-| `deliver` (optional) | string          | Chat delivery mode. `"all"` on `github-issue-resolver` means every run reports back to Chat. |
+| Field                 | Type            | Purpose                                                                                                           |
+| --------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `id`                  | string          | Stable identifier used in observability and enable/disable ops.                                                   |
+| `name`                | string          | Human-readable name for logs and Chat replies.                                                                    |
+| `schedule.kind`       | string          | `"cron"` for the jobs above; the Chat Agent's jobs also use `"interval"` with `minutes`.                          |
+| `schedule.expr`       | string          | Standard 5-field cron expression, evaluated in the pod's time zone (UTC unless overridden).                       |
+| `schedule.display`    | string          | Display form (usually equal to `expr`).                                                                           |
+| `prompt`              | string          | The literal message sent to the agent when the schedule fires.                                                    |
+| `skills`              | array of string | Optional: skills to preload. Most jobs leave empty (the SOP loads what it needs).                                 |
+| `enabled`             | bool            | Set `false` to disable without deleting the entry.                                                                |
+| `deliver` (optional)  | string          | Chat delivery mode. `"all"` reports every run back to Chat; `"local"` reports nothing beyond what the job prints. |
+| `no_agent` (optional) | bool            | Run `script` as a plain subprocess instead of starting a model turn. Chat Agent jobs only.                        |
+| `script` (optional)   | string          | Filename under `$HERMES_HOME/scripts/`, required when `no_agent` is set.                                          |
 
 ## Editing
 
