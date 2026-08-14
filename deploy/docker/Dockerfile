@@ -839,6 +839,51 @@ RUN cp /tmp/latency-patches/kanban_wake_nudge.py /opt/hermes/hermes_cli/kanban_w
     /opt/hermes/.venv/bin/python3 /tmp/latency-patches/verify_kanban_notify_delivery.py && \
     rm -rf /tmp/latency-patches
 
+# Readability: make the Markdown the agent writes survive the trip to Google
+# Chat. Upstream's format_message already converts the constructs Chat has a
+# dialect for (`**bold**`, `## Heading`, `[text](url)`); the two it cannot
+# convert are the two a human reads as "misaligned", and both were measured
+# against the deployed adapter on 2026-08-14 with an ordinary fleet-status reply.
+#
+#   * Nested lists arrived flat. The final `re.sub(r"  +", " ", text)` exists to
+#     tidy the double spaces left by stripping invisible codepoints, but it is
+#     unanchored, so it eats *leading* whitespace too -- a two-space indent came
+#     out as one, which a proportional font cannot show at all. Replaced with the
+#     same tidy-up behind a `(?<=\S)` lookbehind.
+#   * Pipe tables reached Chat verbatim, and Chat draws them in that proportional
+#     font, so no column could ever line up. They are now redrawn padded inside a
+#     fenced block, which Chat renders monospaced. Past MAX_TABLE_WIDTH a fence
+#     scrolls sideways on a phone, so a wide table becomes one labelled stanza
+#     per row instead.
+#
+# Ordering inside format_message is the whole patch and neither half of it is
+# visible to a text match: convert_tables is anchored AFTER the inline-code guard
+# so a table written inside a code block is already a placeholder, and it routes
+# its output back through that same `_ph`, or the space-collapse further down
+# strips out the very padding that makes the grid a grid. Both fail by producing
+# a merely ugly message, which raises nothing -- so verify_gchat_markdown.py
+# drives the real patched format_message and asserts on what comes out, including
+# that the padding is still there after the collapse.
+#
+# ONE COPY + ONE RUN, with the module cp'd into place by the RUN rather than
+# bought a COPY of its own: `credential-proxy` builds FROM `platform` and has hit
+# Docker's layer-depth ceiling once already (build f9f1747c, 2026-08-07).
+# See the module docstring in deploy/docker/patches/gchat_markdown.py.
+COPY deploy/docker/patches/gchat_markdown.py \
+     deploy/docker/patches/apply_gchat_markdown.py \
+     deploy/docker/patches/verify_gchat_markdown.py \
+     deploy/docker/patches/patchlib.py \
+     /tmp/gchat-markdown/
+RUN cp /tmp/gchat-markdown/gchat_markdown.py /opt/hermes/tools/gchat_markdown.py && \
+    /opt/hermes/.venv/bin/python3 /tmp/gchat-markdown/apply_gchat_markdown.py /opt/hermes && \
+    grep -q "from tools import gchat_markdown as _gchat_markdown" /opt/hermes/plugins/platforms/google_chat/adapter.py && \
+    grep -q "text = _gchat_markdown.convert_tables(text, _ph)" /opt/hermes/plugins/platforms/google_chat/adapter.py && \
+    grep -q "text = _gchat_markdown.collapse_interior_spaces(text)" /opt/hermes/plugins/platforms/google_chat/adapter.py && \
+    ! grep -q 'text = re.sub(r"  +", " ", text)' /opt/hermes/plugins/platforms/google_chat/adapter.py && \
+    cd /opt/hermes && \
+    /opt/hermes/.venv/bin/python3 /tmp/gchat-markdown/verify_gchat_markdown.py && \
+    rm -rf /tmp/gchat-markdown
+
 
 # 3. Clone and build mcp-remote proxy. Git is a build-only dependency here;
 # the sandbox runtime exposes only the credential-proxy Git wrapper.
