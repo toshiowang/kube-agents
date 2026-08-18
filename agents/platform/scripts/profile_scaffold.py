@@ -26,6 +26,33 @@ from pathlib import Path
 # profile home, POSIX-separated; each one needs a merge rule below.
 MERGE_PATHS: tuple[str, ...] = ("cron/jobs.json",)
 
+# The only `platforms` keys a named profile inherits from the root config.
+#
+# Why anything is inherited at all: a cron tick on a named profile runs as a
+# `hermes cron tick` *subprocess* with HERMES_HOME pointed at that profile, and
+# a subprocess has no live gateway adapters. `cron/scheduler.py`'s delivery
+# therefore falls back to `config.platforms.get(<platform>)` read from the
+# PROFILE's config.yaml. No template ships a `platforms` block, so that lookup
+# finds nothing and every job with `deliver != local` records
+# "platform '<name>' not configured/enabled" and posts nowhere.
+#
+# Why `enabled` alone. It is sufficient: the delivery target does not come from
+# this file. It arrives as `GOOGLE_CHAT_HOME_CHANNEL`, which
+# `profile_cron_tick.home_target_env` re-reads from the root config and
+# re-injects on every spawn — measured, a config `home_channel` with that env
+# unset still resolves to "no delivery target resolved for deliver=all", and
+# with it set the env value wins. Copying `home_channel` here would duplicate
+# routing state that is already carried correctly, and strand a stale channel
+# on disk the first time somebody runs `/sethome`.
+#
+# It is also the most this may safely copy. The operator deliberately keeps
+# `platforms` out of per-profile overlays, because an inbound subscription on a
+# named profile is a subscription nothing reads — see
+# `gatewayScopedPluginConfigSubtrees` in `platformagent_manifests.go`. A boolean
+# recording that the platform exists on this install is not a subscription, and
+# the credentials and subscription keys stay where they were.
+INHERITED_PLATFORM_KEYS: tuple[str, ...] = ("enabled",)
+
 
 def make_log(prefix: str):
     """Build a stderr logger tagged with a component prefix (shared across the profile scripts)."""
@@ -303,6 +330,93 @@ def _merge_after_overlay(
             log(f"WARN: could not merge {relative}; image copy stands ({exc})")
 
 
+def root_home_of(home: Path) -> Path | None:
+    """The `$HERMES_HOME` a named profile lives under, or None if `home` is it.
+
+    Hermes stores named profiles at `$HERMES_HOME/profiles/<name>` (see
+    `profiles_base`), so the root is two levels up — and the `profiles`
+    component is what distinguishes a named profile from the `default` one.
+    `main --home` overlays straight onto `$HERMES_HOME`, which is already the
+    root: it reads its own `platforms` block and has nothing to inherit.
+    """
+    parent = home.parent
+    return parent.parent if parent.name == "profiles" else None
+
+
+def inherit_platform_enablement(home: Path) -> None:
+    """Give this profile the `platforms.<name>.enabled` flags of its root.
+
+    Restores cron delivery on named profiles. See `INHERITED_PLATFORM_KEYS` for
+    the mechanism and for why `enabled` is both sufficient and the limit of
+    what may be copied.
+
+    Applied after the template copy, not folded into `MERGE_PATHS`: those
+    entries merge the *volume's* prior contents back over the image's, and this
+    is the opposite direction — a value read from a different file that the
+    template legitimately does not ship. Re-running it is a no-op, which is
+    what start-up requires, since the entrypoint scaffolds on every boot.
+
+    Never fails the scaffold. A profile whose config could not be read or
+    rewritten still runs, still ticks, and degrades to exactly the delivery
+    behaviour it had before this function existed; refusing to boot over it
+    would turn a silent delivery gap into a dead agent.
+    """
+    root = root_home_of(home)
+    if root is None:
+        return
+    # Absent is a state, not a fault: `cluster_agent_profile.py` scaffolds into
+    # homes that need not have one yet. Warning here would fire on a boot where
+    # nothing is wrong.
+    root_config = root / "config.yaml"
+    if not root_config.is_file():
+        return
+    try:
+        import yaml
+
+        source = yaml.safe_load(root_config.read_text()) or {}
+        platforms = source.get("platforms")
+        if not isinstance(platforms, dict):
+            return
+
+        inherited = {
+            name: flags
+            for name, block in platforms.items()
+            if isinstance(block, dict)
+            and (
+                flags := {
+                    key: block[key] for key in INHERITED_PLATFORM_KEYS if key in block
+                }
+            )
+        }
+        if not inherited:
+            return
+
+        destination = home / "config.yaml"
+        text = destination.read_text() if destination.is_file() else ""
+        config = yaml.safe_load(text) or {}
+        if not isinstance(config, dict):
+            return
+
+        # Merged per platform rather than assigned wholesale: the template is
+        # allowed to ship its own `platforms` entry, and an install that has
+        # one must keep whatever else it says.
+        target = config.setdefault("platforms", {})
+        if not isinstance(target, dict):
+            return
+        for name, flags in inherited.items():
+            block = target.get(name)
+            target[name] = {**block, **flags} if isinstance(block, dict) else dict(flags)
+
+        # Temp file and os.replace, for the reason `_merge_after_overlay`
+        # gives: a torn config.yaml is a profile that cannot load at all.
+        scratch = destination.with_name(destination.name + ".tmp")
+        scratch.write_text(yaml.safe_dump(config, sort_keys=False), encoding="utf-8")
+        os.replace(scratch, destination)
+    except Exception as exc:  # noqa: BLE001 — see the docstring
+        log(f"WARN: could not inherit platform enablement into {home}; "
+            f"cron delivery on this profile may fail ({exc})")
+
+
 def overlay_template(
     home: Path,
     template_dir: Path,
@@ -322,6 +436,11 @@ def overlay_template(
     `merge_cron_store` for why a file can be both image-owned and runtime state,
     and what `cron_job_ids` narrows that merge to; `cron_retire_ids` names the
     ids to delete from the volume outright (see `retire_cron_jobs`).
+
+    Finally, a named profile inherits its root's platform `enabled` flags —
+    see `inherit_platform_enablement`, which is what makes `deliver` work on a
+    profile at all. Done here rather than at either call site so that the
+    per-cluster profiles `cluster_agent_profile.py` scaffolds get it too.
     """
     if not template_dir.is_dir():
         raise SystemExit(f"ERROR: template dir not found: {template_dir}")
@@ -341,6 +460,7 @@ def overlay_template(
         else:
             shutil.copy2(src, dest)
     _merge_after_overlay(home, template_dir, names, prior, cron_job_ids, cron_retire_ids)
+    inherit_platform_enablement(home)
     if plugins_dir and plugins_dir.is_dir():
         try:
             shutil.copytree(plugins_dir, home / "plugins", dirs_exist_ok=True)

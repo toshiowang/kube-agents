@@ -382,5 +382,149 @@ class EnsureProfileTest(unittest.TestCase):
         self.assertTrue(ps.is_scaffolded(self.home))
 
 
+# --- Platform enablement inheritance --------------------------------------------
+#
+# What these protect is a silent failure: every cron job on a named profile ran
+# to completion, reported `last_status: "ok"`, and posted nowhere, because the
+# tick subprocess resolves delivery against the PROFILE's config.yaml and no
+# template ships a `platforms` block. Measured on a live install: ten jobs, all
+# `deliver: "all"`, all carrying
+# `last_delivery_error: "platform 'google_chat' not configured/enabled"`.
+class InheritPlatformEnablementTest(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp_dir.name)
+        self.home = self.root / "profiles" / "platform"
+        self.home.mkdir(parents=True)
+        self.template = self.root / "template"
+        write(self.template / "config.yaml", "plugins: {}\n")
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def write_root(self, text: str) -> None:
+        write(self.root / "config.yaml", text)
+
+    def platforms_on_disk(self):
+        import yaml
+
+        return (yaml.safe_load((self.home / "config.yaml").read_text()) or {}).get("platforms")
+
+    GCHAT_ROOT = (
+        "platforms:\n"
+        "  google_chat:\n"
+        "    enabled: true\n"
+        "    typing_status_text: thinking\n"
+        "    home_channel:\n"
+        "      platform: google_chat\n"
+        "      chat_id: spaces/ROOT\n"
+        "      name: Home\n"
+    )
+
+    def test_the_enabled_flag_reaches_the_profile(self):
+        """Without this the tick reports "not configured/enabled" and posts nowhere."""
+        self.write_root(self.GCHAT_ROOT)
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertEqual({"google_chat": {"enabled": True}}, self.platforms_on_disk())
+
+    def test_the_home_channel_is_not_copied(self):
+        """The target travels as env, re-read per spawn by `home_target_env`.
+
+        Copying it here would strand a stale channel on disk the first time
+        somebody runs `/sethome`, and it buys nothing: a config `home_channel`
+        with `GOOGLE_CHAT_HOME_CHANNEL` unset resolves to "no delivery target
+        resolved for deliver=all".
+        """
+        self.write_root(self.GCHAT_ROOT)
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertNotIn("home_channel", self.platforms_on_disk()["google_chat"])
+
+    def test_inbound_credentials_and_subscriptions_are_not_copied(self):
+        """The operator keeps `platforms` out of profile overlays for this reason.
+
+        A subscription on a named profile is one nothing reads — see
+        `gatewayScopedPluginConfigSubtrees`. Only the boolean crosses.
+        """
+        self.write_root(
+            "platforms:\n"
+            "  google_chat:\n"
+            "    enabled: true\n"
+            "    subscription_name: projects/p/subscriptions/s\n"
+            "    service_account_json: SECRET\n"
+        )
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertEqual({"google_chat": {"enabled": True}}, self.platforms_on_disk())
+
+    def test_a_disabled_platform_stays_disabled(self):
+        """`enabled` is inherited, not asserted — false has to survive the copy."""
+        self.write_root("platforms:\n  slack:\n    enabled: false\n")
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertEqual({"slack": {"enabled": False}}, self.platforms_on_disk())
+
+    def test_the_template_keeps_everything_it_shipped(self):
+        write(self.template / "config.yaml", "plugins: {}\ntoolsets:\n  - fleet\n")
+        self.write_root(self.GCHAT_ROOT)
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        import yaml
+
+        config = yaml.safe_load((self.home / "config.yaml").read_text())
+        self.assertEqual(["fleet"], config["toolsets"])
+        self.assertEqual({}, config["plugins"])
+
+    def test_a_platforms_block_the_template_ships_is_merged_not_replaced(self):
+        write(
+            self.template / "config.yaml",
+            "platforms:\n  google_chat:\n    typing_status_text: scoped\n",
+        )
+        self.write_root(self.GCHAT_ROOT)
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertEqual(
+            {"google_chat": {"typing_status_text": "scoped", "enabled": True}},
+            self.platforms_on_disk(),
+        )
+
+    def test_rerunning_is_a_no_op(self):
+        """The entrypoint scaffolds on every boot."""
+        self.write_root(self.GCHAT_ROOT)
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        first = (self.home / "config.yaml").read_text()
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertEqual(first, (self.home / "config.yaml").read_text())
+
+    def test_the_default_profile_inherits_nothing(self):
+        """`main --home` overlays onto $HERMES_HOME, which already owns the block.
+
+        Asserted on the root home directly rather than through
+        `overlay_template`, because a template that ships a `config.yaml`
+        overwrites the root's outright — long-standing copy behaviour this
+        change neither causes nor fixes. What matters here is that the
+        inheritance step adds nothing of its own on top.
+        """
+        self.write_root(self.GCHAT_ROOT)
+        self.assertIsNone(ps.root_home_of(self.root))
+
+        before = (self.root / "config.yaml").read_text()
+        ps.inherit_platform_enablement(self.root)
+        self.assertEqual(before, (self.root / "config.yaml").read_text())
+
+    def test_a_root_with_no_platforms_block_is_not_an_error(self):
+        self.write_root("plugins: {}\n")
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertIsNone(self.platforms_on_disk())
+
+    def test_a_missing_root_config_is_not_an_error(self):
+        ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertIsNone(self.platforms_on_disk())
+
+    def test_an_unreadable_root_config_warns_and_the_scaffold_stands(self):
+        """Degrades to the old delivery gap; it never costs the agent its boot."""
+        self.write_root(": not : valid : yaml :\n")
+        stderr = io.StringIO()
+        with redirect_stderr(stderr):
+            ps.overlay_template(self.home, self.template, None, ("config.yaml",))
+        self.assertTrue((self.home / "config.yaml").is_file())
+        self.assertIn("WARN", stderr.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()
