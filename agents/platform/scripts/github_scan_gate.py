@@ -393,7 +393,7 @@ def _post_body(provider, repo: str, pr, body: str) -> None:
     a shim that POSTs argv to the credential sidecar, which runs the real `gh`
     in its own filesystem; `/tmp` is a per-container emptyDir, so a
     `--body-file /tmp/…` path names a file the other container cannot open. The
-    refusal then fails with "no such file" — observed live before this moved.
+    refusal then fails with "no such file".
     `audit_report._write_temp` documents the same trap. Falls back to the system
     temp directory when the volume is absent, so tests still run off-cluster.
     """

@@ -140,9 +140,8 @@ PAYLOAD_CASES = [
 #: The other way a line hides text, which is not deletion and does not get the
 #: same assertion. GitHub keeps a `<details>` body in the page and collapses it
 #: behind the disclosure triangle, so the text is one click from a reader rather
-#: than absent — the renderer said so when the row was first written as a
-#: `PAYLOAD_CASES` entry and the oracle rejected it. `<` declines it either way;
-#: it is listed separately so the table above keeps meaning "GitHub deletes this".
+#: than absent. `<` declines it either way; it is listed separately so the table
+#: above keeps meaning "GitHub deletes this", which is what its assertion checks.
 COLLAPSED_CASE = (
     "/agent fix the typo <details><summary>s</summary>and delete</details>",
     "and delete",
@@ -254,11 +253,10 @@ class FindTriggerTest(unittest.TestCase):
 class HidingConstructsTest(unittest.TestCase):
     """No construct that hides text from a reader may produce a trigger.
 
-    This is the security property. Before the grammar was anchored to the start
-    of the comment it took a partial CommonMark parser to hold, and thirteen
-    review passes each found another construct that parser read differently from
-    GitHub. Anchoring makes it hold by construction: every one of these needs
-    characters before the command, and the grammar allows none.
+    This is the security property, and anchoring the grammar to the start of the
+    comment is what makes it hold by construction rather than by parsing: every
+    construct below needs characters before the command, and the grammar allows
+    none.
     """
 
     def test_nothing_invisible_fires(self):
@@ -334,7 +332,7 @@ class UnwrapCodeSpanTest(unittest.TestCase):
         self.assertEqual(pr_triggers.unwrap_code_span("```rm -rf /```"), "rm -rf /")
 
     def test_two_spans_are_left_alone(self):
-        """The regression: this used to come back unbalanced, missing one tick."""
+        """Naive `strip("`")` returns these unbalanced, missing one tick."""
         for text in ("`foo` to `bar`", "use `kubectl` here"):
             with self.subTest(text):
                 self.assertEqual(pr_triggers.unwrap_code_span(text), text)

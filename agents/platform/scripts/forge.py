@@ -270,7 +270,7 @@ def normalise_login(login: str) -> str:
     Both affixes are stripped, because the comparison this feeds is what stops
     the agent answering itself. Matching `app/x` against `x[bot]` fails, no
     marker the agent wrote is ever recognised as its own, and every tick
-    re-answers the same comment — observed live before this was normalised.
+    re-answers the same comment.
     """
     # Case is folded first, so the affix tests do not depend on the spelling the
     # forge happened to use for them.
