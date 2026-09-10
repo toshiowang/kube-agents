@@ -1,9 +1,10 @@
-"""Unit tests for the Cluster Agent coupling footer re-injection in sync-upstream-skills.
+"""Unit tests for scripts/sync-upstream-skills.py.
 
 Run: python3 -m unittest scripts.test_sync_upstream_skills
 
-The invariant under test: after an upstream sync wipes a skill dir, inject_footer restores the
-Cluster Agent coupling footer exactly once (idempotent), and only for skills that have one.
+Two invariants: after an upstream sync wipes a skill dir, substitutions and the footer are
+re-applied exactly once (idempotent) and only for skills that have them; and every mirrored file
+in the tree matches scripts/upstream_skills_lock.json or is listed there as a local override.
 """
 
 import importlib.util
@@ -62,6 +63,21 @@ class InjectFooterTest(unittest.TestCase):
 
 
 class ApplySubstitutionsTest(unittest.TestCase):
+    def test_three_tuple_targets_a_file_inside_the_skill(self):
+        d = Path(tempfile.mkdtemp())
+        (d / "SKILL.md").write_text("body\n", encoding="utf-8")
+        (d / "references").mkdir()
+        (d / "references" / "notes.md").write_text("old text\n", encoding="utf-8")
+        original = sync.SKILL_SUBSTITUTIONS
+        sync.SKILL_SUBSTITUTIONS = {"gke-x": [("references/notes.md", "old text", "new text")]}
+        try:
+            self.assertTrue(sync.apply_substitutions(str(d), "gke-x"))
+            self.assertEqual((d / "references" / "notes.md").read_text(encoding="utf-8"), "new text\n")
+            self.assertEqual((d / "SKILL.md").read_text(encoding="utf-8"), "body\n")
+            self.assertFalse(sync.apply_substitutions(str(d), "gke-x"))
+        finally:
+            sync.SKILL_SUBSTITUTIONS = original
+
     def _skill_dir(self, body=""):
         d = Path(tempfile.mkdtemp())
         (d / sync.SKILL_MD_FILENAME).write_text(body, encoding=sync.UTF_8_ENCODING)
@@ -145,8 +161,9 @@ class MirrorLockTest(unittest.TestCase):
                     *problems,
                     "These directories are rewritten by scripts/sync-upstream-skills.py, so a direct edit",
                     "is lost at the next run. Put the change in SKILL_SUBSTITUTIONS or SKILL_FOOTERS there",
-                    "and rerun the sync, or list the file under local_overrides in",
-                    f"{sync.LOCK_FILE} with the pull request that made the change.",
+                    "and rerun the sync (it reads the pinned commit by default and rewrites the lock).",
+                    f"local_overrides in {sync.LOCK_FILE} records deviations already merged, which the",
+                    "next sync wipes; it is not where a new change goes.",
                 ]
             ),
         )
@@ -156,11 +173,7 @@ class MirrorLockTest(unittest.TestCase):
         commit = lock[sync.LOCK_COMMIT_KEY]
         self.assertEqual(len(commit), self.SHA1_HEX_LENGTH)
         int(commit, 16)
-        self.assertEqual(lock["upstream_repo"], sync.UPSTREAM_REPO)
-
-    def test_lock_covers_every_mirrored_file(self):
-        lock = sync.load_lock(str(self.REPO_ROOT))
-        self.assertEqual(sorted(lock[sync.LOCK_FILES_KEY]), sync.mirrored_files(str(self.REPO_ROOT)))
+        self.assertEqual(lock[sync.LOCK_REPO_KEY], sync.UPSTREAM_REPO)
 
     def test_direct_edit_is_a_problem_until_listed_as_an_override(self):
         root, skill_md = self._fake_repo()
@@ -190,6 +203,12 @@ class MirrorLockTest(unittest.TestCase):
         problems = sync.check_lock(str(root), lock)
         self.assertEqual(len(problems), 1)
         self.assertIn("added outside the sync", problems[0])
+
+    def test_hidden_files_are_not_part_of_the_mirror(self):
+        root, skill_md = self._fake_repo()
+        lock = sync.build_lock(str(root), "0" * self.SHA1_HEX_LENGTH)
+        (skill_md.parent / ".DS_Store").write_bytes(b"\x00")
+        self.assertEqual(sync.check_lock(str(root), lock), [])
 
     def test_lock_round_trips_through_the_file(self):
         root, _ = self._fake_repo()

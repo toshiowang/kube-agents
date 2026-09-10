@@ -17,8 +17,9 @@ docs/site/src/content/docs/skills/index.mdx
 # template action can change what the action emits.
 agentplugins/*/templates/*.yaml
 
-# Upstream imported skills from google/skills (synced via scripts/sync-upstream-skills.py).
-# These skills are imported verbatim from the upstream repository and should not be reformatted.
+# Upstream skills from google/skills, copied by scripts/sync-upstream-skills.py into
+# agents/platform/skills/gke-* with its recorded substitutions and footers; reformatting them
+# would make every sync a diff. The glob also matches the repo-native agents/cluster/skills/gke-*.
 agents/*/skills/gke-*
 agents/*/skills/gke-*/**
 

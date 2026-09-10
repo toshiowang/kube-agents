@@ -859,10 +859,13 @@ class C4ProvenanceOfExecutableContent(unittest.TestCase):
     def test_C4_upstream_skills_are_pinned_and_verified(self) -> None:
         """KNOWN VIOLATION. Whatever is at upstream HEAD becomes agent instructions.
 
-        `sync-upstream-skills.py` shallow-clones the default branch of an
-        upstream repository with no pinned ref, no tag, no commit SHA and no
-        checksum, then `rmtree`s and `copytree`s fifteen skill directories into
-        the agent's skill set verbatim.
+        `sync-upstream-skills.py` shallow-clones an upstream repository and
+        `rmtree`s and `copytree`s its skill directories into the agent's
+        skill set. It records the commit and a sha256 per file in
+        `scripts/upstream_skills_lock.json` after the copy, and reads that
+        pin back by default, but `--latest` advances to the default-branch
+        head and nothing verifies the fetched content against a trusted
+        checksum before it lands.
 
         C4 forbids automatic upgrade to unpinned upstream content and makes
         checksum verification mandatory. The reason this is a class of
