@@ -71,7 +71,7 @@ The `gke-compute-classes` skill is a good example — it explicitly delineates w
 
 ## Adding a new skill
 
-1. Create `agents/platform/skills/<your-skill>/SKILL.md` — or `agents/cluster/skills/<your-skill>/SKILL.md` if it is a read-only, single-cluster runtime-debugging procedure that belongs to the Cluster Agents.
+1. Create `agents/platform/skills/<your-skill>/SKILL.md` — or `agents/cluster/skills/<your-skill>/SKILL.md` if it is a read-only, single-cluster runtime-debugging procedure that belongs to the Cluster Agents. Do not name it `gke-*` under `agents/platform/skills/`: that prefix is the mirror of upstream `google/skills`, which `scripts/sync-upstream-skills.py` rewrites and a test locks (see the Skills Guidelines in `AGENTS.md`).
 2. Add frontmatter with `name` and a specific `description` — this is what routes the agent to the skill.
 3. Write the procedure. Prefer concrete steps and example manifests over abstract descriptions.
 4. If the skill has safety-critical operations (destructive changes, wide-blast-radius commands), list explicit red lines the model must honor.

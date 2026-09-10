@@ -448,7 +448,7 @@ def main():
 
                     # Apply in-place substitutions to correct upstream defects.
                     if apply_substitutions(dest_path, skill_name):
-                        print(f"  Applied substitutions to {skill_name}/{SKILL_MD_FILENAME}")
+                        print(f"  Applied substitutions to {skill_name}")
 
                     # Re-inject the Cluster Agent coupling footer (wiped by the copy above).
                     if inject_footer(dest_path, skill_name):

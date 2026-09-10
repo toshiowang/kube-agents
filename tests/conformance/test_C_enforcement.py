@@ -857,7 +857,7 @@ class C4ProvenanceOfExecutableContent(unittest.TestCase):
 
     @h.known_violation("C4", "04_major_requirements.md C4")
     def test_C4_upstream_skills_are_pinned_and_verified(self) -> None:
-        """KNOWN VIOLATION. Whatever is at upstream HEAD becomes agent instructions.
+        """KNOWN VIOLATION. Upstream content lands as agent instructions unverified.
 
         `sync-upstream-skills.py` shallow-clones an upstream repository and
         `rmtree`s and `copytree`s its skill directories into the agent's
@@ -875,7 +875,7 @@ class C4ProvenanceOfExecutableContent(unittest.TestCase):
         """
         source = h.text("skill_sync")
         pins = re.search(r"--branch|--revision|UPSTREAM_REF|[0-9a-f]{40}", source)
-        self.assertIsNotNone(pins, "the upstream clone names no immutable ref")
+        self.assertIsNotNone(pins, "the sync verifies nothing against a trusted pin before the copy lands")
         self.assertRegex(
             source, r"sha256|hashlib|checksum", "the synced content is not verified"
         )
