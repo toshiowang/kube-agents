@@ -147,10 +147,9 @@ the assignee is the claim; do not apply `status:` labels to issues in this repos
 
 ## Skills Guidelines
 
-- Skills are located under `agents/platform/skills/` (Platform Agent: provisioning, governance, cost, manifest generation, GitOps) and `agents/cluster/skills/` (Cluster Agent: single-cluster runtime debugging and operations).
-- Each skill directory must contain a `SKILL.md` file providing instructions for that specific skill.
-- Place a skill according to its persona: fleet/provisioning/GitOps-write skills belong to the Platform Agent; read-only, single-cluster runtime-debugging skills belong to the Cluster Agent.
-- When adding new skills, ensure they follow the existing structure and are clearly documented to be understood by AI agents.
+- Skills live under `agents/platform/skills/` (Platform Agent) and `agents/cluster/skills/` (Cluster Agent); each skill directory holds a `SKILL.md` written for an AI agent.
+- Place a skill by persona: fleet, provisioning and GitOps-write skills belong to the Platform Agent; read-only, single-cluster runtime-debugging skills belong to the Cluster Agent.
+- `agents/platform/skills/gke-*` are mirrors of `google/skills`: `scripts/sync-upstream-skills.py` rewrites them wholesale and a test checks them against `scripts/upstream_skills_lock.json`. Do not edit them directly; add a `SKILL_SUBSTITUTIONS` or `SKILL_FOOTERS` entry there and rerun the sync.
 
 ## Engineering Rules
 

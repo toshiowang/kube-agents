@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Syncs GKE agent skills from the upstream google/skills repository (skills/cloud)."""
 
+import argparse
+import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -10,6 +13,20 @@ import tempfile
 UPSTREAM_REPO = "https://github.com/google/skills.git"
 UPSTREAM_SKILLS_PATH = os.path.join("skills", "cloud")
 SKILL_PREFIX = "gke-"
+
+# The lock records what the last sync produced: the upstream commit it read and a digest of
+# every mirrored file after substitutions and footers. scripts/test_sync_upstream_skills.py
+# checks the tree against it on every pull request, so a direct edit to a mirrored file fails
+# there instead of vanishing at the next sync. A deliberate deviation is listed under
+# `local_overrides` with the pull request that made it; the sync wipes those and says so.
+LOCK_FILE = os.path.join("scripts", "upstream_skills_lock.json")
+LOCK_INDENT = 2
+DIGEST_ALGORITHM = "sha256"
+LOCK_FILES_KEY = "files"
+LOCK_OVERRIDES_KEY = "local_overrides"
+LOCK_COMMIT_KEY = "upstream_commit"
+GIT_HEAD = "HEAD"
+GIT_FETCH_HEAD = "FETCH_HEAD"
 
 # Target agents where upstream GKE skills should be synced.
 #
@@ -232,6 +249,82 @@ def inject_footer(dest_path, skill_name):
     return True
 
 
+def _mirror_agents():
+    return sorted(set(DEFAULT_TARGET_AGENTS + [a for agents in SKILL_AGENT_OVERRIDES.values() for a in agents]))
+
+
+def mirrored_files(repo_root):
+    """Repo-relative paths of every file under a mirrored (prefix-named) skill directory."""
+    paths = []
+    for agent in _mirror_agents():
+        skills_dir = os.path.join(repo_root, "agents", agent, "skills")
+        if not os.path.isdir(skills_dir):
+            continue
+        for name in sorted(os.listdir(skills_dir)):
+            skill_dir = os.path.join(skills_dir, name)
+            if not name.startswith(SKILL_PREFIX) or not os.path.isdir(skill_dir):
+                continue
+            for dirpath, _, filenames in os.walk(skill_dir):
+                for filename in filenames:
+                    paths.append(os.path.relpath(os.path.join(dirpath, filename), repo_root))
+    return sorted(paths)
+
+
+def file_digest(path):
+    h = hashlib.new(DIGEST_ALGORITHM)
+    with open(path, "rb") as f:
+        h.update(f.read())
+    return h.hexdigest()
+
+
+def build_lock(repo_root, upstream_commit, local_overrides=None):
+    """The lock for the tree as it stands: one digest per mirrored file."""
+    return {
+        "upstream_repo": UPSTREAM_REPO,
+        "upstream_path": UPSTREAM_SKILLS_PATH,
+        LOCK_COMMIT_KEY: upstream_commit,
+        LOCK_FILES_KEY: {rel: file_digest(os.path.join(repo_root, rel)) for rel in mirrored_files(repo_root)},
+        LOCK_OVERRIDES_KEY: dict(sorted((local_overrides or {}).items())),
+    }
+
+
+def load_lock(repo_root):
+    with open(os.path.join(repo_root, LOCK_FILE), "r", encoding=UTF_8_ENCODING) as f:
+        return json.load(f)
+
+
+def write_lock(repo_root, lock):
+    with open(os.path.join(repo_root, LOCK_FILE), "w", encoding=UTF_8_ENCODING) as f:
+        json.dump(lock, f, indent=LOCK_INDENT, sort_keys=True)
+        f.write("\n")
+
+
+def check_lock(repo_root, lock):
+    """Problems between the tree and the lock; empty when every mirrored file is accounted for.
+
+    A file counts as accounted for when its digest matches the lock or it is listed under
+    local_overrides. An override whose file matches the lock anyway is stale and is reported
+    too, so the list stays an honest record of what the next sync will wipe.
+    """
+    locked = lock.get(LOCK_FILES_KEY, {})
+    overrides = lock.get(LOCK_OVERRIDES_KEY, {})
+    actual = {rel: file_digest(os.path.join(repo_root, rel)) for rel in mirrored_files(repo_root)}
+    problems = []
+    for rel in sorted(set(actual) - set(locked)):
+        problems.append(f"{rel}: not in the lock (added outside the sync)")
+    for rel in sorted(set(locked) - set(actual)):
+        problems.append(f"{rel}: in the lock but missing from the tree")
+    for rel in sorted(set(actual) & set(locked)):
+        if actual[rel] != locked[rel] and rel not in overrides:
+            problems.append(f"{rel}: differs from the last sync and is not listed under {LOCK_OVERRIDES_KEY}")
+    for rel in sorted(overrides):
+        if rel not in actual:
+            problems.append(f"{rel}: listed under {LOCK_OVERRIDES_KEY} but missing from the tree")
+        elif rel in locked and actual[rel] == locked[rel]:
+            problems.append(f"{rel}: listed under {LOCK_OVERRIDES_KEY} but matches the last sync (stale entry)")
+    return problems
+
+
 def run_cmd(cmd, cwd=None):
     """Runs a shell command and returns the result, raising an exception on failure."""
     res = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
@@ -244,7 +337,17 @@ def run_cmd(cmd, cwd=None):
 
 def main():
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--upstream-commit", help="Sync from this upstream commit instead of the default branch head.")
+    parser.add_argument("--check", action="store_true", help="Compare the tree with the lock and exit non-zero on any difference; no network.")
+    args = parser.parse_args()
+
+    if args.check:
+        problems = check_lock(repo_root, load_lock(repo_root))
+        for problem in problems:
+            print(problem, file=sys.stderr)
+        sys.exit(1 if problems else 0)
+
     try:
         print("Creating temporary directory for shallow clone...")
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -253,6 +356,12 @@ def main():
                 "git", "clone", "--depth", "1",
                 UPSTREAM_REPO, tmpdir
             ])
+            if args.upstream_commit:
+                print(f"Checking out pinned upstream commit {args.upstream_commit}...")
+                run_cmd(["git", "fetch", "--depth", "1", "origin", args.upstream_commit], cwd=tmpdir)
+                run_cmd(["git", "checkout", "--quiet", GIT_FETCH_HEAD], cwd=tmpdir)
+            upstream_commit = run_cmd(["git", "rev-parse", GIT_HEAD], cwd=tmpdir).stdout.strip()
+            previous_overrides = load_lock(repo_root).get(LOCK_OVERRIDES_KEY, {}) if os.path.isfile(os.path.join(repo_root, LOCK_FILE)) else {}
             
             upstream_skills_dir = os.path.join(tmpdir, UPSTREAM_SKILLS_PATH)
             if not os.path.isdir(upstream_skills_dir):
@@ -274,8 +383,7 @@ def main():
                 print(f"  - {name}")
 
             # Prune obsolete local skill directories that were renamed/removed upstream
-            target_agents = set(DEFAULT_TARGET_AGENTS + [a for agents in SKILL_AGENT_OVERRIDES.values() for a in agents])
-            for agent in target_agents:
+            for agent in _mirror_agents():
                 agent_skills_dir = os.path.join(repo_root, "agents", agent, "skills")
                 if os.path.isdir(agent_skills_dir):
                     for local_name in sorted(os.listdir(agent_skills_dir)):
@@ -310,6 +418,14 @@ def main():
                     # Re-inject the Cluster Agent coupling footer (wiped by the copy above).
                     if inject_footer(dest_path, skill_name):
                         print(f"  Injected kube-agents footer into {skill_name}/{SKILL_MD_FILENAME}")
+
+            # Every mirrored file is now upstream content plus substitutions and footers, so the
+            # override list starts empty again. Anything it held was just overwritten; name it so
+            # the change can be re-made as a SKILL_SUBSTITUTIONS entry rather than lost quietly.
+            for rel, reason in sorted(previous_overrides.items()):
+                print(f"Wiped local override {rel} ({reason}); re-add it under SKILL_SUBSTITUTIONS if still wanted.", file=sys.stderr)
+            write_lock(repo_root, build_lock(repo_root, upstream_commit))
+            print(f"Wrote {LOCK_FILE} at upstream commit {upstream_commit}.")
 
             print("\nSynchronization complete!")
     except subprocess.CalledProcessError:

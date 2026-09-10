@@ -114,6 +114,89 @@ class ApplySubstitutionsTest(unittest.TestCase):
             self.assertNotIn(sync.GKE_WORKLOAD_SECURITY_OLD_NETPOL_SNIPPET, content)
             self.assertIn(sync.GKE_WORKLOAD_SECURITY_NEW_NETPOL_SNIPPET, content)
 
+class MirrorLockTest(unittest.TestCase):
+    """The tree's mirrored files match scripts/upstream_skills_lock.json.
+
+    Mirrored (`gke-*`) skill directories are rewritten wholesale by the sync, so an edit made
+    directly to one lasts until the next run. These tests make that edit fail here instead:
+    every mirrored file must digest to what the last sync wrote, or be named under
+    local_overrides with the pull request that changed it.
+    """
+
+    REPO_ROOT = Path(__file__).resolve().parent.parent
+    SHA1_HEX_LENGTH = 40
+
+    def _fake_repo(self, body="upstream\n"):
+        root = Path(tempfile.mkdtemp())
+        skill = root / "agents" / "platform" / "skills" / "gke-example"
+        skill.mkdir(parents=True)
+        (skill / "SKILL.md").write_text(body, encoding="utf-8")
+        (root / "scripts").mkdir()
+        return root, skill / "SKILL.md"
+
+    def test_repo_mirrors_match_lock(self):
+        problems = sync.check_lock(str(self.REPO_ROOT), sync.load_lock(str(self.REPO_ROOT)))
+        self.assertEqual(
+            problems,
+            [],
+            "\n".join(
+                [
+                    "Mirrored gke-* skill files differ from the last upstream sync:",
+                    *problems,
+                    "These directories are rewritten by scripts/sync-upstream-skills.py, so a direct edit",
+                    "is lost at the next run. Put the change in SKILL_SUBSTITUTIONS or SKILL_FOOTERS there",
+                    "and rerun the sync, or list the file under local_overrides in",
+                    f"{sync.LOCK_FILE} with the pull request that made the change.",
+                ]
+            ),
+        )
+
+    def test_lock_pins_an_upstream_commit(self):
+        lock = sync.load_lock(str(self.REPO_ROOT))
+        commit = lock[sync.LOCK_COMMIT_KEY]
+        self.assertEqual(len(commit), self.SHA1_HEX_LENGTH)
+        int(commit, 16)
+        self.assertEqual(lock["upstream_repo"], sync.UPSTREAM_REPO)
+
+    def test_lock_covers_every_mirrored_file(self):
+        lock = sync.load_lock(str(self.REPO_ROOT))
+        self.assertEqual(sorted(lock[sync.LOCK_FILES_KEY]), sync.mirrored_files(str(self.REPO_ROOT)))
+
+    def test_direct_edit_is_a_problem_until_listed_as_an_override(self):
+        root, skill_md = self._fake_repo()
+        lock = sync.build_lock(str(root), "0" * self.SHA1_HEX_LENGTH)
+        self.assertEqual(sync.check_lock(str(root), lock), [])
+
+        skill_md.write_text("edited locally\n", encoding="utf-8")
+        problems = sync.check_lock(str(root), lock)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("differs from the last sync", problems[0])
+
+        rel = str(skill_md.relative_to(root))
+        lock[sync.LOCK_OVERRIDES_KEY] = {rel: "#1: reason"}
+        self.assertEqual(sync.check_lock(str(root), lock), [])
+
+    def test_stale_override_and_unsynced_file_are_problems(self):
+        root, skill_md = self._fake_repo()
+        rel = str(skill_md.relative_to(root))
+        lock = sync.build_lock(str(root), "0" * self.SHA1_HEX_LENGTH, {rel: "#1: reason"})
+        problems = sync.check_lock(str(root), lock)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("stale entry", problems[0])
+
+        lock[sync.LOCK_OVERRIDES_KEY] = {}
+        (skill_md.parent / "references").mkdir()
+        (skill_md.parent / "references" / "new.md").write_text("x\n", encoding="utf-8")
+        problems = sync.check_lock(str(root), lock)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("added outside the sync", problems[0])
+
+    def test_lock_round_trips_through_the_file(self):
+        root, _ = self._fake_repo()
+        lock = sync.build_lock(str(root), "0" * self.SHA1_HEX_LENGTH)
+        sync.write_lock(str(root), lock)
+        self.assertEqual(sync.load_lock(str(root)), lock)
+
 
 if __name__ == "__main__":
     unittest.main()
