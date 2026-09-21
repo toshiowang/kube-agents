@@ -12,7 +12,9 @@ that is merely slow is not reported:
     A progress condition (``Progressing``, ``Accepted``, ``Programmed``,
     ``ResolvedRefs``, ``Ready``, ``Available``) is not ``True`` and its
     ``lastTransitionTime`` is older than the threshold. Conditions nested under
-    ``status`` (Gateway listeners, HTTPRoute parents) are read too.
+    ``status`` (Gateway listeners, HTTPRoute parents) are read too, and the row
+    carries the controller's message, which is what names a referent the
+    identity cannot list.
 ``repeating-warnings``
     A Warning event on the object has been repeating for longer than the
     threshold and was still firing within the last threshold window.
@@ -179,6 +181,8 @@ HEURISTIC_EVENTS = "repeating-warnings"
 HEURISTIC_REFERENCE = "dangling-reference"
 
 TABLE_COLUMNS = ("OBJECT", "HEURISTIC", "DETAIL", "STALLED_FOR")
+#: Joins a stale-condition row's reason to the controller's message in the table.
+DETAIL_MESSAGE_SEPARATOR = ": "
 SUMMARY_LINE = "stalled resources: {count}"
 # The table's DETAIL column is capped, with a marker, so one event message
 # cannot push a row off the screen; the finding dict behind it, and so --json,
@@ -372,13 +376,14 @@ def object_label(obj: dict) -> str:
     return f"{kind}{RESOURCE_NAME_SEPARATOR}{name}"
 
 
-def finding(obj: dict, heuristic: str, detail: str, stalled: timedelta) -> dict:
+def finding(obj: dict, heuristic: str, detail: str, stalled: timedelta, message: str = "") -> dict:
     seconds = int(stalled.total_seconds())
     return {
         "object": object_label(obj),
         "namespace": (obj.get("metadata") or {}).get("namespace", ""),
         "heuristic": heuristic,
         "detail": detail,
+        "message": message,
         "stalled_for": format_duration(seconds),
         "stalled_seconds": seconds,
     }
@@ -459,8 +464,19 @@ def check_stale_conditions(obj: dict, now: datetime, threshold: timedelta) -> li
         where = f"{path} " if path else ""
         reason = cond.get("reason") or ""
         detail = f"{where}{ctype}={cond.get('status')} {reason}".strip()
-        findings.append(finding(obj, HEURISTIC_CONDITION, detail, age))
+        findings.append(finding(obj, HEURISTIC_CONDITION, detail, age, condition_message(cond)))
     return findings
+
+
+def condition_message(cond: dict) -> str:
+    """The controller's message on one line.
+
+    Kept apart from `detail` so a consumer keying rows on `detail` sees a stable
+    string while the message moves; the table joins the two. On the default
+    read-only identity Secrets cannot be listed, so for a listener waiting on a
+    TLS Secret this message is what names it.
+    """
+    return " ".join(str(cond.get("message") or "").split())
 
 
 def event_count(event: dict) -> int:
@@ -632,9 +648,16 @@ def table_detail(detail: str) -> str:
     return detail[: TABLE_DETAIL_MAX_CHARS - len(TRUNCATION_MARKER)] + TRUNCATION_MARKER
 
 
+def detail_cell(f: dict) -> str:
+    message = f.get("message") or ""
+    if not message:
+        return f["detail"]
+    return f"{f['detail']}{DETAIL_MESSAGE_SEPARATOR}{message}"
+
+
 def render_table(findings: list[dict]) -> str:
     rows = [
-        [f["object"], f["heuristic"], table_detail(f["detail"]), f["stalled_for"]]
+        [f["object"], f["heuristic"], table_detail(detail_cell(f)), f["stalled_for"]]
         for f in findings
     ]
     widths = [len(col) for col in TABLE_COLUMNS]

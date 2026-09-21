@@ -165,6 +165,40 @@ class StaleConditions(unittest.TestCase):
         details = {r["heuristic"]: r["detail"] for r in rows}
         self.assertEqual(details["stale-condition"], "listeners[https] ResolvedRefs=False InvalidCertificateRef")
 
+    def test_condition_message_names_what_the_controller_waits_on(self):
+        # On the default read-only identity Secrets cannot be listed, so the
+        # controller's message is what names the one the listener waits on.
+        cond = condition("ResolvedRefs", "False", 90, "InvalidCertificateRef")
+        cond["message"] = "Error GWCER102: Secret payments/edge-tls\n  not found."
+        gw = obj(
+            "Gateway",
+            "edge",
+            spec={},
+            status={"listeners": [{"name": "https", "conditions": [cond]}]},
+            managed_fields=[managed(100)],
+        )
+        rows = analyze([gw])
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["detail"], "listeners[https] ResolvedRefs=False InvalidCertificateRef")
+        self.assertEqual(rows[0]["message"], "Error GWCER102: Secret payments/edge-tls not found.")
+        self.assertIn(
+            "InvalidCertificateRef: Error GWCER102: Secret payments/edge-tls not found.",
+            stall_report.render_table(rows),
+        )
+
+    def test_condition_without_message_renders_the_reason_alone(self):
+        dep = obj(
+            "Deployment",
+            "api",
+            spec={"replicas": 1},
+            status={"conditions": [condition("Available", "False", 90, "MinimumReplicasUnavailable")]},
+            managed_fields=[managed(100)],
+        )
+        rows = analyze([dep])
+        self.assertEqual(rows[0]["message"], "")
+        cell = stall_report.render_table(rows).split("\n")[1].split("  ")[2]
+        self.assertEqual(cell, "Available=False MinimumReplicasUnavailable")
+
     def test_epoch_transition_time_is_clamped_to_creation(self):
         gw = obj("Gateway", "edge", spec={}, status={"conditions": [
             {"type": "Accepted", "status": "Unknown", "reason": "Pending", "lastTransitionTime": "1970-01-01T00:00:00Z"},
