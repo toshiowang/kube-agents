@@ -13,7 +13,13 @@ from cuj.utils.acceptance_criteria import AcceptanceCriteria
 from cuj.utils.evidence import EvidenceLog
 from cuj.utils.interaction import InteractionRunner
 from cuj.utils.milestones import MilestoneSuite
-from cuj.utils.portal import CANONICAL_AGENT_ID, PortalError, isolated_portal
+from cuj.utils.portal import (
+    CANONICAL_AGENT_ID,
+    Portal,
+    PortalError,
+    isolated_portal,
+    portal_token,
+)
 
 DEFAULT_TIMEOUT_SECONDS = 1600.0
 DEFAULT_POLL_INTERVAL_SECONDS = 2.0
@@ -67,6 +73,13 @@ class Scenario:
     build_prompt: Callable[[], str]
     evaluate_acceptance: Callable[[dict[str, Any]], AcceptanceCriteria]
     evaluate_milestones: Callable[[dict[str, Any]], MilestoneSuite] | None = None
+    # Reads what the interaction projection does not carry, such as the cards
+    # a worker filed, while the portal is still up. Its keys are merged into
+    # the interaction the evaluators receive.
+    collect_evidence: (
+        Callable[[Portal, dict[str, Any]], dict[str, Any]] | None
+    ) = None
+    default_timeout: float = DEFAULT_TIMEOUT_SECONDS
 
     def __post_init__(self) -> None:
         if not re.fullmatch(r"[a-z][a-z0-9_]*", self.id):
@@ -77,11 +90,19 @@ class Scenario:
         try:
             prompt = self.build_prompt()
             with isolated_portal(log.root) as endpoint:
-                config = ScenarioConfig.from_env(endpoint)
+                config = ScenarioConfig.from_env(
+                    endpoint, default_timeout=self.default_timeout
+                )
                 interaction = InteractionRunner(config, log).run(
                     prompt,
                     session_prefix=f"portal_{self.id}",
                 )
+                if self.collect_evidence is not None:
+                    collected = self.collect_evidence(
+                        Portal(endpoint, token=portal_token()), interaction
+                    )
+                    log.record("collected_evidence", collected)
+                    interaction = {**interaction, **collected}
             acceptance = self.evaluate_acceptance(interaction)
             milestones = None
             milestone_results = ()
