@@ -31,7 +31,7 @@ Platform Agent must hand this to that cluster's Cluster Agent and wait for its \
 answer rather than read the cluster itself. This is read-only: do not change \
 anything."""
 
-TIMEOUT_SECONDS = 600.0
+TIMEOUT_SECONDS = 300.0
 PLATFORM_PROFILE = "platform"
 CLUSTER_AGENT_PREFIX = "cluster-"
 
