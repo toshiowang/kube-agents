@@ -566,11 +566,12 @@ if docker image inspect "$AGENT_IMAGE" >/dev/null 2>&1; then
   check "and still connects" "named=[]" "$elsewhere"
 
   # Connection sharing, which is how Hermes actually connects: every ssh it
-  # spawns carries ControlMaster=auto and one ControlPath per user@host:port,
-  # so every process in the pod rides the master the first one opened. A
-  # profile carried by SetEnv would be the master's here, not the caller's; a
-  # SendEnv'd variable is forwarded by the master from the caller's own
-  # environment. One container, so the two sessions share a control socket:
+  # spawns carries ControlMaster=auto, so later commands ride the master the
+  # first one opened (deploy/docker/ssh_config.d/10-sandbox-profile-home.conf
+  # says how widely it is shared). A profile carried by SetEnv would be the
+  # master's here, not the caller's; a SendEnv'd variable is forwarded by the
+  # master from the caller's own environment. One container, so the two
+  # sessions share a control socket:
   # the master is opened as the platform profile, the multiplexed session asks
   # as the cluster profile, and the cluster profile is what has to arrive.
   mux=$(docker run --rm -i --network host --add-host "$SANDBOX_ALIAS:127.0.0.1" \

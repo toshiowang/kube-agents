@@ -64,8 +64,9 @@ AcceptEnv LANG LC_*
 # one would add a second file-transfer path into the sandbox that nothing uses
 # and nothing watches.
 
-# Hermes holds one ControlMaster connection open and spawns every command
-# through it, so the session count is not a proxy for how busy the agent is.
+# Hermes holds a ControlMaster connection open for each environment and spawns
+# that environment's commands through it, so the session count is not a proxy
+# for how busy the agent is.
 # The idle timeout is what closes a connection the agent pod has stopped using
 # without waiting for TCP to notice.
 ClientAliveInterval 60

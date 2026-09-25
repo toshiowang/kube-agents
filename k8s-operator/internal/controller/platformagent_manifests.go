@@ -1552,16 +1552,18 @@ func buildGitopsStateConfigMap(agent *agentv1alpha1.PlatformAgent) *corev1.Confi
 // callers.
 //
 // `lifetime_seconds` is the reaper's idle timeout, and it is here to keep the
-// reaper from firing at all. Hermes gives every task its own SSHEnvironment but
-// derives the ssh ControlPath from sha256(user@host:port) — all three fixed by
-// this block — so every concurrent task multiplexes over ONE master connection.
-// Teardown is per environment and not per connection: cleanup() runs
-// `ssh -O exit` on that shared path, which drops the master and kills every
-// session riding it. A sibling task loses its in-flight command with exit 255
-// and an empty stderr. At the 300s default and delegation.max_concurrent_children
-// of 3, the reaper reaches that state whenever one child idles while another
-// works. Nothing is reclaimed by reaping here — the far side is a StatefulSet pod
-// that stays up either way — so the timeout buys nothing and costs the race.
+// reaper from firing at all. Nothing is reclaimed by reaping here — the far side
+// is a StatefulSet pod that stays up either way — so the timeout buys nothing,
+// and in upstream Hermes it costs a race: every task gets its own SSHEnvironment,
+// but the ssh ControlPath is derived from sha256(user@host:port) — all three
+// fixed by this block — so every concurrent task multiplexes over ONE master
+// connection, and a reaped environment's cleanup() runs `ssh -O exit` on that
+// shared path, killing every sibling's in-flight command with exit 255 and an
+// empty stderr. At the 300s default and delegation.max_concurrent_children of 3,
+// the reaper reaches that state whenever one child idles while another works.
+// The agent image keys the path per environment
+// (deploy/docker/patches/apply_ssh_per_env_socket.py), which closes the race for
+// the reaper and for a worker process exiting alike.
 //
 // `workspace_root` is the sixth and is NOT Hermes'. Hermes ignores it; the reader
 // is agents/platform/scripts/sandbox_exec.py, which already parses this block for

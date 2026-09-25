@@ -293,8 +293,8 @@ dependency update.
 The fourth defect is not a path or an environment variable. Hermes gives every
 task its own `SSHEnvironment`, but derives the `ssh` `ControlPath` from
 `sha256(user@host:port)` — and this design fixes all three of those, since the
-operator publishes one host, one user and one port for the whole agent. Every
-concurrent task therefore multiplexes over a single master connection.
+operator publishes one host, one user and one port for the whole agent. Unpatched,
+every concurrent task therefore multiplexes over a single master connection.
 
 Teardown is per environment and not per connection. `cleanup()` runs
 `ssh -O exit` against that shared path, which drops the master and kills every
@@ -319,12 +319,18 @@ root-owned file at the socket path so the socket can never be created fails
 because `cleanup()` unlinks that path, and the sandbox entrypoint runs as an
 unprivileged uid that cannot write a file the shell user could not then remove.
 
-What remains is the other two triggers. A process that exits still tears down
-its environment and still drops the shared master, so a delegated worker
-finishing while a sibling works can still cut the sibling's command — kanban
-workers are subprocesses that share the same socket directory, so they are the
-realistic case. Closing that needs a per-environment `ControlPath` in Hermes,
-which is an upstream change and not one this repository will carry as a patch.
+That leaves the other two triggers, and a process exiting is the one that happens
+in practice: kanban workers are subprocesses that share the socket directory, so
+a worker finishing its card while a sibling works cuts the sibling's command.
+The agent image closes this with a one-line Hermes patch,
+`deploy/docker/patches/apply_ssh_per_env_socket.py`, which appends the
+environment's session id to the socket key, the way upstream already keys the
+prompt builder's probe environment. Every environment then opens its own master,
+and its `cleanup()` can only close that; the `SendEnv` sibling sockets are named
+after the plain socket and follow without an edit. The cost is one handshake per
+environment rather than one per pod, and an idle environment's master still
+exits after `ControlPersist=300`. The patch is deleted when upstream keys every
+environment per instance.
 
 ### What the credential proxy is for
 
@@ -1496,9 +1502,10 @@ than extending it — and `hermes` is never offered it.
 `SendEnv` from the environment, and not `SetEnv HERMES_PROFILE_HOME=${HERMES_HOME}`, which
 the client would expand itself and which needs no wrapper. That form does not survive
 [the connection sharing](#one-connection-under-every-environment) this document already
-records: every `ssh` Hermes spawns carries `ControlMaster=auto` with one `ControlPath` per
-`user@host:port`, so the gateway, the Platform Agent worker and every Cluster Agent card
-ride one master. A multiplexed client hands its session request to the master, and the
+records: every `ssh` Hermes spawns carries `ControlMaster=auto`, so later commands ride
+the master the first one opened — one per environment in this image, and in upstream
+Hermes one per `user@host:port`, shared by the gateway, the Platform Agent worker and every
+Cluster Agent card. A multiplexed client hands its session request to the master, and the
 master forwards the client's variables only where its own `SendEnv` list permits the name,
 then adds its own `SetEnv` values after them — so under `SetEnv` the sandbox sees the
 profile of whichever process opened the master, for as long as that master persists,

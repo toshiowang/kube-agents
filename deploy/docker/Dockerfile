@@ -1067,6 +1067,14 @@ RUN /opt/hermes/.venv/bin/python3 /tmp/kanban-scheduling/apply_kanban_scheduling
 # and the entrypoint's step 1.7; this is the belt for any database that stays
 # in WAL. Ordered before the two above only because it is independent of them.
 # See the module docstring in deploy/docker/patches/apply_state_db_synchronous_full.py.
+#
+# ssh_per_env_socket rides the same COPY and RUN for the same reason and shares
+# no file with the others: it keys tools/environments/ssh.py's ControlMaster
+# socket per environment. Upstream keys it on user@host:port, which the operator
+# fixes for the whole pod, so every process shares one master and a worker's
+# cleanup() -- `ssh -O exit` on that path -- cuts every other process's
+# in-flight command with exit 255.
+# See the module docstring in deploy/docker/patches/apply_ssh_per_env_socket.py.
 COPY --chmod=0644 deploy/docker/patches/kanban_guardrail_exit.py \
      deploy/docker/patches/rate_limit_retry_delay.py \
      /opt/hermes/hermes_cli/
@@ -1076,12 +1084,16 @@ COPY deploy/docker/patches/apply_kanban_guardrail_exit.py \
      deploy/docker/patches/verify_rate_limit_retry_delay.py \
      deploy/docker/patches/apply_state_db_synchronous_full.py \
      deploy/docker/patches/verify_state_db_synchronous_full.py \
+     deploy/docker/patches/apply_ssh_per_env_socket.py \
+     deploy/docker/patches/verify_ssh_per_env_socket.py \
      deploy/docker/patches/patchlib.py \
      /tmp/kanban-guardrail-exit/
 RUN /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/apply_state_db_synchronous_full.py /opt/hermes && \
+    /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/apply_ssh_per_env_socket.py /opt/hermes && \
     /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/apply_kanban_guardrail_exit.py /opt/hermes && \
     /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/apply_rate_limit_retry_delay.py /opt/hermes && \
     grep -q 'if sys.platform == "linux":  # kube-agents patch: state-db-synchronous-full' /opt/hermes/hermes_state_wal.py && \
+    grep -q '# kube-agents patch: ssh-per-env-socket' /opt/hermes/tools/environments/ssh.py && \
     grep -q "if _kanban_halt_nudge:" /opt/hermes/agent/turn_tool_round.py && \
     grep -q "_kanban_should_record_missing(" /opt/hermes/agent/turn_finalizer.py && \
     grep -q "agent._kube_last_api_failure = (" /opt/hermes/agent/turn_api_error.py && \
@@ -1089,6 +1101,7 @@ RUN /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/apply_state_db_sync
     grep -q "_kube_block_rate_limited_chat(turn.result)" /opt/hermes/hermes_cli/cli_chat_turn_mixin.py && \
     grep -q "_kube_retry_delay_from_error(api_error)" /opt/hermes/agent/turn_recovery.py && \
     cd /opt/hermes && /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/verify_state_db_synchronous_full.py && \
+    /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/verify_ssh_per_env_socket.py && \
     /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/verify_kanban_guardrail_exit.py && \
     /opt/hermes/.venv/bin/python3 /tmp/kanban-guardrail-exit/verify_rate_limit_retry_delay.py && \
     rm -rf /tmp/kanban-guardrail-exit
