@@ -4,15 +4,15 @@ The check an author runs after deploying a change, minutes after the rollout
 rather than hours later in the presubmit gate. It asks one read-only question
 that must travel both delegation hops and scores the cards each hop filed.
 
-The interaction projection lists only the cards the Planning Agent filed, so
-the Cluster Agent's card is found through the platform worker's session: the
-dispatcher starts every worker with ``work kanban task <id>``, and a card the
-worker files carries the worker's session id.
+Every card in the journey carries the portal session: a card a worker files
+inherits its creator card's session. The tasks endpoint returns them with the
+timestamps the interaction projection omits, but with no parent link, so a
+Cluster Agent card is attributed to the platform card that was open when it
+was filed.
 """
 
 from __future__ import annotations
 
-import re
 import urllib.parse
 from datetime import UTC, datetime
 from typing import Any
@@ -20,21 +20,20 @@ from typing import Any
 from cuj.utils.acceptance_criteria import AcceptanceCriteria, AcceptanceCriterion
 from cuj.utils.interaction import projected_tasks, tool_operations
 from cuj.utils.portal import CANONICAL_AGENT_ID, Portal
-from cuj.utils.scenario import Scenario, required_env
+from cuj.utils.scenario import Scenario
 
-PROMPT = """Have the Platform Agent ask the Cluster Agent for cluster \
-{cluster} ({location}) in project {project_id} to list the namespaces on that \
-cluster, then report the cluster name and the namespace names back to me. The \
-Platform Agent must hand the question to that cluster's Cluster Agent and \
-wait for its answer rather than read the cluster itself. This is read-only: \
-do not change anything."""
+# The prompt names no cluster. Given a name that appears in its roster, the
+# Planning Agent routes straight to that Cluster Agent (agents/chat/SOUL.md
+# §3) and the Platform Agent hop, the one this journey exists for, never runs.
+PROMPT = """List the namespaces on the GKE cluster that kube-agents itself is \
+installed on, and report that cluster's name and its namespace names. The \
+Platform Agent must hand this to that cluster's Cluster Agent and wait for its \
+answer rather than read the cluster itself. This is read-only: do not change \
+anything."""
 
 TIMEOUT_SECONDS = 600.0
 PLATFORM_PROFILE = "platform"
 CLUSTER_AGENT_PREFIX = "cluster-"
-SESSION_LISTING_LIMIT = 200
-# The dispatcher's worker prompt, as admin_console/pages/chat.py matches it.
-WORKER_PROMPT = re.compile(r"work\s+kanban(?:\s+task)?\s+([A-Za-z0-9_.:-]+)")
 
 ACCEPTANCE_CRITERIA = (
     AcceptanceCriterion(
@@ -50,78 +49,36 @@ ACCEPTANCE_CRITERIA = (
     AcceptanceCriterion(
         "ac03-platform-card-done",
         "The Platform Agent's card runs and completes.",
-        "a root card assigned to platform is done after at least one run",
+        "a card assigned to platform is done after at least one run",
     ),
     AcceptanceCriterion(
         "ac04-cluster-card-filed",
         "The Platform Agent hands the question to a Cluster Agent.",
-        "the platform worker's session filed at least one card assigned to a "
-        "cluster-* profile",
+        "a cluster-* card was filed while a platform card was open",
     ),
     AcceptanceCriterion(
         "ac05-cluster-cards-done",
         "Every Cluster Agent card runs and completes.",
-        "every cluster-* card is done after at least one run",
+        "every handed-off cluster-* card is done after at least one run",
     ),
     AcceptanceCriterion(
         "ac06-platform-waited",
         "The Platform Agent completes its card only after the Cluster Agent "
         "answered, not on the dispatch receipt.",
-        "each platform card completed at or after every cluster-* card its "
-        "worker filed",
+        "each platform card completed at or after every cluster-* card filed "
+        "while it was open",
     ),
 )
 
 
-def _session_tasks(portal: Portal, session_id: str) -> list[dict[str, Any]]:
+def collect_handoff(portal: Portal, interaction: dict[str, Any]) -> dict[str, Any]:
+    session_id = str(interaction.get("sessionId") or "")
+    if not session_id:
+        return {"handoff": {"sessionCards": []}}
     quoted = urllib.parse.quote(session_id, safe="")
     response = portal.get(f"agents/{CANONICAL_AGENT_ID}/sessions/{quoted}/tasks")
-    return [card for card in response.get("tasks", []) if isinstance(card, dict)]
-
-
-def collect_handoff(portal: Portal, interaction: dict[str, Any]) -> dict[str, Any]:
-    root_session = str(interaction.get("sessionId") or "")
-    root_cards = _session_tasks(portal, root_session) if root_session else []
-    platform_ids = {
-        str(card.get("task_id"))
-        for card in root_cards
-        if card.get("assignee") == PLATFORM_PROFILE
-    }
-    query = urllib.parse.urlencode(
-        {
-            "cutoff": str(interaction.get("createdAt") or ""),
-            "limit": SESSION_LISTING_LIMIT,
-        }
-    )
-    listing = portal.get(f"agents/{CANONICAL_AGENT_ID}/sessions?{query}")
-    workers = []
-    for conversation in listing.get("conversations", []):
-        if not isinstance(conversation, dict):
-            continue
-        if conversation.get("profile") != PLATFORM_PROFILE:
-            continue
-        match = WORKER_PROMPT.search(str(conversation.get("preview") or ""))
-        if match and match.group(1) in platform_ids:
-            workers.append(
-                {
-                    "sessionId": str(conversation.get("session_id") or ""),
-                    "taskId": match.group(1),
-                }
-            )
-    cluster_cards = [
-        {**card, "workerTaskId": worker["taskId"]}
-        for worker in workers
-        for card in _session_tasks(portal, worker["sessionId"])
-        if str(card.get("assignee") or "").startswith(CLUSTER_AGENT_PREFIX)
-    ]
-    return {
-        "handoff": {
-            "rootCards": root_cards,
-            "workerSessions": workers,
-            "clusterCards": cluster_cards,
-            "sessionListingTruncated": bool(listing.get("truncated")),
-        }
-    }
+    cards = [card for card in response.get("tasks", []) if isinstance(card, dict)]
+    return {"handoff": {"sessionCards": cards}}
 
 
 def _timestamp(value: Any) -> datetime | None:
@@ -132,11 +89,37 @@ def _timestamp(value: Any) -> datetime | None:
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
 
 
+def _completed_at(card: dict[str, Any]) -> datetime | None:
+    return _timestamp(card.get("updated_at")) if card.get("status") == "done" else None
+
+
+def _filing_platform_card(
+    card: dict[str, Any], platform_cards: list[dict[str, Any]]
+) -> dict[str, Any] | None:
+    # A card filed before any platform card, or after it completed, is the
+    # Planning Agent's own and is not a hand-off.
+    filed = _timestamp(card.get("created_at"))
+    if filed is None:
+        return None
+    open_then = []
+    for platform in platform_cards:
+        opened = _timestamp(platform.get("created_at"))
+        closed = _completed_at(platform)
+        if opened is not None and opened <= filed and (closed is None or closed >= filed):
+            open_then.append((opened, platform))
+    return max(open_then, key=lambda pair: pair[0])[1] if open_then else None
+
+
 def evaluate_acceptance(interaction: dict[str, Any]) -> AcceptanceCriteria:
-    handoff = interaction.get("handoff") or {}
-    root_cards = handoff.get("rootCards") or []
-    workers = handoff.get("workerSessions") or []
-    cluster_cards = handoff.get("clusterCards") or []
+    cards = (interaction.get("handoff") or {}).get("sessionCards") or []
+    platform_cards = [card for card in cards if card.get("assignee") == PLATFORM_PROFILE]
+    handed_off = []
+    for card in cards:
+        if not str(card.get("assignee") or "").startswith(CLUSTER_AGENT_PREFIX):
+            continue
+        platform = _filing_platform_card(card, platform_cards)
+        if platform is not None:
+            handed_off.append((card, platform))
     platform_tasks = projected_tasks(interaction, assignee=PLATFORM_PROFILE)
     completed_operations = tool_operations(interaction, completed_only=True)
     done_platform = [
@@ -144,12 +127,7 @@ def evaluate_acceptance(interaction: dict[str, Any]) -> AcceptanceCriteria:
         for task in platform_tasks
         if task.get("status") == "done" and int(task.get("runCount") or 0) >= 1
     ]
-    listing_blocker = (
-        ("session listing was truncated; a worker session may be missing",)
-        if handoff.get("sessionListingTruncated")
-        else ()
-    )
-    no_cluster_card = () if cluster_cards else ("no Cluster Agent card to score",)
+    no_cluster_card = () if handed_off else ("no Cluster Agent card to score",)
 
     suite = AcceptanceCriteria(ACCEPTANCE_CRITERIA)
     suite.record(
@@ -172,48 +150,35 @@ def evaluate_acceptance(interaction: dict[str, Any]) -> AcceptanceCriteria:
     )
     suite.record(
         "ac04-cluster-card-filed",
-        bool(cluster_cards),
-        {
-            "workerSessions": workers,
-            "clusterCards": [
-                {key: card.get(key) for key in ("task_id", "assignee", "status")}
-                for card in cluster_cards
-            ],
-        },
-        blocked_by=() if cluster_cards else listing_blocker,
+        bool(handed_off),
+        [
+            {key: card.get(key) for key in ("task_id", "assignee", "status", "created_at")}
+            for card in cards
+        ],
     )
     suite.record(
         "ac05-cluster-cards-done",
-        bool(cluster_cards)
+        bool(handed_off)
         and all(
             card.get("status") == "done" and int(card.get("run_count") or 0) >= 1
-            for card in cluster_cards
+            for card, _ in handed_off
         ),
         [
             {
                 key: card.get(key)
                 for key in ("task_id", "assignee", "status", "run_count", "error")
             }
-            for card in cluster_cards
+            for card, _ in handed_off
         ],
         blocked_by=no_cluster_card,
     )
-    completed_at = {
-        str(card.get("task_id")): _timestamp(card.get("updated_at"))
-        for card in root_cards
-        if card.get("status") == "done"
-    }
     ordering = []
-    for card in cluster_cards:
-        platform_done = completed_at.get(str(card.get("workerTaskId")))
-        cluster_done = (
-            _timestamp(card.get("updated_at"))
-            if card.get("status") == "done"
-            else None
-        )
+    for card, platform in handed_off:
+        platform_done = _completed_at(platform)
+        cluster_done = _completed_at(card)
         ordering.append(
             {
-                "platformTaskId": card.get("workerTaskId"),
+                "platformTaskId": platform.get("task_id"),
                 "platformCompletedAt": platform_done and platform_done.isoformat(),
                 "clusterTaskId": card.get("task_id"),
                 "clusterCompletedAt": cluster_done and cluster_done.isoformat(),
@@ -232,11 +197,7 @@ def evaluate_acceptance(interaction: dict[str, Any]) -> AcceptanceCriteria:
 
 
 def build_prompt() -> str:
-    return PROMPT.format(
-        cluster=required_env("CUJ_CLUSTER_NAME"),
-        location=required_env("CUJ_CLUSTER_LOCATION"),
-        project_id=required_env("CUJ_PROJECT_ID"),
-    )
+    return PROMPT
 
 
 def test_01_handoff() -> None:

@@ -14,9 +14,7 @@ The suite targets the stock `platform-agent` resource created by
 `install.sh`, through the connection the admin portal's Connection page saved
 (`~/.kube-agent/state/admin-portal-connection.json`, or the path in
 `KUBE_AGENTS_ADMIN_CONNECTION_STATE`). Set `CUJ_PROJECT_ID` for scenarios that
-need a Google Cloud project. `delegation/test_01_handoff.py` also needs
-`CUJ_CLUSTER_NAME` and `CUJ_CLUSTER_LOCATION`, naming a cluster the install
-manages. `CUJ_PROFILE`, `CUJ_TIMEOUT`, and
+need a Google Cloud project. `CUJ_PROFILE`, `CUJ_TIMEOUT`, and
 `CUJ_POLL_INTERVAL` are optional overrides shared by the whole suite.
 Pytest reports every journey independently using its normal test discovery.
 Before running a journey, `test_00_agent_responsive.py` requires the configured
