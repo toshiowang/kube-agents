@@ -27,7 +27,7 @@ criterion, or a reviewed skill.
 
 The job starts no agent and depends on Hermes only through one adapter file. Hermes' own
 background learning is switched off, because on this deployment it almost never runs and what it
-writes is deleted at the next pod start (§1).
+writes under a specialist profile is deleted at the next pod start (§1).
 
 ## 1. The problem
 
@@ -36,11 +36,12 @@ calls last Tuesday finding which project a cluster lives in, so it spends them a
 The pieces that come closest to fixing this are either inert or unconnected. Measured on one dev
 install running Hermes v2026.9.14 on 2026-09-25:
 
-- **Hermes' background skill review is on by default and almost never completes.** It ran to
-  completion in 1 of 85 Platform Agent kanban sessions and in none on Cluster Agent profiles:
-  kanban workers exit when their task completes, before the review thread finishes, and cron runs
-  skip the review entirely. The curator starts with the gateway or an interactive CLI, and in this
-  pod only the Planning Agent's gateway runs it. Anything the review does write under a specialist
+- **Hermes' background skill review is on by default and almost never completes.** It runs only
+  in a profile that has the `skill_manage` tool, so never in the Planning Agent, which disables its
+  `skills` toolset. It ran to completion in 1 of 85 Platform Agent kanban sessions and in none on
+  Cluster Agent profiles: kanban workers exit when their task completes, before the review thread
+  finishes, and cron runs skip the review entirely. The curator runs from long-lived processes —
+  the gateway, the web server, an interactive CLI — and never from a kanban worker. Anything the review does write under a specialist
   profile's `skills/` is removed at the next pod start by step 2.6a of
   `deploy/shared/docker-entrypoint.sh`, which replaces that directory from the image on purpose.
 - **Memory does not learn from work.** [`memory.md`](memory.md) makes specialist memory read-only
@@ -52,8 +53,8 @@ install running Hermes v2026.9.14 on 2026-09-25:
 - **Capability self-learning is specified but not built.**
   [`capability-delivery-vehicle.md`](capability-delivery-vehicle.md) R5 describes an agent that
   proposes criteria changes from conversations. The criteria store proposed in
-  [#1368](https://github.com/gke-labs/kube-agents/pull/1368) has no pending-proposal state, and
-  its `confirmed_by` field is a string nothing checks.
+  [#1368](https://github.com/gke-labs/kube-agents/pull/1368), as of its commit `d01f2e9`, has no
+  pending-proposal state, and its `confirmed_by` field is a string nothing checks.
 - **The data a harness-neutral job would read is incomplete.** Fluent Bit ships
   `/opt/data/logs/*.log`, which holds the Planning Agent's log; each specialist profile writes
   `profiles/<name>/logs/agent.log`, which is not shipped. Every profile reports the same
@@ -65,8 +66,9 @@ install running Hermes v2026.9.14 on 2026-09-25:
   retries or token counts.
 
 The closest prior art is the self-improvement job from #965, re-proposed as #1304 and closed. It
-was a CronJob with a read-only identity, a ConfigMap ledger, a recurrence gate and report-only
-output, aimed at kube-agents bugs. This design keeps that skeleton and points it at the install.
+was a CronJob with a read-only identity, a ConfigMap ledger and a recurrence gate, report-only by
+default, aimed at kube-agents bugs; it ran a model in a Hermes profile of its own. This design keeps
+that skeleton, drops the model from detection, and points it at the install.
 
 ## 2. Goals and non-goals
 
@@ -119,33 +121,38 @@ authenticated, paged, redacting reads of Cloud Logging and Cloud Trace, `normali
 `normalize_trace`, and the `ActivityEvent` shape they emit. Those modules (`telemetry.py`,
 `domain.py`, `connections.py`, `project_config.py`) are stdlib-only. `ActivityEvent` keeps a fixed
 set of fields, though, and `normalize_trace` discards the token, call-count and delegation
-attributes a record needs and drops spans with no session id. The Hermes adapter,
-`retrospective/adapters/hermes.py`, therefore reads raw spans for those attributes through the same
-provider's trace client. It is the only file in the package that names Hermes, and its tests pin
-the attribute names from recorded spans, because Hermes documents none of them.
+attributes a record needs and drops spans with no session id. The provider also lists only traces
+labelled `session.id`, which only the Planning Agent's `session_otel_bridge` plugin sets, so it never
+returns a Platform Agent, Cluster Agent or cron trace. The Hermes adapter,
+`retrospective/adapters/hermes.py`, therefore lists traces with its own filter, on the release's
+`service.name`, and reads raw spans for the attributes it needs, reusing the provider's
+authentication, paging and redaction. It is the only file in the package that names Hermes, and its
+tests pin the filter and the attribute names from recorded spans, because Hermes documents none of
+them.
 
-| Field                                                             | Filled from today                                                                             | Gap                                                                                                             |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `record_id`, `harness` (`hermes@<tag>`), `task_key`, `parent_key` | Span `gen_ai.conversation.id` or session id; audit `task_id`; `subagent.*` spans              | Joining a kanban task to its session is inferred, so every record carries `ActivityEvent`'s `attribution` level |
-| `profile`                                                         | —                                                                                             | P0-2 adds it to spans; P0-1 carries it in the shipped log's file path                                           |
-| `trigger`, `started_at`, `ended_at`, `duration_ms`                | Root `agent` or `cron` span; audit timestamp                                                  | Until P0-1, an audit line re-shipped after a restart gets the ship time                                         |
-| `llm_calls`, `tokens`                                             | `gen_ai.usage.*`, `hermes.turn.api_call_count`, read by the adapter                           | Absent where an install ships logs but not traces                                                               |
-| `tools[]`: name, outcome, duration, argument digest, error class  | `tool.*` spans; `tool_call_audit` lines for the Planning Agent                                | Specialist profiles have spans only until P0-1 ships their logs                                                 |
-| `skills`, `delegations`, `approvals`, `final_status`              | `skill.*`, `hermes.subagent.*`, `approval.*`, `hermes.turn.final_status`, read by the adapter | —                                                                                                               |
-| `outcomes[]`: finding accepted or dismissed, pull request state   | —                                                                                             | P0-5                                                                                                            |
-| `goal_excerpt`                                                    | Prompt evidence on the root span, redacted and cut to 300 characters                          | Held in memory for the run and never written anywhere                                                           |
-| `coverage`: trace, audit, outcomes                                | `TelemetrySnapshot.incomplete`                                                                | —                                                                                                               |
+| Field                                                             | Filled from today                                                                                                    | Gap                                                                                                             |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `record_id`, `harness` (`hermes@<tag>`), `task_key`, `parent_key` | Span `gen_ai.conversation.id` or session id; audit `task_id`; `subagent.*` spans                                     | Joining a kanban task to its session is inferred, so every record carries `ActivityEvent`'s `attribution` level |
+| `profile`                                                         | —                                                                                                                    | P0-2 adds it to spans; P0-1 carries it in the shipped log's file path                                           |
+| `trigger`, `started_at`, `ended_at`, `duration_ms`                | Root `agent` or `cron` span; audit timestamp                                                                         | Until P0-1, an audit line re-shipped after a restart gets the ship time                                         |
+| `llm_calls`, `tokens`                                             | `gen_ai.usage.*`, `hermes.turn.api_call_count`, read by the adapter                                                  | Absent where an install ships logs but not traces                                                               |
+| `tools[]`: name, outcome, duration, argument digest, error class  | `tool.*` spans; `tool_call_audit` lines for the Planning Agent                                                       | The Platform Agent's audit lines ship after P0-1; Cluster Agent profiles write none                             |
+| `skills`, `delegations`, `approvals`, `final_status`              | `skill.*`, `hermes.subagent.*`, `approval.*`, `hermes.turn.final_status`, read by the adapter                        | —                                                                                                               |
+| `outcomes[]`: finding accepted or dismissed, pull request state   | —                                                                                                                    | P0-5                                                                                                            |
+| `goal_excerpt`                                                    | Prompt evidence on the root span, redacted and cut to 300 characters                                                 | Held in memory for the run and never written anywhere                                                           |
+| `coverage`: trace, audit, outcomes                                | Per record: whether a trace and, where that profile's audit lines are shipped, an audit line were found for its task | —                                                                                                               |
 
 The argument digest is a hash of the tool arguments with identifiers, numbers and UUIDs normalised
 out, so two calls that differ only in a timestamp compare equal and no argument value is kept. The
-provider has already redacted the arguments and cut them at 8,000 characters, so a digest over a
-truncated argument can merge two calls that differ past the cut.
+arguments arrive redacted and cut short — at 2,000 characters on an audit line, 8,000 in the
+provider — so a digest over a truncated argument can merge two calls that differ past the cut.
 
 The provider reads a window that ends now, with a length from a fixed set (1, 6, 24, 72, 168 or 720
-hours), and caps a load at 10 pages per source: up to 500 rows a page on each of its two logging
-queries and 100 traces a page. The job reads the last 24 hours each run, or 72 when the ledger shows
-the previous run missing, with every source at its 10-page cap. Windows overlap and records repeat
-across runs; §6 counts each task once.
+hours), and caps a load at 10 pages per query: up to 500 rows a page on each of its two logging
+queries and 100 traces a page on the trace query. The job reads the last 24 hours each run, or 72
+when the ledger shows the previous run missing, with every query at its 10-page cap. A load that
+hits the cap is reported in the run's output. Windows overlap and records repeat across runs; §6
+counts each task once.
 
 ## 5. Detectors
 
@@ -184,16 +191,20 @@ where profile class collapses every `cluster-*` profile into one and the subject
 digits and UUIDs removed. A fingerprint becomes a proposal when it has been seen in at least three
 distinct tasks on at least two UTC days within seven days, or in at least five tasks within 28
 days. The day is the UTC day the task started, not the day the job ran. A record with partial
-coverage counts as half a task, so a day with missing traces cannot push a pattern over the line. A
-run opens at most five new proposals. A dismissal holds for 90 days and reopens early only if the
+coverage — no trace, or no audit line where its profile's audit lines are shipped — counts as half a task, so a
+task seen through only one source cannot push a pattern over the line. Coverage is judged per
+record, never from whether the whole load was truncated, so a busy day that hits the page cap does
+not halve every count. A run opens at most five new proposals. A dismissal holds for 90 days and reopens early only if the
 28-day count reaches twice the count recorded with the dismissal.
 
 The ledger is one ConfigMap, `kube-agents-retrospective-ledger`, updated by compare-and-swap on
 `resourceVersion` and retried on conflict, as #965 did. For each fingerprint it holds, per UTC day,
-the set of 8-hex-character digests of the task keys that matched, so a task seen by two overlapping
-runs, a manual run, or a log line re-shipped after a restart counts once. Beyond that it holds
-state and a title rendered from a fixed template per detector — no text taken from telemetry,
-because the Platform Agent's ClusterRole reads every ConfigMap in the cluster
+two sets of 8-hex-character digests of the task keys that matched, one for full coverage and one
+for partial, so a task seen by two overlapping runs, a manual run, or a log line re-shipped after a
+restart counts once. Beyond that it holds state and a title rendered from a fixed template per
+detector. A template interpolates only the profile class and subject names that match
+`^[A-Za-z0-9_.:-]{1,64}$`; any other value is replaced by its digest. No free text is taken from
+telemetry, because the Platform Agent's ClusterRole reads every ConfigMap in the cluster
 (`kubeagents:minimal:*` in `platformagent_manifests.go`), and a ledger that quoted tool output or
 prompts would put that text in front of the agent looking like a kube-agents record. Days older
 than 28 are dropped, and the job refuses to write past 900 KiB of ConfigMap's 1 MiB.
@@ -217,9 +228,9 @@ modules it imports; it starts no Hermes process.
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Schedule   | `0 10 * * *` UTC (06:00 EDT, 05:00 EST); the Monday run also writes the weekly report                                                                                                                                                                                                                                                                    |
 | Job shape  | `concurrencyPolicy: Forbid`, `backoffLimit: 0`, 30-minute deadline, non-root, read-only root filesystem                                                                                                                                                                                                                                                  |
-| Identity   | KSA `kube-agents-retrospective`, bound through Workload Identity to its own GSA holding `roles/cloudtrace.user`, a Logging view on the release's logs, and object creation on the proposals bucket. Provisioned in `terraform/modules/kube-agents-iam` and wired into `examples/full-install`                                                            |
+| Identity   | KSA `kube-agents-retrospective`, bound through Workload Identity to its own GSA holding `roles/cloudtrace.user`, a Logging view on the release's logs, and object creation on the proposals bucket. Provisioned in `terraform/modules/kube-agents-iam` and wired into `terraform/examples/full-install`                                                  |
 | Kubernetes | A Role with `get` and `update` on the ledger ConfigMap and `get` on the decisions ConfigMap, each by `resourceNames`. No Secrets, no `pods/exec`, no PVC. The chart creates both ConfigMaps with `helm.sh/resource-policy: keep` and no `data`, so the job never needs `create` and an upgrade's three-way merge leaves what the job and operators wrote |
-| Network    | A NetworkPolicy with no ingress; egress to DNS, the metadata server and 443. LiteLLM is added in Phase 2 and Hindsight in Phase 3                                                                                                                                                                                                                        |
+| Network    | A NetworkPolicy with no ingress; egress to DNS, to the metadata server at both `169.254.169.254:80` and `169.254.169.252:988` as `github-minter.yaml` does, and to 443. LiteLLM is added in Phase 2 and Hindsight in Phase 3                                                                                                                             |
 
 The agent image fails its build if it contains `gcloud` (the cluster-CLI check in
 `deploy/docker/Dockerfile`), and `CloudTelemetryProvider` gets its token through a
@@ -251,11 +262,11 @@ text can be forged by anything that reached the model's context.
 Each route has an applier that is deterministic code, reads the decision itself, and records the
 decision id with what it wrote. No model sits between the decision and the write.
 
-| Kind     | Destination                                                                                                   | Applied by                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| -------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fact     | Shared memory. The fact must pass `memory.md`'s bar: no live state, no conclusion the agent drew about itself | On Hindsight installs, the job's next run retains the decision's text through Hindsight's HTTP API with the tags `scope:shared`, `source:retrospective`, `decision:<id>` and `domain:<slug>`. On `multiuser_memory` installs there is no API to write through, so the fact stays a proposal the operator relays word for word to the Planning Agent                                                                                                         |
-| Criteria | The capability's criteria file in the store #1368 proposes                                                    | The kube-agents operator mounts the decisions ConfigMap read-only into the agent pod. A step there, run at start and on a timer, reads accepted criteria decisions from the mount and writes each key through the store's validation and learning policy, with `decision:<id>` as the confirmation. It calls the store's code, not the `capability_criteria` MCP tool, so no model is involved                                                              |
-| Skill    | `learned-skills/<profile>/<name>/SKILL.md` in a repository the operator keeps                                 | The operator commits the drafted skill from the bucket and merges it through review; the merge is the decision, and `hack/retrospective.sh accept` records it in the ConfigMap for the ledger. Markdown only; a draft carrying scripts is refused. Phase 3c adds the read-only sync that brings the directory to `/opt/data/learned-skills/<profile>`, outside the tree step 2.6a replaces, and the Hermes adapter adds that path to `skills.external_dirs` |
+| Kind     | Destination                                                                                                   | Applied by                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fact     | Shared memory. The fact must pass `memory.md`'s bar: no live state, no conclusion the agent drew about itself | On Hindsight installs, the job's next run retains the decision's text through Hindsight's HTTP API with the tags `scope:shared`, `source:retrospective`, `decision:<id>` and `domain:<slug>`, and with `observation_scopes` pinned to `[["scope:shared"]]` and the shared strategy, as `memory.md`'s shared writes are, so the extra tags do not split its observations from the rest of shared memory. On `multiuser_memory` installs there is no API to write through, so the fact stays a proposal the operator relays word for word to the Planning Agent |
+| Criteria | The capability's criteria file in the store #1368 proposes                                                    | The kube-agents operator mounts the decisions ConfigMap read-only into the agent pod. A step there, run at start and on a timer, reads accepted criteria decisions from the mount and writes each key through the store's validation and learning policy, with `decision:<id>` as the confirmation. It calls the store's code, not the `capability_criteria` MCP tool, so no model is involved                                                                                                                                                                |
+| Skill    | `learned-skills/<profile>/<name>/SKILL.md` in a repository the operator keeps                                 | The operator commits the drafted skill from the bucket and merges it through review; the merge is the decision, and `hack/retrospective.sh accept` records it in the ConfigMap for the ledger. Markdown only; a draft carrying scripts is refused. Phase 3c adds the read-only sync that brings the directory to `/opt/data/learned-skills/<profile>`, outside the tree step 2.6a replaces, and the Hermes adapter adds that path to `skills.external_dirs`                                                                                                   |
 
 The skill route is the one whose decision record is git rather than the ConfigMap: review of a
 pull request is already the stronger record, and duplicating it would add a second place to
@@ -269,17 +280,19 @@ stale.
 
 ## 10. Switching off Hermes' own loop
 
-Hermes' background skill review and curator would otherwise write skills nobody approved, in a
-place that is wiped on restart (§1). The kube-agents operator pins two keys in the managed scope
+Hermes' background skill review and curator would otherwise write skills nobody approved (§1). The kube-agents operator pins two keys in the managed scope
 it already renders to `/etc/hermes` (`renderConfigYAML` in `platformagent_manifests.go`):
 
 - `skills.creation_nudge_interval: 0`. The review fires only when the interval is greater than
-  zero (Hermes v2026.9.14, `agent/turn_finalizer.py`).
+  zero and the profile has `skill_manage` (Hermes v2026.9.14, `agent/turn_finalizer.py`).
 - `curator.enabled: false`, which `curator.is_enabled()` reads.
 
 The managed scope is the right place because Hermes overlays it per leaf key on every config load,
 for every profile in the pod, and refuses to save over it, so a model editing its own profile
-config cannot turn the loop back on. Setting the keys in `agents/{chat,platform,cluster}/config.yaml`
+config cannot turn the loop back on. The comment on `renderConfigYAML` admits a key only if it is
+the same for every profile and beyond the agent's own repair; these two pass the first test and
+not the second. They join the way `approvals.cron_mode` did, as a policy that is uniform by design,
+and the P0-6 pull request widens that comment to say so. Setting the keys in `agents/{chat,platform,cluster}/config.yaml`
 would not reach every existing volume either: the Planning Agent's config is back-filled only for
 keys it lacks, so a volume that already sets the interval keeps it; the platform profile is
 back-filled the same way when it serves as the gateway; and cluster profile configs are not
@@ -295,22 +308,26 @@ to it.
 Each prerequisite is useful without the rest of this design and ships as its own pull request.
 
 - **P0-1. Ship specialist profile logs.** Add `/opt/data/profiles/*/logs/agent.log` to the Fluent
-  Bit config the kube-agents operator renders (`buildFluentBitConfigMap`), with a parser that keeps the line's
-  own timestamp.
-- **P0-2. Name the profile in spans.** Add a `kubeagents.profile` resource attribute, beside the
-  existing `kubeagents.agent_type` and `kubeagents.agent_name`, in `deploy/shared/otel_config.py`
-  and `agents/platform/scripts/cluster_agent_profile.py`, leaving `service.name` as it is so
-  existing dashboards keep working.
+  Bit config the kube-agents operator renders (`buildFluentBitConfigMap`), with a parser that keeps
+  the line's own timestamp. This adds the Platform Agent's `tool_call_audit` lines; Cluster Agent
+  profiles load no audit plugin, so their tool calls still come from spans alone.
+- **P0-2. Name the profile in spans.** Add a `kubeagents.profile` resource attribute to each
+  profile's `hermes_otel` `resource_attributes`, which `deploy/shared/otel_config.py` writes, and to
+  the Cluster Agent profiles `agents/platform/scripts/cluster_agent_profile.py` stamps. The existing
+  `kubeagents.agent_type` and `kubeagents.agent_name` come from the pod-wide
+  `OTEL_RESOURCE_ATTRIBUTES` (`manifest_helpers.go`) and cannot differ per profile. `service.name`
+  stays as it is so existing dashboards keep working.
 - **P0-3. A NetworkPolicy for `hindsight-api`.** The chart gives the Hindsight database a policy
   but not the API. Phase 3 adds the job as a Hindsight client, and the policy that admits it should
   exist before a new client does.
 - **P0-4. Carry the memory provider to the Planning Agent.** `agents/chat/config.yaml` names
   `multiuser_memory` itself, and `spec.harness.memory.provider` no longer reaches it, which
-  `memory.md` still describes as the only copy the running system reads. Either make the CR field
-  reach the Planning Agent or correct `memory.md`.
+  `memory.md` and the site's `reference/config.md` still describe as reaching it. Either make the
+  CR field reach the Planning Agent or correct both documents.
 - **P0-5. Log finding outcomes.** Emit one structured log line wherever a finding changes state in
   `session_kv_server.py` — registration, surfacing, snooze expiry, verification and patch — so D7
-  has something to count.
+  has something to count. Each line carries an `audit_event` key, which the provider's logging
+  queries select on.
 - **P0-6. Switch off Hermes' loop** (§10).
 
 ## 12. Phases
@@ -344,8 +361,8 @@ before and after, and propose a revert when it did not fall. On one install that
 separate the change from everything else that moved in those weeks. A firm answer needs parallel
 installs running the same workload with and without the change, which is a separate design: the
 admission webhook allows one `PlatformAgent` per cluster, so each arm needs its own cluster and
-renamed service accounts, and `bench` records token counts per run that its scoring does not yet
-use.
+renamed service accounts, and `bench` records token counts per run but does not yet score on
+them.
 
 ## 13. Verification and eval-driven development
 
@@ -363,9 +380,12 @@ On a live install:
 3. `kubectl create job --from=cronjob/kube-agents-retrospective` writes ledger entries per profile
    with coverage; three sessions per profile checked by hand against their transcripts match their
    records; and a second manual run in the same hour leaves the task counts unchanged.
-4. `kubectl auth can-i` shows the job's service account cannot read Secrets, exec into pods or
-   update decisions, and the Platform Agent's cannot update the ledger or decisions. The Platform
-   Agent's GSA cannot read the proposals bucket.
+4. `kubectl auth can-i`, impersonating each Kubernetes service account, shows the job's cannot
+   read Secrets, exec into pods or update decisions, and the Platform Agent's cannot update the
+   ledger or decisions. The same checks run with each Google service account's own credentials,
+   through service-account impersonation, cover the IAM half, since GKE authorizes those through
+   IAM as well as RBAC. The Platform Agent's Google service account cannot read the proposals
+   bucket.
 5. An accepted criteria decision is applied within one timer period, survives a pod restart, and
    the store's changelog carries its decision id.
 
@@ -379,7 +399,7 @@ the loop in [`eval_driven_development.md`](../../.agents/rules/eval_driven_devel
 Each Phase 3 case seeds the learned artifact as a fixture — a criteria decision, a Hindsight fact, a
 `learned-skills` directory — and checks the agent uses it; it claims the domain of the artifact it
 seeds, so a criteria case claims `fleet-audits`. P0-6 has no artifact to seed. Its case sends the
-Planning Agent, where the review does run, a task long enough to cross the review interval, and
+Platform Agent, which has `skill_manage`, a task long enough to cross the review interval, and
 checks that no skill was written. Whether that case can be made red on `main` reliably, given how
 rarely the review completes, is open question 5.
 
@@ -399,8 +419,8 @@ to turn off.
 3. **Where learned skills live.** The Reviewed tier in the capability vehicle's R6 is not built.
    Until it is, which repository holds `learned-skills/`, and what credential does the sync read it
    with?
-4. **Criteria gate.** Should #1368 take a decision id as its confirmation now, or land first and
-   adopt it in 3a?
+4. **Criteria gate.** Should the criteria store take a decision id as its confirmation from its
+   first version, or adopt it in 3a?
 5. **P0-6's red.** If the review completes too rarely for a case to fail on `main`, is the managed
    scope pin, checked by the kube-agents operator's manifest tests, enough evidence on its own?
 6. **Where the weekly report is read.** A bucket object nobody opens changes nothing. Should the
