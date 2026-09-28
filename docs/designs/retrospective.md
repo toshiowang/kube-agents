@@ -278,19 +278,19 @@ the rest. Each fact also keeps the date it was accepted, for re-checking facts t
 stale.
 
 What the appliers write survives an upgrade: Hindsight's database and the agent's volume keep their
-disks, #1368's store merges stored values over the image's defaults at every start, the
+disks, the store #1368 proposes merges stored values over the image's defaults at every start, the
 learned-skills directory sits outside the tree step 2.6a replaces, and both ConfigMaps carry
 `helm.sh/resource-policy: keep`. An upgrade can instead make what was learned wrong or inert. A
-release may fix the tool a skill works around or move what a fact points at, and the store prunes a
-criterion whose key the new schema drops and ignores one whose value falls outside a tightened
-bound, using the default in its place. So the first run after the release or harness tag changes —
-the ledger keeps the last pair it saw — adds a section to the report listing every accepted decision
-made under an older pair, for the operator to confirm or retire with
-`hack/retrospective.sh confirm|retire <fingerprint>`. Confirming stamps the decision with the
-running pair; retiring removes what its applier wrote, found by the decision id. The in-pod criteria
-applier runs at every start, so after every upgrade, and logs an `audit_event` line for each
-accepted criterion the store now prunes or ignores; the job reads those back through its logging
-queries and lists them in the same section.
+release may fix the tool a skill works around or move what a fact points at, and the store stops
+reading a criterion whose key the new schema drops, pruning it at the next `set`, and ignores one
+whose value falls outside a tightened bound, using the default in its place. So the first run after
+the release or harness tag changes — the ledger keeps the last pair it saw — adds a section to the
+report listing every accepted decision made under an older pair, for the operator to confirm or
+retire with `hack/retrospective.sh confirm|retire <fingerprint>`. Confirming stamps the decision
+with the running pair; retiring removes what its applier wrote, found by the decision id. The in-pod
+criteria applier runs at every start, so after every upgrade, and logs an `audit_event` line for
+each accepted criterion the store now prunes or ignores; the job reads those back through its
+logging queries and lists them in the same section.
 
 ## 10. Switching off Hermes' own loop
 
