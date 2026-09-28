@@ -4,8 +4,9 @@
 > before any code is written; the phases in §12 start only after it is agreed.
 
 **Scope:** a scheduled job that reads what an install's agents did over recent days, finds work they
-repeated or wasted, and proposes a change that would make the next run cheaper or better. A person
-accepts or dismisses each proposal; only an accepted one reaches an agent.
+repeated or wasted, and proposes a change only when it would save more than a set floor and more
+than it costs to carry. A person accepts or dismisses each proposal; only an accepted one reaches an
+agent.
 
 **Owns:** learning that is specific to one install — its clusters, its operators' preferences, the
 lookups its agents keep repeating. Defects in kube-agents' own code are
@@ -20,10 +21,11 @@ A CronJob, `kube-agents-retrospective`, runs a small Python package once a day. 
 install's Cloud Logging and Cloud Trace records, turns them into one record per task in a shape that
 names no harness, and runs fixed detectors over those records: the same tool called with the same
 arguments three times, a tool retried after an error, a finding the operator keeps dismissing, a
-lookup repeated across days. A pattern becomes a proposal only once it recurs across tasks and days.
-The Monday run writes a weekly report of open proposals. An operator accepts or dismisses each one
-outside chat, and only then is it applied — as a shared memory fact, a capability criterion, or a
-reviewed skill.
+lookup repeated across days. A pattern becomes a proposal only once it recurs across tasks and days,
+is still happening, and would save more than a floor and more than the change adds to every run
+(§6). The Monday run writes a weekly report of at most three proposals, largest saving first; a week
+with nothing worth changing has none. An operator accepts or dismisses each one outside chat, and
+only then is it applied — as a shared memory fact, a capability criterion, or a reviewed skill.
 
 The job starts no agent and depends on Hermes only through one adapter file. Hermes' own background
 learning is switched off, because on this deployment it almost never runs and what it writes under a
@@ -78,6 +80,8 @@ Goals:
   already keeps.
 - Name no harness outside one adapter. Replacing Hermes means writing a new adapter that emits the
   same records; the detectors, gate, ledger and appliers do not change.
+- Propose only what is worth an operator's time. Each proposal states the saving it expects, and a
+  week with nothing worth changing produces no proposal.
 - Apply nothing without a human decision recorded where no agent can write.
 - Put what is learned where the agent already looks — shared memory, capability criteria, skills —
   rather than in a new store the agent has to be taught to read.
@@ -170,6 +174,12 @@ proposal. A model is not involved in detection.
 | D8. The same read-only lookup subject in three or more tasks on two or more days | lookup subject              | Fact: the subject and where the answer lives, never the value |
 | D9. The harness's own skill-writing tool called (`skill_manage` on Hermes)       | skill name                  | Skill review                                                  |
 
+Each detector also measures what one occurrence wasted, in the units the record carries: D1 the
+repeated calls after the first; D2 the calls after the first error; D3 and D4 the whole task or
+delegation, which ended without a result; D5 the calls the denials blocked; D7 one finding a person
+read and dismissed; D8 the calls the lookup took after the first time it was answered. A call's
+waste is its duration and its share of the task's tokens.
+
 D8's rule matters for the memory bar in `memory.md`: a fact states where to find something ("the
 billing export for project X is table Y"), never the live value the agent looked up, which would be
 stale by the next run.
@@ -179,10 +189,10 @@ install, a tool that errors regardless of input — still becomes an ordinary pr
 who reads it dismisses it with the reason `upstream` and files it against the repository; the job
 holds no GitHub credential and files nothing.
 
-## 6. Recurrence gate and ledger
+## 6. Gates and ledger
 
-A detector firing once is noise. The gate decides when a subject has recurred enough to be worth an
-operator's attention.
+A detector firing once is noise, and a pattern that recurs can still be too small to be worth a
+decision. Two gates decide what reaches an operator: one for recurrence, one for worth.
 
 The fingerprint is the first 16 hex characters of `sha256(detector | profile class | subject)`,
 where profile class collapses every `cluster-*` profile into one and the subject has identifiers,
@@ -192,20 +202,42 @@ The day is the UTC day the task started, not the day the job ran. A record with 
 no trace, or no audit line where its profile's audit lines are shipped — counts as half a task, so a
 task seen through only one source cannot push a pattern over the line. Coverage is judged per
 record, never from whether the whole load was truncated, so a busy day that hits the page cap does
-not halve every count. A run opens at most five new proposals. A dismissal holds for 90 days and
-reopens early only if the 28-day count reaches twice the count recorded with the dismissal.
+not halve every count.
+
+A fingerprint that recurs is proposed only if it is also worth it:
+
+- It is still happening: seen in the last seven days.
+- Its projected saving, the mean waste per occurrence times occurrences a week over the last 28
+  days, reaches a floor: by default 100,000 tokens, 30 minutes of agent time, or two tasks that
+  ended without a result, a week. The floors are chart values; Phase 1 records every candidate's
+  score, so an install can set them from its own data before anything is proposed.
+- The saving is at least five times what the change adds: the tokens a skill's index entry or a fact
+  adds to each run that loads it, times those runs a week. A criterion adds nothing.
+- Nothing already accepted covers it. If the tasks that showed the pattern loaded a learned skill
+  with the same subject, or an accepted fact already names it, another one will not help, and the
+  report lists the existing item as not working instead.
+
+Of the fingerprints that pass, the weekly report carries at most three, largest saving first; the
+rest stay in the ledger and are scored again next week. When none pass, the report gives only the
+number of patterns that fell below the bar. `dismiss` takes a reason from a fixed list —
+`not-worth-it`, `wrong`, `already-known`, `upstream` — and three `not-worth-it` dismissals in a row
+from one detector double that detector's floors, until an acceptance returns them to the chart's. A
+dismissal holds for 90 days and reopens early only if the 28-day count reaches twice the count
+recorded with the dismissal. A proposal left undecided for four weeks expires, and returns only if
+it passes both gates again.
 
 The ledger is one ConfigMap, `kube-agents-retrospective-ledger`, updated by compare-and-swap on
 `resourceVersion` and retried on conflict, as #965 did. For each fingerprint it holds, per UTC day,
 two sets of 8-hex-character digests of the task keys that matched, one for full coverage and one for
 partial, so a task seen by two overlapping runs, a manual run, or a log line re-shipped after a
-restart counts once. Beyond that it holds state and a title rendered from a fixed template per
-detector. A template interpolates only the profile class and subject names that match
-`^[A-Za-z0-9_.:-]{1,64}$`; any other value is replaced by its digest. No free text is taken from
-telemetry, because the Platform Agent's ClusterRole reads every ConfigMap in the cluster
-(`kubeagents:minimal:*` in `platformagent_manifests.go`), and a ledger that quoted tool output or
-prompts would put that text in front of the agent looking like a kube-agents record. Days older than
-28 are dropped, and the job refuses to write past 900 KiB of ConfigMap's 1 MiB.
+restart counts once, and the waste those tasks measured. Beyond that it holds state, each detector's
+floor multiplier, and a title rendered from a fixed template per detector. A template interpolates
+only the profile class and subject names that match `^[A-Za-z0-9_.:-]{1,64}$`; any other value is
+replaced by its digest. No free text is taken from telemetry, because the Platform Agent's
+ClusterRole reads every ConfigMap in the cluster (`kubeagents:minimal:*` in
+`platformagent_manifests.go`), and a ledger that quoted tool output or prompts would put that text
+in front of the agent looking like a kube-agents record. Days older than 28 are dropped, and the job
+refuses to write past 900 KiB of ConfigMap's 1 MiB.
 
 Proposal bodies quote evidence — tool errors, span attributes, and in Phase 2 a drafted fact or
 skill — and some of it the agents cannot read today: the Platform Agent's service account holds
@@ -242,13 +274,13 @@ A second ConfigMap, `kube-agents-retrospective-decisions`, maps each fingerprint
 `dismissed` or `retired` with a reason and, for an accepted fact or criterion, the exact change: the
 fact's text, or the criteria key and value. The operator writes that change, starting from the
 proposal's draft, so what gets applied is what a person put there. Each decision also records the
-build and harness version its proposal was drafted under, which `accept` copies from the proposal
-and `confirm` (§9) replaces. The job writes both into every proposal from its own image:
-`KUBE_AGENTS_VERSION`, the commit SHA the image was built from, which a release promotes unchanged,
-and the version the harness adapter reports, for Hermes the `hermes-agent` distribution version. A
-value that does not match §6's name pattern is written as `unknown`. The job's image is the chart's
-platform-agent image, which the agents also run unless the PlatformAgent CR overrides it, as
-`scripts/dev/dev_rebuild_agent.sh` does.
+build and harness version its proposal was drafted under, which `accept` copies from the proposal,
+so Phase 4 can tell a change's effect from an upgrade's. The job writes both into every proposal
+from its own image: `KUBE_AGENTS_VERSION`, the commit SHA the image was built from, which a release
+promotes unchanged, and the version the harness adapter reports, for Hermes the `hermes-agent`
+distribution version. A value that does not match §6's name pattern is written as `unknown`. The
+job's image is the chart's platform-agent image, which the agents also run unless the PlatformAgent
+CR overrides it, as `scripts/dev/dev_rebuild_agent.sh` does.
 
 No agent identity and not the job can write the ConfigMap. Agent ClusterRoles grant `get`, `list`
 and `watch` on ConfigMaps and nothing more, and the job's Role grants `get`. This rests on the
@@ -290,10 +322,12 @@ inert. A release may fix the tool a skill works around or move what a fact point
 #1368 proposes uses the schema default in place of a value outside a tightened bound and, under a
 closed schema, stops reading a key the new schema drops.
 
-So every weekly report lists each accepted decision whose recorded build or harness version differs
-from the running one, until the operator runs `hack/retrospective.sh confirm|retire <fingerprint>`.
-Confirming records the running versions on the decision. Retiring sets it to `retired`, and each
-route undoes what it applied:
+Nothing asks the operator to re-approve what still works after an upgrade. The report lists each
+accepted criteria decision the running build would not apply (below), and Phase 4 proposes retiring
+a learned skill whose pattern has also stopped in tasks that did not load it, since something else,
+often the upgrade, fixed it. The operator retires a decision with
+`hack/retrospective.sh retire <fingerprint>`, which sets it to `retired`, and each route undoes what
+it applied:
 
 - A criterion: the in-pod applier removes the key when it reads `retired`, and treats a key already
   gone as removed. The store #1368 proposes can set a key but not remove one, and setting the
@@ -371,7 +405,9 @@ One bullet is one pull request.
 - 1a. `retrospective/records.py`, `retrospective/adapters/hermes.py` and tests built on
   `admin_console/tests/activity_fixtures.py` and recorded spans; add `retrospective/tests` to
   `PYTHON_TEST_DIRS`.
-- 1b. `retrospective/{fingerprint,detectors,gate}.py` with tests. All pure functions.
+- 1b. `retrospective/{fingerprint,detectors,gate}.py` with tests. All pure functions. The report
+  lists every candidate with its projected saving, so the default floors are checked against real
+  data before Phase 2.
 - 1c. `retrospective/{ledger,gcp,run}.py`.
 - 1d. The chart template, values and schema (`enabled: false`), `tests/test_chart_retrospective.py`,
   the IAM module change, and the Dockerfile `COPY`, inside the image-layer budget.
@@ -383,28 +419,31 @@ One bullet is one pull request.
   the output is validated against a JSON schema. Each proposal records the build and harness version
   (§8).
 - 2b. The decisions ConfigMap and `hack/retrospective.sh list|show|accept|dismiss`, with `accept`
-  copying the proposal's build and harness version onto the decision.
+  copying the proposal's build and harness version onto the decision and `dismiss` requiring a
+  reason from §6's list.
 - 2c. Optionally, a console page.
 
 **Phase 3: apply.** One route per pull request, each under the eval loop: 3a criteria (the in-pod
 applier), 3b facts, 3c skills (the `learned-skills` sync, `external_dirs`, and the copy the sandbox
-needs). 3d, once the first route ships, is the post-upgrade review in §9:
-`hack/retrospective.sh confirm|retire`, and the remove operation the criteria store needs.
+needs). 3d, once the first route ships, is `hack/retrospective.sh retire` and the remove operation
+the criteria store needs (§9).
 
 **Phase 4: check the effect.** For each accepted fingerprint, compare its rate over the four weeks
-before and after, and propose a revert when it did not fall. On one install that comparison cannot
-separate the change from everything else that moved in those weeks. A firm answer needs parallel
-installs running the same workload with and without the change, which is a separate design: the
-admission webhook allows one `PlatformAgent` per cluster, so each arm needs its own cluster and
-renamed service accounts, and `bench` records token counts per run but does not yet score on them.
+before and after, and propose retiring it when the saving it achieved is below what it adds to every
+run, or, for a skill, when the pattern also stopped in tasks that did not load it. On one install
+that comparison cannot separate the change from everything else that moved in those weeks. A firm
+answer needs parallel installs running the same workload with and without the change, which is a
+separate design: the admission webhook allows one `PlatformAgent` per cluster, so each arm needs its
+own cluster and renamed service accounts, and `bench` records token counts per run but does not yet
+score on them.
 
 ## 13. Verification and eval-driven development
 
-Unit tests cover records, detectors, the gate, the ledger's conflict retry, task-key de-duplication
-and size budget, and redaction, using recorded Logging and Trace responses as fixtures.
-`tests/test_chart_retrospective.py` checks the Role's `resourceNames`, the absence of Secrets, the
-ConfigMaps' empty `data`, and the NetworkPolicy. The kube-agents operator's manifest tests cover
-P0-1 and P0-6.
+Unit tests cover records, detectors, both gates and the floor multiplier, the ledger's conflict
+retry, task-key de-duplication and size budget, and redaction, using recorded Logging and Trace
+responses as fixtures. `tests/test_chart_retrospective.py` checks the Role's `resourceNames`, the
+absence of Secrets, the ConfigMaps' empty `data`, and the NetworkPolicy. The kube-agents operator's
+manifest tests cover P0-1 and P0-6.
 
 On a live install:
 
@@ -421,9 +460,8 @@ On a live install:
    as RBAC. The Platform Agent's Google service account cannot read the proposals bucket.
 5. An accepted criteria decision is applied within one timer period, survives a pod restart, and the
    store's changelog carries its decision id.
-6. After an upgrade of the install, the next weekly report lists each accepted decision recorded
-   under the previous build, and a criterion set outside a bound that a test build tightens is
-   listed as not applied. Retiring a criterion removes its key from the criteria file.
+6. After an upgrade to a test build that tightens a bound, the next weekly report lists a criterion
+   set outside it as not applied. Retiring a criterion removes its key from the criteria file.
 
 P0-1, P0-2, P0-3 and P0-5, and Phases 1 and 2, change no agent behaviour and take the eval
 exemption; so does P0-4 if it corrects `memory.md`, and it takes the loop if it changes which
@@ -467,3 +505,5 @@ turn off.
 7. **Retiring a Hindsight fact.** Can Hindsight's API delete memories by tag, and do the
    observations consolidated from them go with them? If not, a retired Hindsight fact can be marked
    but not removed.
+8. **The worth floors.** Are tokens, minutes and failed tasks the right units, and should the
+   defaults stay fixed in the chart or be derived from each install's Phase 1 data?
