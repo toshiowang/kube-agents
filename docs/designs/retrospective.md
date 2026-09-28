@@ -54,8 +54,7 @@ running Hermes v2026.9.14 on 2026-09-25:
 - **Capability self-learning is specified but not built.**
   [`capability-delivery-vehicle.md`](capability-delivery-vehicle.md) R5 describes an agent that
   proposes criteria changes from conversations. No criteria store exists yet, and applying a
-  proposed change safely needs one with a pending state and a confirmation it checks (§14, question
-  4).
+  proposed change safely needs one with a confirmation it checks (§14, question 4).
 - **The data a harness-neutral job would read is incomplete.** Fluent Bit ships
   `/opt/data/logs/*.log`, which holds the Planning Agent's log; each specialist profile writes
   `profiles/<name>/logs/agent.log`, which is not shipped. Every profile reports the same
@@ -242,7 +241,9 @@ calls use the in-cluster REST API through `urllib`.
 A second ConfigMap, `kube-agents-retrospective-decisions`, maps each fingerprint to `accepted` or
 `dismissed` with a reason and, for an accepted fact or criterion, the exact change: the fact's text,
 or the criteria key and value. The operator writes that change, starting from the proposal's draft,
-so what gets applied is what a person put there.
+so what gets applied is what a person put there. Each decision also records the kube-agents release
+and the harness tag it was made under: the chart's `appVersion`, which the chart passes to the job,
+and the `harness` field of the records behind it.
 
 No agent identity and not the job can write the ConfigMap. Agent ClusterRoles grant `get`, `list`
 and `watch` on ConfigMaps and nothing more, and the job's Role grants `get`. This rests on the
@@ -275,6 +276,21 @@ otherwise ungrouped — `multiuser_memory` is one list and Hindsight ranks by re
 is what lets an operator list, review or expire everything learned about cost, say, without reading
 the rest. Each fact also keeps the date it was accepted, for re-checking facts that may have gone
 stale.
+
+What the appliers write survives an upgrade: Hindsight's database and the agent's volume keep their
+disks, #1368's store merges stored values over the image's defaults at every start, the
+learned-skills directory sits outside the tree step 2.6a replaces, and both ConfigMaps carry
+`helm.sh/resource-policy: keep`. An upgrade can instead make what was learned wrong or inert. A
+release may fix the tool a skill works around or move what a fact points at, and the store prunes a
+criterion whose key the new schema drops and ignores one whose value falls outside a tightened
+bound, using the default in its place. So the first run after the release or harness tag changes —
+the ledger keeps the last pair it saw — adds a section to the report listing every accepted decision
+made under an older pair, for the operator to confirm or retire with
+`hack/retrospective.sh confirm|retire <fingerprint>`. Confirming stamps the decision with the
+running pair; retiring removes what its applier wrote, found by the decision id. The in-pod criteria
+applier runs at every start, so after every upgrade, and logs an `audit_event` line for each
+accepted criterion the store now prunes or ignores; the job reads those back through its logging
+queries and lists them in the same section.
 
 ## 10. Switching off Hermes' own loop
 
@@ -348,12 +364,14 @@ One bullet is one pull request.
 - 2a. `retrospective/propose.py` and the proposals bucket: each detector's fixed route, with an
   optional model-written draft through LiteLLM. Evidence is passed to the model as quoted data and
   the output is validated against a JSON schema.
-- 2b. The decisions ConfigMap and `hack/retrospective.sh list|show|accept|dismiss`.
+- 2b. The decisions ConfigMap, with the release and harness tag on each decision, and
+  `hack/retrospective.sh list|show|accept|dismiss`.
 - 2c. Optionally, a console page.
 
 **Phase 3: apply.** One route per pull request, each under the eval loop: 3a criteria (the in-pod
 applier), 3b facts, 3c skills (the `learned-skills` sync, `external_dirs`, and the copy the sandbox
-needs).
+needs). 3d, once the first route ships, is the post-upgrade review in §9 and
+`hack/retrospective.sh confirm|retire`.
 
 **Phase 4: check the effect.** For each accepted fingerprint, compare its rate over the four weeks
 before and after, and propose a revert when it did not fall. On one install that comparison cannot
@@ -385,6 +403,9 @@ On a live install:
    as RBAC. The Platform Agent's Google service account cannot read the proposals bucket.
 5. An accepted criteria decision is applied within one timer period, survives a pod restart, and the
    store's changelog carries its decision id.
+6. After an upgrade of the install, the next run's report lists the decisions accepted under the
+   previous release, and a criterion set outside a bound that a test build tightens is listed as
+   ignored.
 
 P0-1, P0-2, P0-3 and P0-5, and Phases 1 and 2, change no agent behaviour and take the eval
 exemption; so does P0-4 if it corrects `memory.md`, and it takes the loop if it changes which
