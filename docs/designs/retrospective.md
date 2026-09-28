@@ -127,17 +127,17 @@ provider's authentication, trace listing, paging and redaction. It is the only f
 that names Hermes, and its tests pin the attribute names from recorded spans, because Hermes
 documents none of them.
 
-| Field                                                             | Filled from today                                                                                                    | Gap                                                                                                             |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `record_id`, `harness` (`hermes@<tag>`), `task_key`, `parent_key` | Span `gen_ai.conversation.id` or session id; audit `task_id`; `subagent.*` spans                                     | Joining a kanban task to its session is inferred, so every record carries `ActivityEvent`'s `attribution` level |
-| `profile`                                                         | —                                                                                                                    | P0-2 adds it to spans; P0-1 carries it in the shipped log's file path                                           |
-| `trigger`, `started_at`, `ended_at`, `duration_ms`                | Root `agent` or `cron` span; audit timestamp                                                                         | Until P0-1, an audit line re-shipped after a restart gets the ship time                                         |
-| `llm_calls`, `tokens`                                             | `gen_ai.usage.*`, `hermes.turn.api_call_count`, read by the adapter                                                  | Absent where an install ships logs but not traces                                                               |
-| `tools[]`: name, outcome, duration, argument digest, error class  | `tool.*` spans; `tool_call_audit` lines for the Planning Agent                                                       | The Platform Agent's audit lines ship after P0-1; Cluster Agent profiles write none                             |
-| `skills`, `delegations`, `approvals`, `final_status`              | `skill.*`, `hermes.subagent.*`, `approval.*`, `hermes.turn.final_status`, read by the adapter                        | —                                                                                                               |
-| `outcomes[]`: finding accepted or dismissed, pull request state   | —                                                                                                                    | P0-5                                                                                                            |
-| `goal_excerpt`                                                    | Prompt evidence on the root span, redacted and cut to 300 characters                                                 | Held in memory for the run and never written anywhere                                                           |
-| `coverage`: trace, audit, outcomes                                | Per record: whether a trace and, where that profile's audit lines are shipped, an audit line were found for its task | —                                                                                                               |
+| Field                                                                 | Filled from today                                                                                                    | Gap                                                                                                             |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `record_id`, `harness` (`hermes@<version>`), `task_key`, `parent_key` | Span `gen_ai.conversation.id` or session id; audit `task_id`; `subagent.*` spans                                     | Joining a kanban task to its session is inferred, so every record carries `ActivityEvent`'s `attribution` level |
+| `profile`                                                             | —                                                                                                                    | P0-2 adds it to spans; P0-1 carries it in the shipped log's file path                                           |
+| `trigger`, `started_at`, `ended_at`, `duration_ms`                    | Root `agent` or `cron` span; audit timestamp                                                                         | Until P0-1, an audit line re-shipped after a restart gets the ship time                                         |
+| `llm_calls`, `tokens`                                                 | `gen_ai.usage.*`, `hermes.turn.api_call_count`, read by the adapter                                                  | Absent where an install ships logs but not traces                                                               |
+| `tools[]`: name, outcome, duration, argument digest, error class      | `tool.*` spans; `tool_call_audit` lines for the Planning Agent                                                       | The Platform Agent's audit lines ship after P0-1; Cluster Agent profiles write none                             |
+| `skills`, `delegations`, `approvals`, `final_status`                  | `skill.*`, `hermes.subagent.*`, `approval.*`, `hermes.turn.final_status`, read by the adapter                        | —                                                                                                               |
+| `outcomes[]`: finding accepted or dismissed, pull request state       | —                                                                                                                    | P0-5                                                                                                            |
+| `goal_excerpt`                                                        | Prompt evidence on the root span, redacted and cut to 300 characters                                                 | Held in memory for the run and never written anywhere                                                           |
+| `coverage`: trace, audit, outcomes                                    | Per record: whether a trace and, where that profile's audit lines are shipped, an audit line were found for its task | —                                                                                                               |
 
 The argument digest is a hash of the tool arguments with identifiers, numbers and UUIDs normalised
 out, so two calls that differ only in a timestamp compare equal and no argument value is kept. The
@@ -238,15 +238,17 @@ calls use the in-cluster REST API through `urllib`.
 
 ## 8. Recording a decision
 
-A second ConfigMap, `kube-agents-retrospective-decisions`, maps each fingerprint to `accepted` or
-`dismissed` with a reason and, for an accepted fact or criterion, the exact change: the fact's text,
-or the criteria key and value. The operator writes that change, starting from the proposal's draft,
-so what gets applied is what a person put there. Each decision also records the release and harness
-its proposal was drafted under, which `accept` copies from the proposal. The job writes that pair
-into every proposal from its own image, the same platform-agent image the agents run: the image's
-`KUBE_AGENTS_VERSION`, the commit it was built from, and the harness version the adapter reads from
-the installed harness package. A value that does not match §6's name pattern is written as
-`unknown`.
+A second ConfigMap, `kube-agents-retrospective-decisions`, maps each fingerprint to `accepted`,
+`dismissed` or `retired` with a reason and, for an accepted fact or criterion, the exact change: the
+fact's text, or the criteria key and value. The operator writes that change, starting from the
+proposal's draft, so what gets applied is what a person put there. Each decision also records the
+build and harness version its proposal was drafted under, which `accept` copies from the proposal
+and `confirm` (§9) replaces. The job writes both into every proposal from its own image:
+`KUBE_AGENTS_VERSION`, the commit SHA the image was built from, which a release promotes unchanged,
+and the version the harness adapter reports, for Hermes the `hermes-agent` distribution version. A
+value that does not match §6's name pattern is written as `unknown`. The job's image is the chart's
+platform-agent image, which the agents also run unless the PlatformAgent CR overrides it, as
+`scripts/dev/dev_rebuild_agent.sh` does.
 
 No agent identity and not the job can write the ConfigMap. Agent ClusterRoles grant `get`, `list`
 and `watch` on ConfigMaps and nothing more, and the job's Role grants `get`. This rests on the
@@ -281,31 +283,31 @@ the rest. Each fact also keeps the date it was accepted, for re-checking facts t
 stale.
 
 What the appliers write survives an upgrade: Hindsight's database and the agent's volume keep their
-disks, #1368's scaffolder keeps the volume's `criteria.json` over the image's at every start, the
-learned-skills directory sits outside the tree step 2.6a replaces, and both ConfigMaps keep what was
-written through an upgrade (§7). An upgrade can instead make what was learned wrong or inert. A
-release may fix the tool a skill works around or move what a fact points at. Under a closed schema,
-as #1368's is, the store stops reading a criterion whose key the new schema drops and uses the
-schema default in place of a value outside a tightened bound; the next `set` removes either.
+disks, the scaffolder #1368 proposes keeps the volume's `criteria.json` over the image's at every
+start, the learned-skills directory sits outside the tree step 2.6a replaces, and both ConfigMaps
+keep what was written through an upgrade (§7). An upgrade can instead make what was learned wrong or
+inert. A release may fix the tool a skill works around or move what a fact points at, and the store
+#1368 proposes uses the schema default in place of a value outside a tightened bound and, under a
+closed schema, stops reading a key the new schema drops.
 
-So every weekly report lists each accepted decision whose recorded pair differs from the running
-one, until the operator confirms or retires it with
-`hack/retrospective.sh confirm|retire <fingerprint>`. Confirming stamps the decision with the
-running pair. Retiring undoes it by route:
+So every weekly report lists each accepted decision whose recorded build or harness version differs
+from the running one, until the operator runs `hack/retrospective.sh confirm|retire <fingerprint>`.
+Confirming records the running versions on the decision. Retiring sets it to `retired`, and each
+route undoes what it applied:
 
-- A criterion: the in-pod applier removes the key and the changelog records the decision id. #1368's
-  store can set a key but not remove one, and setting the default instead would pin the key so a
-  later release's default no longer reaches it, so the store needs a remove operation.
-- A Hindsight fact: the job deletes it, found by its `decision:<id>` tag. Whether Hindsight's API
-  deletes by tag, and whether consolidated observations go with it, is checked before this ships.
+- A criterion: the in-pod applier removes the key when it reads `retired`, and treats a key already
+  gone as removed. The store #1368 proposes can set a key but not remove one, and setting the
+  default instead would pin the key so a later release's default never reaches it, so the store
+  needs a remove operation.
+- A Hindsight fact: the job deletes what it retained under `decision:<id>`, if Hindsight's API
+  allows it (§14, question 7).
 - A `multiuser_memory` fact: the operator relays its removal, as they relayed the fact.
 - A skill: a pull request that reverts it in the learned-skills repository.
 
-Before each write the in-pod criteria applier checks the decision's key and value against the
-running schema, and writes one decision per call so each changelog entry names one decision. A
-decision the store would prune or reject is not written; the applier logs it once per pod start as
-an `audit_event` line, and the job reads that back through its logging queries into the same report
-section.
+The same report lists each accepted criteria decision the running build would not apply. The job
+reads the capability schemas from its own image, which ships the same files as the agent's, and
+checks each decision's key and value against them; the in-pod applier makes the same check and does
+not write a decision that fails it.
 
 ## 10. Switching off Hermes' own loop
 
@@ -378,9 +380,10 @@ One bullet is one pull request.
 
 - 2a. `retrospective/propose.py` and the proposals bucket: each detector's fixed route, with an
   optional model-written draft through LiteLLM. Evidence is passed to the model as quoted data and
-  the output is validated against a JSON schema.
-- 2b. The decisions ConfigMap, with the release and harness tag on each decision, and
-  `hack/retrospective.sh list|show|accept|dismiss`.
+  the output is validated against a JSON schema. Each proposal records the build and harness version
+  (§8).
+- 2b. The decisions ConfigMap and `hack/retrospective.sh list|show|accept|dismiss`, with `accept`
+  copying the proposal's build and harness version onto the decision.
 - 2c. Optionally, a console page.
 
 **Phase 3: apply.** One route per pull request, each under the eval loop: 3a criteria (the in-pod
@@ -418,10 +421,9 @@ On a live install:
    as RBAC. The Platform Agent's Google service account cannot read the proposals bucket.
 5. An accepted criteria decision is applied within one timer period, survives a pod restart, and the
    store's changelog carries its decision id.
-6. After an upgrade of the install, the next weekly report lists the decisions accepted under the
-   previous release, and a criterion set outside a bound that a test build tightens is listed as not
-   applied. Retiring a criterion removes its key from the criteria file, and the changelog carries
-   the decision id.
+6. After an upgrade of the install, the next weekly report lists each accepted decision recorded
+   under the previous build, and a criterion set outside a bound that a test build tightens is
+   listed as not applied. Retiring a criterion removes its key from the criteria file.
 
 P0-1, P0-2, P0-3 and P0-5, and Phases 1 and 2, change no agent behaviour and take the eval
 exemption; so does P0-4 if it corrects `memory.md`, and it takes the loop if it changes which
@@ -433,10 +435,11 @@ domain.
 
 Each Phase 3 case seeds the learned artifact as a fixture — a criteria decision, a Hindsight fact, a
 `learned-skills` directory — and checks the agent uses it; it claims the domain of the artifact it
-seeds, so a criteria case claims `fleet-audits`. P0-6 has no artifact to seed. Its case sends the
-Platform Agent, which has `skill_manage`, a task long enough to cross the review interval, and
-checks that no skill was written. Whether that case can be made red on `main` reliably, given how
-rarely the review completes, is open question 5.
+seeds, so a criteria case claims `fleet-audits`. 3d's case seeds an accepted criteria decision,
+retires it, and checks the agent's audit follows the schema default again. P0-6 has no artifact to
+seed. Its case sends the Platform Agent, which has `skill_manage`, a task long enough to cross the
+review interval, and checks that no skill was written. Whether that case can be made red on `main`
+reliably, given how rarely the review completes, is open question 5.
 
 Two bench changes support this and are exempt from the loop: a `maximum_calls` bound on the
 tool-called verifier, so a case can fail on repetition, and a setup step that seeds an artifact
@@ -461,3 +464,6 @@ turn off.
 6. **Where the weekly report is read.** A bucket object nobody opens changes nothing. Should the
    report also reach the operator's chat channel, and through what path that does not pass through
    an agent?
+7. **Retiring a Hindsight fact.** Can Hindsight's API delete memories by tag, and do the
+   observations consolidated from them go with them? If not, a retired Hindsight fact can be marked
+   but not removed.
