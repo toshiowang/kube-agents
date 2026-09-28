@@ -4,9 +4,9 @@
 > before any code is written; the phases in §12 start only after it is agreed.
 
 **Scope:** a scheduled job that reads what an install's agents did over recent days, finds work they
-repeated or wasted, and proposes a change only when it would save more than a set floor and five
-times what it costs to carry. A person accepts or dismisses each proposal; only an accepted one
-reaches an agent.
+repeated or wasted, and proposes a change only when it would save at least a set number of tokens a
+week, or when an operator has dismissed the same finding three times. A person accepts or dismisses
+each proposal; only an accepted one reaches an agent.
 
 **Owns:** learning that is specific to one install — its clusters, its operators' preferences, the
 lookups its agents keep repeating. Defects in kube-agents' own code are
@@ -22,10 +22,10 @@ install's Cloud Logging and Cloud Trace records, turns them into one record per 
 names no harness, and runs fixed detectors over those records: the same tool called with the same
 arguments three times, a tool retried after an error, a finding the operator keeps dismissing, a
 lookup repeated across days. A pattern becomes a proposal only once it recurs across tasks and days,
-is still happening, and would save more than a floor and five times what the change adds to every
-run (§6). The Monday run writes a weekly report of at most three proposals; a week with nothing
-worth changing has none. An operator accepts or dismisses each one outside chat, and only then is it
-applied — as a shared memory fact, a capability criterion, or a reviewed skill.
+is still happening, and would save at least a floor of tokens a week (§6). The Monday run writes a
+weekly report of at most three proposals; a week with nothing worth changing has none. An operator
+accepts or dismisses each one outside chat, and only then is it applied — as a shared memory fact, a
+capability criterion, or a reviewed skill.
 
 The job starts no agent and depends on Hermes only through one adapter file. Hermes' own background
 learning is switched off, because on this deployment it almost never runs and what it writes under a
@@ -80,8 +80,8 @@ Goals:
   already keeps.
 - Name no harness outside one adapter. Replacing Hermes means writing a new adapter that emits the
   same records; the detectors, gate, ledger and appliers do not change.
-- Propose only what is worth an operator's time. Each proposal states the saving it expects, and a
-  week with nothing worth changing produces no proposal.
+- Propose only what is worth an operator's time. Each skill or fact proposal states the tokens a
+  week it expects to save, and a week with nothing worth changing produces no proposal.
 - Apply nothing without a human decision recorded where no agent can write.
 - Put what is learned where the agent already looks — shared memory, capability criteria, skills —
   rather than in a new store the agent has to be taught to read.
@@ -169,22 +169,27 @@ proposal. A model is not involved in detection.
 | D3. A turn or search budget exhausted                                            | profile, trigger            | Skill                                                         |
 | D4. A failed delegation re-spawned with the same goal                            | target profile, goal digest | Skill                                                         |
 | D5. The same approval pattern denied across tasks                                | tool, pattern               | Skill                                                         |
-| D6. Cost above 1.5× the p90 of its (profile, trigger) class, with n ≥ 5          | profile, trigger            | Report only                                                   |
+| D6. Tokens above 1.5× the p90 of its (profile, trigger) class, with n ≥ 5        | profile, trigger            | Report only                                                   |
 | D7. The same finding check dismissed three or more times                         | capability, check id        | Criteria                                                      |
 | D8. The same read-only lookup subject in three or more tasks on two or more days | lookup subject              | Fact: the subject and where the answer lives, never the value |
 | D9. The harness's own skill-writing tool called (`skill_manage` on Hermes)       | skill name                  | Report only, for skill review                                 |
 
 Each detector also measures what one occurrence wasted, in tokens, from records with full coverage
-only: D1 the repeated calls after the first; D2 the calls after the first error; D3 and D4 the whole
-task or delegation, which ended without a result; D5 the calls the denials blocked; D8 every call on
-the subject in a task after the earliest task in the 28-day window that made one. A task's tokens
-are its record's `tokens`: input tokens less cache reads, where the provider reports them, plus
-output tokens. No span carries a per-call count, so a wasted call is charged the task's tokens
-divided by its tool calls. D6, D7 and D9 measure no waste (§6).
+whose root span has ended; a task still running is left for the next run. D1 counts the repeated
+calls after the first; D2 the calls after the first error; D3 and D4 the whole task or delegation,
+which ended without a result; D5 the calls the denials blocked; D8 the calls on the subject after
+the first in each task, since a fact that says where the answer lives still leaves one read. A
+task's tokens are its record's `tokens`: input tokens less cache reads, where the provider reports
+them, plus output tokens. No tool span carries a token count, so a wasted call is charged the task's
+tokens divided by its tool calls. D6, D7 and D9 measure no waste (§6).
 
 D8's rule matters for the memory bar in `memory.md`: a fact states where to find something ("the
 billing export for project X is table Y"), never the live value the agent looked up, which would be
-stale by the next run.
+stale by the next run. A fact reaches the profile that made the lookup directly only on Hindsight
+installs, where the Platform Agent reads shared memory; Cluster Agents read none, and on
+`multiuser_memory` installs no specialist does, so there it reaches them only if the Planning Agent
+copies it onto the task's card. The report lists a fact whose pattern keeps recurring as not
+working, whichever path failed.
 
 A pattern that points at kube-agents itself — a skill that always exhausts its budget on every
 install, a tool that errors regardless of input — still becomes an ordinary proposal. The operator
@@ -210,35 +215,32 @@ A fingerprint that recurs is proposed only if it is also worth it:
 
 - It is still happening: seen in the last seven days.
 - Its projected saving, the mean waste per full-coverage occurrence times occurrences a week over
-  the last 28 days, reaches a floor: 100,000 tokens a week by default. The floor is a chart value;
-  Phase 1 records every candidate's saving, so an install can set it from its own data before
-  anything is proposed.
-- The saving is at least five times the tokens the change adds a week. A skill adds its index entry
-  to every model call its profile class makes and its body to every model call after a task loads
-  it, estimated from the matched tasks. A fact adds its text to every model call the Planning Agent
-  makes, an upper bound on Hindsight installs, where recall returns a fact only when it is relevant.
-  A criterion adds nothing.
-- Nothing already accepted covers it. `accept` records what the decision created —
-  `<profile>/<name>` for a skill, the fingerprint it answers for a fact — and a learned skill may
-  not take the name of a skill the image ships. If tasks that showed the pattern loaded that skill,
-  or an accepted fact answers the fingerprint, another one will not help, and the report lists the
-  existing item as not working instead.
+  the last 28 days, reaches a floor: 100,000 tokens a week by default. The floor is a chart value,
+  settable per detector; Phase 1 records every candidate's saving, so an install can set it from its
+  own data before anything is proposed.
+- It is not already accepted. An accepted fingerprint that passes the recurrence gate again,
+  counting only tasks after its decision, is listed in the report as not working instead.
 
-D7 skips the two saving tests: what a dismissed finding costs is a person's time, which no record
-measures, and the criterion that fixes it adds nothing to a run, so three dismissals are reason
-enough to ask. D6 and D9 propose nothing.
+What a change adds to every run is not scored. A skill's index entry and a fact are a few dozen
+tokens in the stable part of the system prompt, which a provider that caches prompts serves from its
+cache, and the text to measure does not exist until a proposal is drafted. The proposal states its
+draft's size, and the operator weighs it.
 
-Proposals are made on the Monday run only. It proposes at most three of the fingerprints that pass,
-D7's first and the rest by largest saving, and says how many more passed; those stay in the ledger
-and are scored again next week. When none pass, the proposals section gives only the number of
-patterns that fell below the bar. D6's and D9's findings, accepted items that are not working, and
-criteria the build would not apply (§9) are listed in sections of their own every week, outside the
-limit. `dismiss` takes a reason from a fixed list — `not-worth-it`, `wrong`, `already-known`,
-`upstream` — and the report shows each detector's acceptances and `not-worth-it` dismissals over the
-last 90 days, which is what an operator reads before changing the floor. A dismissal holds for 90
-days and reopens early only if the 28-day count reaches twice the count recorded with the dismissal.
-A proposal left undecided for four weeks expires and is held out for 28 days, so an unread report
-does not return the same three every week.
+D7 skips the saving test: what a dismissed finding costs is a person's time, which no record
+measures, and three dismissals of one check are reason enough to ask. D6 and D9 propose nothing.
+
+Proposals are made on the Monday run only. It proposes at most three of the fingerprints that pass —
+at most one from D7, the check dismissed most often, and the rest by largest saving — and says how
+many more passed; those stay in the ledger and are scored again next week. When none pass, the
+proposals section gives only the number of patterns that fell below the bar. D6's and D9's findings,
+accepted items that are not working, and criteria the build would not apply (§9) are listed in
+sections of their own every week, outside the limit. `dismiss` takes a reason from a fixed list —
+`not-worth-it`, `wrong`, `already-known`, `upstream` — and the report shows each detector's
+acceptances and `not-worth-it` dismissals over the last 90 days, which is what an operator reads
+before changing that detector's floor. A dismissal holds for 90 days and reopens early only if the
+28-day count reaches twice the count recorded with the dismissal. A proposal left undecided for four
+weeks expires and is held out for 28 days, so an unread report does not return the same three every
+week.
 
 The ledger is one ConfigMap, `kube-agents-retrospective-ledger`, updated by compare-and-swap on
 `resourceVersion` and retried on conflict, as #965 did. For each fingerprint it holds, per UTC day,
@@ -288,13 +290,14 @@ A second ConfigMap, `kube-agents-retrospective-decisions`, maps each fingerprint
 `dismissed` or `retired` with a reason, the date and, for an accepted fact or criterion, the exact
 change: the fact's text, or the criteria key and value. The operator writes that change, starting
 from the proposal's draft, so what gets applied is what a person put there. Each decision also
-records the build and harness version its proposal was drafted under, which `accept` copies from the
-proposal, so Phase 4 can flag a comparison window that spans an upgrade. The job writes both into
-every proposal from its own image: `KUBE_AGENTS_VERSION`, the commit SHA the image was built from,
-which a release promotes unchanged, and the version the harness adapter reports, for Hermes the
-`hermes-agent` distribution version. A value that does not match §6's name pattern is written as
-`unknown`. The job's image is the chart's platform-agent image, which the agents also run unless the
-PlatformAgent CR overrides it, as `scripts/dev/dev_rebuild_agent.sh` does.
+records the fingerprint's 28-day count and the build and harness version its proposal was drafted
+under, which `accept` copies from the proposal, so a later report can set the count then against the
+count now and show whether an upgrade came between them. The job writes both into every proposal
+from its own image: `KUBE_AGENTS_VERSION`, the commit SHA the image was built from, which a release
+promotes unchanged, and the version the harness adapter reports, for Hermes the `hermes-agent`
+distribution version. A value that does not match §6's name pattern is written as `unknown`. The
+job's image is the chart's platform-agent image, which the agents also run unless the PlatformAgent
+CR overrides it, as `scripts/dev/dev_rebuild_agent.sh` does.
 
 No agent identity and not the job can write the ConfigMap. Agent ClusterRoles grant `get`, `list`
 and `watch` on ConfigMaps and nothing more, and the job's Role grants `get`. This rests on the
@@ -337,13 +340,13 @@ inert. A release may fix the tool a skill works around or move what a fact point
 closed schema, stops reading a key the new schema drops.
 
 Nothing asks the operator to re-approve what still works after an upgrade. The report lists each
-accepted criteria decision the running build would not apply (below), and Phase 4 proposes retiring
-a learned skill whose pattern also fell in tasks that could have loaded it and did not, since
-something else, often the upgrade, fixed it (§12). Facts and skills have no schema to check against:
-one an upgrade made wrong shows only as its pattern returning, which the report lists as not
-working, or through Phase 4. The operator retires a decision with
-`hack/retrospective.sh retire <fingerprint>`, which sets it to `retired`, and each route undoes what
-it applied:
+accepted criteria decision the running build would not apply (below), and shows each accepted
+fingerprint's count at its decision and now, with the build each was taken under (§12), so a pattern
+that stopped when a new build arrived is visible and the operator can retire what that build made
+unnecessary. Facts and skills have no schema to check against: one an upgrade made wrong shows only
+as its pattern returning, which the report lists as not working. The operator retires a decision
+with `hack/retrospective.sh retire <fingerprint>`, which sets it to `retired`, and each route undoes
+what it applied:
 
 - A criterion: the in-pod applier removes the key when it reads `retired`, and treats a key already
   gone as removed. The store #1368 proposes can set a key but not remove one, and setting the
@@ -443,23 +446,21 @@ applier), 3b facts, 3c skills (the `learned-skills` sync, `external_dirs`, and t
 needs). 3d, once the first route ships, is `hack/retrospective.sh retire` and the remove operation
 the criteria store needs (§9).
 
-**Phase 4: check the effect.** For each accepted fingerprint, compare its rate over the four weeks
-before and after, and propose retiring it when the saving it achieved is below what it adds to every
-run, or, for a skill, when the pattern's rate, against its rate before acceptance, also fell in at
-least five full-coverage tasks that met the detector's precondition — called the subject's tool, or
-ran in its profile and trigger — without loading the skill. On one install that comparison cannot
-separate the change from everything else that moved in those weeks. A firm answer needs parallel
-installs running the same workload with and without the change, which is a separate design: the
-admission webhook allows one `PlatformAgent` per cluster, so each arm needs its own cluster and
-renamed service accounts, and `bench` records token counts per run but does not yet score on them.
+**Phase 4: check the effect.** For each accepted fingerprint, the weekly report shows its 28-day
+count at the decision and now, and the build each was taken under; the operator retires what did not
+help. The job proposes no retirement itself. On one install that comparison cannot separate the
+change from everything else that moved in those weeks. A firm answer needs parallel installs running
+the same workload with and without the change, which is a separate design: the admission webhook
+allows one `PlatformAgent` per cluster, so each arm needs its own cluster and renamed service
+accounts, and `bench` records token counts per run but does not yet score on them.
 
 ## 13. Verification and eval-driven development
 
-Unit tests cover records, detectors, both gates and the carrying-cost estimate, the ledger's
-conflict retry, task-key de-duplication and size budget, and redaction, using recorded Logging and
-Trace responses as fixtures. `tests/test_chart_retrospective.py` checks the Role's `resourceNames`,
-the absence of Secrets, the ConfigMaps' empty `data`, and the NetworkPolicy. The kube-agents
-operator's manifest tests cover P0-1 and P0-6.
+Unit tests cover records, detectors, both gates, the weekly selection, the ledger's conflict retry,
+task-key de-duplication and size budget, and redaction, using recorded Logging and Trace responses
+as fixtures. `tests/test_chart_retrospective.py` checks the Role's `resourceNames`, the absence of
+Secrets, the ConfigMaps' empty `data`, and the NetworkPolicy. The kube-agents operator's manifest
+tests cover P0-1 and P0-6.
 
 On a live install:
 
