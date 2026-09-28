@@ -10,8 +10,9 @@ each proposal; only an accepted one reaches an agent.
 
 **Owns:** learning that is specific to one install — its clusters, its operators' preferences, the
 lookups its agents keep repeating. Defects in kube-agents' own code are
-[#1284](https://github.com/gke-labs/kube-agents/issues/1284)'s job, which improves the product from
-the repository side; this job never files one.
+[#1284](https://github.com/gke-labs/kube-agents/issues/1284)'s job: it lands
+[#965](https://github.com/gke-labs/kube-agents/pull/965)'s loop, which also runs in an install but
+turns what it finds into reports and pull requests against kube-agents; this job never files one.
 
 ---
 
