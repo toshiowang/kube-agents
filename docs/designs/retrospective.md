@@ -241,9 +241,12 @@ calls use the in-cluster REST API through `urllib`.
 A second ConfigMap, `kube-agents-retrospective-decisions`, maps each fingerprint to `accepted` or
 `dismissed` with a reason and, for an accepted fact or criterion, the exact change: the fact's text,
 or the criteria key and value. The operator writes that change, starting from the proposal's draft,
-so what gets applied is what a person put there. Each decision also records the kube-agents release
-and the harness tag it was made under: the chart's `appVersion`, which the chart passes to the job,
-and the `harness` field of the records behind it.
+so what gets applied is what a person put there. Each decision also records the release and harness
+its proposal was drafted under, which `accept` copies from the proposal. The job writes that pair
+into every proposal from its own image, the same platform-agent image the agents run: the image's
+`KUBE_AGENTS_VERSION`, the commit it was built from, and the harness version the adapter reads from
+the installed harness package. A value that does not match §6's name pattern is written as
+`unknown`.
 
 No agent identity and not the job can write the ConfigMap. Agent ClusterRoles grant `get`, `list`
 and `watch` on ConfigMaps and nothing more, and the job's Role grants `get`. This rests on the
@@ -278,19 +281,31 @@ the rest. Each fact also keeps the date it was accepted, for re-checking facts t
 stale.
 
 What the appliers write survives an upgrade: Hindsight's database and the agent's volume keep their
-disks, the store #1368 proposes merges stored values over the image's defaults at every start, the
-learned-skills directory sits outside the tree step 2.6a replaces, and both ConfigMaps carry
-`helm.sh/resource-policy: keep`. An upgrade can instead make what was learned wrong or inert. A
-release may fix the tool a skill works around or move what a fact points at, and the store stops
-reading a criterion whose key the new schema drops, pruning it at the next `set`, and ignores one
-whose value falls outside a tightened bound, using the default in its place. So the first run after
-the release or harness tag changes — the ledger keeps the last pair it saw — adds a section to the
-report listing every accepted decision made under an older pair, for the operator to confirm or
-retire with `hack/retrospective.sh confirm|retire <fingerprint>`. Confirming stamps the decision
-with the running pair; retiring removes what its applier wrote, found by the decision id. The in-pod
-criteria applier runs at every start, so after every upgrade, and logs an `audit_event` line for
-each accepted criterion the store now prunes or ignores; the job reads those back through its
-logging queries and lists them in the same section.
+disks, #1368's scaffolder keeps the volume's `criteria.json` over the image's at every start, the
+learned-skills directory sits outside the tree step 2.6a replaces, and both ConfigMaps keep what was
+written through an upgrade (§7). An upgrade can instead make what was learned wrong or inert. A
+release may fix the tool a skill works around or move what a fact points at. Under a closed schema,
+as #1368's is, the store stops reading a criterion whose key the new schema drops and uses the
+schema default in place of a value outside a tightened bound; the next `set` removes either.
+
+So every weekly report lists each accepted decision whose recorded pair differs from the running
+one, until the operator confirms or retires it with
+`hack/retrospective.sh confirm|retire <fingerprint>`. Confirming stamps the decision with the
+running pair. Retiring undoes it by route:
+
+- A criterion: the in-pod applier removes the key and the changelog records the decision id. #1368's
+  store can set a key but not remove one, and setting the default instead would pin the key so a
+  later release's default no longer reaches it, so the store needs a remove operation.
+- A Hindsight fact: the job deletes it, found by its `decision:<id>` tag. Whether Hindsight's API
+  deletes by tag, and whether consolidated observations go with it, is checked before this ships.
+- A `multiuser_memory` fact: the operator relays its removal, as they relayed the fact.
+- A skill: a pull request that reverts it in the learned-skills repository.
+
+Before each write the in-pod criteria applier checks the decision's key and value against the
+running schema, and writes one decision per call so each changelog entry names one decision. A
+decision the store would prune or reject is not written; the applier logs it once per pod start as
+an `audit_event` line, and the job reads that back through its logging queries into the same report
+section.
 
 ## 10. Switching off Hermes' own loop
 
@@ -370,8 +385,8 @@ One bullet is one pull request.
 
 **Phase 3: apply.** One route per pull request, each under the eval loop: 3a criteria (the in-pod
 applier), 3b facts, 3c skills (the `learned-skills` sync, `external_dirs`, and the copy the sandbox
-needs). 3d, once the first route ships, is the post-upgrade review in §9 and
-`hack/retrospective.sh confirm|retire`.
+needs). 3d, once the first route ships, is the post-upgrade review in §9:
+`hack/retrospective.sh confirm|retire`, and the remove operation the criteria store needs.
 
 **Phase 4: check the effect.** For each accepted fingerprint, compare its rate over the four weeks
 before and after, and propose a revert when it did not fall. On one install that comparison cannot
@@ -403,16 +418,18 @@ On a live install:
    as RBAC. The Platform Agent's Google service account cannot read the proposals bucket.
 5. An accepted criteria decision is applied within one timer period, survives a pod restart, and the
    store's changelog carries its decision id.
-6. After an upgrade of the install, the next run's report lists the decisions accepted under the
-   previous release, and a criterion set outside a bound that a test build tightens is listed as
-   ignored.
+6. After an upgrade of the install, the next weekly report lists the decisions accepted under the
+   previous release, and a criterion set outside a bound that a test build tightens is listed as not
+   applied. Retiring a criterion removes its key from the criteria file, and the changelog carries
+   the decision id.
 
 P0-1, P0-2, P0-3 and P0-5, and Phases 1 and 2, change no agent behaviour and take the eval
 exemption; so does P0-4 if it corrects `memory.md`, and it takes the loop if it changes which
-provider the Planning Agent loads. P0-6 and each Phase 3 route change what an agent does and follow
-the loop in [`eval_driven_development.md`](../../.agents/rules/eval_driven_development.md): red on
-`main`, green three times on the branch, and the case registered in `hack/ci-eval-pr.sh` with
-`owner:` and a domain.
+provider the Planning Agent loads. P0-6 and each Phase 3 pull request, 3d included because retiring
+removes what an agent reads, change what an agent does and follow the loop in
+[`eval_driven_development.md`](../../.agents/rules/eval_driven_development.md): red on `main`, green
+three times on the branch, and the case registered in `hack/ci-eval-pr.sh` with `owner:` and a
+domain.
 
 Each Phase 3 case seeds the learned artifact as a fixture — a criteria decision, a Hindsight fact, a
 `learned-skills` directory — and checks the agent uses it; it claims the domain of the artifact it
