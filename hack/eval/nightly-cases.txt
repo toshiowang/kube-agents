@@ -79,8 +79,9 @@
 # 2026-09-25 also added obtainability-planted-orphan-service (~45min at the
 # 900s band; tofu, so it serializes on the infra lock with the other tofu
 # cases). Forty-nine cases, ~1176-1196min serial. 2026-09-28 adds
-# bootstrap-discovery-fanout (~30min at its 600s hint; tofu, so it too
-# serializes on the infra lock): fifty-two cases across the two files,
+# bootstrap-discovery-fanout and 2026-09-29 bootstrap-inventory-ranking-delivery
+# (~30min each at their 600s hints; tofu, so they too serialize on the infra
+# lock): fifty-three cases across the two files,
 # counted from the lists, since the running totals above had fallen two
 # behind. The
 # periodic runs at 00:00 UTC -- 8 PM EDT, after the working day's presubmit
@@ -93,7 +94,7 @@
 # wider, realises ~2.4x or better. Night one (2026-09-16, build
 # 2100374258805903360, #1491)
 # realised 5.57x on the thirty-nine-case matrix and used 71% of the budget,
-# so the thirteen additions since are priced inside its headroom. The first nights after this change measure it:
+# so the fourteen additions since are priced inside its headroom. The first nights after this change measure it:
 # record the wall clock and any truncation on #1491, and if the deadline
 # bites, the lever is the periodic's timeout or this list's tail, in that
 # order. A deadline kill is survivable by design -- the cost-hinted queue
@@ -110,8 +111,8 @@
 # 1002s, p90 2074s, over 903 repetitions 2026-09-04 to 09-15) nearer 150.
 # 2026-09-29: the canary returned to the presubmit file held out (#2013) and
 # pdb-remediation-pr moved there held out beside it (#2016, seat opened
-# 2026-09-28), so this file's share is thirty-eight cases (114 units) of the
-# fifty-two-case, 156-unit matrix the additions through 2026-09-29 made it; the
+# 2026-09-28), so this file's share is thirty-nine cases (117 units) of the
+# fifty-three-case, 159-unit matrix the additions through 2026-09-29 made it; the
 # nightly runs both files, so its matrix and its price do not change.
 # Whether the worst night fits is a question about the whole matrix, and the
 # six measured nights (2026-09-16 to 09-21, oss-test-infra#2707's table)
@@ -449,3 +450,10 @@
 # rather than presubmit because the fan-out's cards take dispatcher slots
 # from whatever else is running.
 ./tasks/bootstrap-discovery-fanout/task.yaml
+
+# The onboarding prioritization stage (#2143): plants a fixed raw inventory
+# report on the install under test's shell sandbox, files the
+# bootstrap-inventory-prioritize card, and grades the findings its worker
+# extracts in the sandbox. Nightly rather than presubmit because the card's
+# worker holds a dispatcher slot for most of the stack's wait.
+./tasks/bootstrap-inventory-ranking-delivery/task.yaml
