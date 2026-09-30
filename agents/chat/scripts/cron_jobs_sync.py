@@ -36,9 +36,12 @@ two rosters obeying opposite merge rules is a trap for whoever edits either.
 ``enabled`` being image-owned is the load-bearing consequence. Shipping
 ``enabled: false`` is how a watchdog is turned off fleet-wide, which is the
 protocol ``concepts/autonomous-watchdogs.md`` documents and the one the five
-retired watchdogs took. The cost is the other direction: a job disabled by hand
-on a live pod is switched back on by the next image roll, because the image is
-the declaration of record. Retire a job by shipping ``enabled: false`` and
+retired watchdogs took. The cost is the other direction: a job whose ``enabled``
+was set to false by hand on a live pod is switched back on by the next image
+roll, because the image is the declaration of record. A job paused with
+``hermes cron pause`` stays paused: the pause also writes ``state`` and
+``paused_at``, which the image does not ship, and Hermes does not fire a job
+that carries them. Retire a job by shipping ``enabled: false`` and
 leaving the entry in place; dropping the id is safe only once every live cluster
 has merged that disabled form, since nothing here prunes.
 
