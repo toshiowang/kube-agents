@@ -555,8 +555,8 @@ registered seven and three, and not the same three; a batch rejected for one mis
 back one field at a time and was abandoned; and one accepted call read as done. Enumeration is not a
 judgement, so the sweep writes the findings as a machine-readable block
 (`inventory.md` Step 4) and `agents/platform/scripts/inventory_findings.py` owns both ends —
-`extract` produces the numbered set, `register` refuses to send anything until every number carries
-a score. The stage's judgement is scoring, which is the part that needs a model.
+`extract` produces the numbered set, and the `register_inventory_scores` platform tool refuses to
+send anything until every number carries a score. The stage's judgement is scoring, which is the part that needs a model.
 
 **The event watcher.** [`k8s-event-watcher`](../../k8s-operator/cmd/k8s-event-watcher/) already
 POSTs to the same Session KV server, so registering a finding is one more call on a path that

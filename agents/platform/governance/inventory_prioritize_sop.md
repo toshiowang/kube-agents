@@ -5,7 +5,7 @@ findings queue that later publishers read, and the short ranked report the user 
 `/opt/data/INVENTORY.raw.md`, extracts every finding with `/opt/data/scripts/inventory_findings.py`,
 registers them with the `register_inventory_scores` tool, writes `/opt/data/INVENTORY.md`.
 
-**You do not decide what the findings are, and you do not make the registration call.** The sweep
+**You do not decide what the findings are, and you do not build what gets registered.** The sweep
 wrote a machine-readable block into the raw file; `inventory_findings.py extract` turns it into a
 numbered list, and the `register_inventory_scores` tool refuses to send anything until every number
 on that list carries a score, then reads the order back. Your job between those two steps is
@@ -274,8 +274,9 @@ Write one score entry per extracted id to `/opt/data/INVENTORY.scores.json`, the
 ```
 
 **`register_inventory_scores` is a tool call, like `kanban_complete`, not a shell command.** Step 2
-ran a script in your shell; this step does not. There is no script by that name, and
-`inventory_findings.py register` cannot reach the queue from your shell, so do not run it. The tool
+ran a script in your shell; this step does not. There is no script by that name, and do not
+run `inventory_findings.py register` in its place: the tool runs the same checks and is this stage's
+one route to the queue. The tool
 takes no arguments: it reads `/opt/data/INVENTORY.items.json` and `/opt/data/INVENTORY.scores.json`
 from where your shell wrote them.
 
@@ -358,11 +359,13 @@ updated.
 
 **`ERROR: some findings did not register:` — one or more clusters could not be sent.** **Write the
 report anyway.** The clusters it
-did not name are registered; the ones it named are not. Say which in the card's completion summary,
-do not block the card, do not retry more than once, and do not skip Step 5. A user waiting on their
+did not name are registered; the ones it named are not. The reply carries no ranked order, because
+the queue's would leave the named clusters out, so Step 5 ranks by your own scores. Say which clusters
+are missing in the card's completion summary, do not block the card, do not retry more than once, and
+do not skip Step 5. A user waiting on their
 first report is not served by a stage that stops because a background queue was unavailable.
 
-On success the reply lists each cluster's outcomes and a final `registered N of N`. It also names
+On success the reply lists each cluster's outcomes and `registered N of N`. It also names
 any finding that came back **`suppressed`**, meaning the user has already dismissed it permanently: a
 suppressed finding must not appear in the report or in the roll-up count.
 
@@ -370,8 +373,8 @@ suppressed finding must not appear in the report or in the roll-up count.
 
 ## Step 5: Select What to Show
 
-Step 4's reply ends with the queue's ranked order and a `total:` line. Work from that; there is
-nothing more to run or call.
+On success, Step 4's reply ends with the queue's ranked order, a `total:` line and a note on the
+roll-up. Work from that; there is nothing more to run or call.
 
 **Take the order it gives you.** It is computed from the vectors you just registered, by the same
 rule for every source, and it is the reason this stage is reproducible. Do not re-sort it, do not
@@ -379,8 +382,9 @@ second-guess a placement, and do not promote a finding because it reads worse th
 Each row carries its score, severity, check, object and the `provider_managed` and `not_actionable`
 flags the rules below turn on, and the `total:` line is what the roll-up counts from.
 
-If the reply says it could not read the ranked order, or Step 4 could not read the inventory files,
-rank by the scores you computed in Step 3 instead —
+If the reply says it could not read the ranked order, or Step 4 reported that some findings did not
+register or that it could not read the inventory files, rank by the scores you computed in Step 3
+instead —
 actionable before unactionable, then highest score first — and say so in the card summary.
 
 From the top of that order:

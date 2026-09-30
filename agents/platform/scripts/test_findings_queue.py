@@ -955,6 +955,22 @@ class SopRubricParityTests(unittest.TestCase):
         server = (Path(__file__).parent / "platform_mcp_server.py").read_text(encoding="utf-8")
         self.assertIn("@mcp.tool()\ndef register_inventory_scores() -> str:", server)
 
+    def test_the_sop_names_each_error_the_tool_leads_with(self):
+        server = (Path(__file__).parent / "platform_mcp_server.py").read_text(encoding="utf-8")
+        for marker in (
+            "ERROR: nothing was registered.",
+            "ERROR: could not read the inventory files",
+            "ERROR: some findings did not register:",
+        ):
+            self.assertIn(marker, server)
+            self.assertIn(f"`{marker}", self.text)
+
+    def test_a_partial_registration_ranks_by_the_workers_scores(self):
+        # The tool returns no ranked order when a batch fails, so Step 5 has to
+        # send that case to the same fallback as the other two.
+        step5 = " ".join(self.text.split("## Step 5", 1)[1].split())
+        self.assertIn("some findings did not register", step5)
+
     def test_the_sop_calls_its_one_queue_tool_a_tool_and_not_a_script(self):
         # A live run blocked outright looking for `get_ranked_findings` as a
         # third script once the steps either side of it became shell commands.

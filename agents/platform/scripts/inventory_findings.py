@@ -3,9 +3,11 @@
 
 The onboarding sweep writes a ```findings block into the raw file; this script
 reads it and owns every deterministic step of the prioritization stage:
-`extract` produces the authoritative item list, `register` refuses to send
-anything until every one of those items carries a score, and `ranked` reads
-back the queue's order and the total the report's roll-up line counts from.
+`extract` produces the authoritative item list, and `register_scored` refuses
+to send anything until every one of those items carries a score. The stage
+reaches `register_scored` through the platform MCP server's
+`register_inventory_scores` tool; the `register` and `ranked` commands run the
+same steps from a shell that can reach the queue.
 
 The stage used to ask the worker to enumerate the findings from prose and call
 `register_findings` itself, and it lost findings three ways at once. It decided

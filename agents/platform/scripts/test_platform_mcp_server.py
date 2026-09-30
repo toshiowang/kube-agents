@@ -1569,7 +1569,7 @@ class TestRegisterInventoryScores(unittest.TestCase):
         self.assertTrue(result.startswith("ERROR: could not read the inventory files"), result)
         self.assertEqual(self.captured, [])
 
-    def test_a_failed_batch_still_returns_the_ranked_order(self):
+    def test_a_failed_batch_leads_with_the_error_and_returns_no_ranked_order(self):
         import urllib.error
 
         real = platform_mcp_server._findings_request
@@ -1581,9 +1581,11 @@ class TestRegisterInventoryScores(unittest.TestCase):
 
         with patch.object(platform_mcp_server, "_findings_request", refuse_post):
             result = platform_mcp_server.register_inventory_scores()
-        self.assertIn("ERROR: some findings did not register:", result)
+        self.assertTrue(result.startswith("ERROR: some findings did not register:"), result)
+        self.assertIn("Write the report from the scores you computed", result)
         self.assertIn("registered 0 of 6", result)
-        self.assertIn("total: 6", result)
+        self.assertNotIn("total:", result)
+        self.assertNotIn(("GET", "/v1/findings/ranked"), [c[:2] for c in self.captured])
 
     def test_an_unreadable_ranked_order_says_to_rank_by_the_scores(self):
         real = platform_mcp_server._findings_request

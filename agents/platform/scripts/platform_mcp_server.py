@@ -1178,13 +1178,12 @@ def register_inventory_scores() -> str:
         scores = _read_inventory_file(INVENTORY_SCORES_PATH, "scores", in_sandbox)
         inventory_findings.register_scored(items, scores, INVENTORY_ITEMS_PATH, _post_inventory_batch, lines.append)
     except inventory_findings.Failure as failure:
+        errors = [f"  - {error}" for error in failure.errors]
         if failure.code != inventory_findings.EXIT_POST_FAILED:
-            return "\n".join(
-                ["ERROR: nothing was registered.", *(f"  - {error}" for error in failure.errors), failure.hint]
-            ).rstrip()
-        # Some batches did register, so the ranked order below is still the
-        # queue's, with those clusters missing from it.
-        lines.extend(["ERROR: some findings did not register:", *(f"  - {e}" for e in failure.errors), failure.hint])
+            return "\n".join(["ERROR: nothing was registered.", *errors, failure.hint]).rstrip()
+        # No ranked order: the queue's would silently leave out the clusters
+        # that did not send, so the report is ranked from the worker's scores.
+        return "\n".join(["ERROR: some findings did not register:", *errors, failure.hint, "", *lines])
     except (sandbox_exec.SandboxUnavailable, sandbox_exec.SandboxMisconfigured, subprocess.TimeoutExpired, OSError) as e:
         return (
             f"ERROR: could not read the inventory files: {e}. Nothing was registered. Write the report "
