@@ -72,6 +72,7 @@ from kube_agents_bench.fleet import (
 )
 
 __all__ = [
+    "BootstrapDeliveredVerifier",
     "BootstrapFanoutVerifier",
     "BootstrapFindingsVerifier",
     "BootstrapReportReadVerifier",
