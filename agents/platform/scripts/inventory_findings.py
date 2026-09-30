@@ -20,6 +20,7 @@ make -- the model scores what this script extracted.
 """
 
 import argparse
+import http.client
 import json
 import os
 import re
@@ -420,7 +421,7 @@ def register_scored(
             continue
         try:
             result = post(batch, scope)
-        except (urllib.error.URLError, OSError, ValueError) as exc:
+        except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as exc:
             detail = exc.read().decode("utf-8", "replace") if isinstance(exc, urllib.error.HTTPError) else str(exc)
             failures.append(f"{where}: {detail}")
             continue

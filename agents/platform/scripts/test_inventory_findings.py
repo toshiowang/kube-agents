@@ -1,3 +1,4 @@
+import http.client
 import io
 import json
 import sys
@@ -333,6 +334,16 @@ class RegisterTests(unittest.TestCase):
             raise OSError("connection refused")
 
         inv.post_batch = boom
+        code = self.register({"scores": {"f001": SCORE, "f002": SCORE}})
+        self.assertEqual(code, inv.EXIT_POST_FAILED)
+
+    def test_a_truncated_response_is_that_clusters_failure_not_a_traceback(self):
+        self.extract()
+
+        def truncated(endpoint, findings, scope):
+            raise http.client.IncompleteRead(b"")
+
+        inv.post_batch = truncated
         code = self.register({"scores": {"f001": SCORE, "f002": SCORE}})
         self.assertEqual(code, inv.EXIT_POST_FAILED)
 
