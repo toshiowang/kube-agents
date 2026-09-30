@@ -1888,28 +1888,44 @@ class ApiKeyPinCheckTest(unittest.TestCase):
 
 
 class SandboxMirrorGateTest(unittest.TestCase):
-    """Step 5.7 pushes the profile layout into the shell sandbox, and is fatal.
+    """Step 5.7 mirrors into the shell sandbox; only what no restart fixes is fatal.
 
     The agent's Kubernetes credentials are read-only, so nothing in this container can
     write an Event or a condition to say the migration failed. Exiting non-zero is the
     one channel it has: the kubelet restarts the container, and the operator's
     getDeploymentStatusDetails scans the gateway pod's container statuses and copies the
-    waiting reason into the CR as phase Degraded. Come up 0 instead and the CR reads
-    Ready while the model's files sit on this volume where its shell cannot see them —
-    which is what happened on a live upgrade, to ten cluster profile homes at once.
+    waiting reason into the CR as phase Degraded. That channel is kept for failures no
+    restart clears; the model can provoke the retryable ones from a sandbox shell, so a
+    fatal exit there would let a prompt injection hold this container down for good.
 
     So the exit status is the contract, and these pin both directions of it. The
     transient case does not arrive here as a failure at all: sandbox_mirror.py returns 0
     when the sandbox has not started yet and leaves its marker unwritten, so the next
-    start retries. What reaches this block non-zero is a wrong --remote-root or a
-    transfer that ran and failed, and neither gets better on its own.
+    start retries. A wrong --remote-root or a transfer that ran and failed returns
+    EXIT_RETRY, which warns and lets the agent start. What reaches this block with any
+    other non-zero status is no tar on PATH, an unhandled exception, or a missing or
+    broken interpreter, and none of them gets better on its own.
     """
 
     @classmethod
     def setUpClass(cls):
-        cls._BLOCK = _extract_shell_block(
-            'SANDBOX_MIRROR_SCRIPT="/opt/defaults/scripts/sandbox_mirror.py"'
-        )
+        # The block compares against a readonly declared at the top of the file, far
+        # above the extracted lines; without it every non-zero exit reads as fatal.
+        opener = 'SANDBOX_MIRROR_SCRIPT="/opt/defaults/scripts/sandbox_mirror.py"'
+        lines = _ENTRYPOINT.read_text(encoding="utf-8").splitlines()
+        retry = [
+            i
+            for i, line in enumerate(lines)
+            if line.startswith("readonly SANDBOX_MIRROR_RETRY_RC=")
+        ]
+        if len(retry) != 1:
+            raise AssertionError(
+                f"expected one SANDBOX_MIRROR_RETRY_RC in {_ENTRYPOINT}, found {len(retry)}"
+            )
+        if retry[0] > lines.index(opener):
+            raise AssertionError("SANDBOX_MIRROR_RETRY_RC is declared after step 5.7 reads it")
+        cls._RETRY_RC = int(lines[retry[0]].split("=", 1)[1])
+        cls._BLOCK = lines[retry[0]] + "\n" + _extract_shell_block(opener)
 
     def _run(self, rc=0, primary="1", install_script=True):
         """Run the shipped block with a python3 that exits `rc`.
@@ -1961,9 +1977,17 @@ class SandboxMirrorGateTest(unittest.TestCase):
         self.assertNotEqual(
             proc.returncode,
             0,
-            "a migration that failed left the container coming up healthy; the CR will "
-            "say Ready and nothing will say the model's files did not cross",
+            "a failure no restart clears left the container coming up healthy; the CR "
+            "will say Ready and nothing will say the sandbox was never mirrored",
         )
+        self.assertNotIn("REACHED-EXEC", proc.stdout)
+
+    def test_a_missing_interpreter_is_fatal(self):
+        """The shell's 127 is neither 0 nor EXIT_RETRY, and no restart brings the venv back."""
+        proc, invoked = self._run(rc=127)
+        self.assertTrue(invoked)
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertIn("FATAL", proc.stderr)
         self.assertNotIn("REACHED-EXEC", proc.stdout)
 
     def test_the_failure_names_itself_and_carries_the_log_out(self):
@@ -1976,6 +2000,27 @@ class SandboxMirrorGateTest(unittest.TestCase):
             "the cause stayed in logs/sandbox_mirror.log on the PVC, which is exactly "
             "the silence this change exists to end",
         )
+
+    def test_the_retry_code_matches_the_script(self):
+        tree = ast.parse(
+            (_REPO / "deploy" / "shared" / "sandbox_mirror.py").read_text(encoding="utf-8")
+        )
+        values = [
+            node.value.value
+            for node in tree.body
+            if isinstance(node, ast.Assign)
+            and any(isinstance(t, ast.Name) and t.id == "EXIT_RETRY" for t in node.targets)
+        ]
+        self.assertEqual(values, [self._RETRY_RC])
+
+    def test_a_retryable_failure_warns_and_starts(self):
+        proc, invoked = self._run(rc=self._RETRY_RC)
+        self.assertTrue(invoked, "the mirror never ran, so this asserts nothing")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertIn("REACHED-EXEC", proc.stdout)
+        self.assertIn("WARN", proc.stderr)
+        self.assertNotIn("FATAL", proc.stderr)
+        self.assertIn("mirror said something an operator needs to read", proc.stderr)
 
     def test_a_clean_migration_leaves_start_up_alone(self):
         proc, invoked = self._run(rc=0)

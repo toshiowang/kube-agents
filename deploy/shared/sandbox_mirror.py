@@ -23,12 +23,11 @@ move those files are still there and the model can no longer see them, which
 from a user's point of view is an upgrade that deleted their work. This copies
 them over once.
 
-Neither step is fatal on its own. The sandbox is a separate pod with no ordering
-against this one, so "not up yet" is an ordinary outcome; both steps are
-idempotent and the next container start retries. One thing is fatal, and the
-exit codes below say why it is the only one: a copy that ran and failed. That
-holds the agent pod down, because coming up healthy with the model's files
-stranded is the failure this script exists to prevent.
+Neither step is fatal. The sandbox is a separate pod with no ordering against
+this one, so "not up yet" is an ordinary outcome; both steps are idempotent and
+the next container start retries. That includes a copy that ran and failed: the
+copy never removes anything from the agent pod, so a retry loses nothing. The
+exit codes below say what is left fatal and why.
 
 What does *not* come across, and why the list below is a denylist:
 

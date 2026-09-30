@@ -1289,13 +1289,17 @@ directories. Nothing about it is ordered against the sandbox starting: the Deplo
 the StatefulSet come up independently, so the script waits for sshd and, failing that,
 leaves the agent pod's files untouched and lets the next start retry.
 
-**One of its failures holds the agent pod down and the rest do not**, which is a distinction
-the exit codes carry rather than a judgement the entrypoint makes. A copy that ran and
-failed can have moved the model's files off the agent pod's volume without landing them on
-the sandbox's, and coming up healthy in that state is the outcome the mirror exists to
-prevent — so it exits `EXIT_FATAL`, the container refuses to start, and
-`getDeploymentStatusDetails` surfaces a Degraded CR naming this container. Everything else
-exits `EXIT_RETRY`: the entrypoint warns and the agent starts.
+**Only what a restart cannot fix holds the agent pod down**, which is a distinction the exit
+codes carry rather than a judgement the entrypoint makes. No `tar` on `PATH`, or an
+unhandled exception, exits `EXIT_FATAL`: the container refuses to start, and
+`getDeploymentStatusDetails` surfaces a Degraded CR naming this container. An unfinished
+run the script does not treat as a failure exits 0 with no warning and leaves the marker
+unwritten, so the next start tries again: a sandbox that does not answer inside `--wait`,
+for example, or a copy that left paths behind because they did not fit the free-space
+budget. A failure the next start can clear exits `EXIT_RETRY`, including a copy that ran
+and failed: the copy reads the agent pod's volume and never removes from it, so the
+model's files stay where they were and the next start copies again. The entrypoint warns
+and the agent starts.
 
 The dividing line is who can provoke the failure, not how bad it looks. Everything under
 the sandbox's `/opt/data` is owned by uid 1000 and the volume outlives the pod, so the model

@@ -1891,26 +1891,21 @@ fi
 # same script with --skeleton-only when it scaffolds one, so a profile created
 # between restarts does not wait for the next one.
 #
-# Foreground, and fatal on EXIT_FATAL only. It was neither, and the reason it
-# was both is sound as far as it goes: the sandbox is a separate StatefulSet
-# with no start ordering against this Deployment, so "not up yet" is an ordinary
-# outcome rather than an error. What that misses is that the script already
-# draws the distinction. A sandbox that never answers inside --wait returns 0
-# and leaves the marker unwritten, so the next start retries; the fatal exits
-# are a --remote-root that is not the sandbox's volume, and a transfer that ran
-# and failed. Neither is survivable and neither is transient, so backgrounding
-# them bought nothing but silence: the agent came up healthy, the model's files
-# were still on this volume where its shell can no longer see them, and the sole
-# trace was a WARN line in a log file nobody reads. That happened on a live
-# upgrade — ten cluster profile homes, every one Permission denied — and it was
-# found by hand, days later.
-#
-# Fatal on *those* and not on everything non-zero, which is the correction. The
-# layout push and the marker write both reach a filesystem uid 1000 owns, so the
-# model can make either fail — and while any non-zero exit landed here, that was
-# a way for a prompt injection to CrashLoopBackOff this container permanently,
-# with no path back because the thing that would repair it is the thing that is
-# down. Those two now return EXIT_RETRY and warn instead.
+# Foreground, and fatal on any non-zero status but EXIT_RETRY. The sandbox is a
+# separate StatefulSet with no start ordering against this Deployment, so "not up
+# yet" is an ordinary outcome rather than an error, and the script draws that line
+# itself. A sandbox that never answers inside --wait returns 0 and leaves the
+# marker unwritten, so the next start retries; so does a copy that left paths
+# behind because they did not fit the sandbox's free space. A --remote-root that is not the
+# sandbox's volume, a failed layout push, a failed marker write and a transfer
+# that ran and failed return EXIT_RETRY: none of them removes anything from this
+# volume, and the model can provoke the first three on a filesystem uid 1000
+# owns, so a fatal exit there would let a prompt injection CrashLoopBackOff this
+# container with no path back. What stays fatal is what a restart cannot fix: no
+# tar on PATH, an unhandled exception, or a missing or broken interpreter.
+# Foreground either way, so the warning and the log tail below reach `kubectl
+# logs` and not only logs/sandbox_mirror.log, where a failed migration once went
+# unnoticed for days.
 #
 # Exiting non-zero here is what makes it visible, and it needs no privilege the
 # agent does not have. The kubelet restarts the container, CrashLoopBackOff
@@ -1939,10 +1934,10 @@ if [ "$IS_BOOTSTRAP_PRIMARY" = "1" ] && [ -f "$SANDBOX_MIRROR_SCRIPT" ]; then
         "$SANDBOX_MIRROR_SCRIPT" --agent-home "$TARGET_DIR" \
         >>"$TARGET_DIR/logs/sandbox_mirror.log" 2>&1 || SANDBOX_MIRROR_RC=$?
     if [ "$SANDBOX_MIRROR_RC" = "$SANDBOX_MIRROR_RETRY_RC" ]; then
-        echo "WARN: the shell sandbox mirror did not finish, in a way the next start retries. Nothing has been lost -- the copy either has not run or has already landed. Last lines of logs/sandbox_mirror.log:" >&2
+        echo "WARN: the shell sandbox mirror did not finish, and the next start retries it. Nothing was removed from this pod's volume, so a copy that did not land runs again then. Last lines of logs/sandbox_mirror.log:" >&2
         tail -n 20 "$TARGET_DIR/logs/sandbox_mirror.log" >&2 || true
     elif [ "$SANDBOX_MIRROR_RC" != "0" ]; then
-        echo "FATAL: the shell sandbox migration failed. The model's files are still on this pod's volume, where its shell cannot reach them, so this container is refusing to start rather than come up looking healthy with the agent's work missing. Last lines of logs/sandbox_mirror.log:" >&2
+        echo "FATAL: the shell sandbox migration failed with an error a restart does not clear (no tar on PATH, an unhandled exception, or a missing or broken interpreter), so this container is refusing to start rather than come up looking healthy with the sandbox never mirrored. Last lines of logs/sandbox_mirror.log:" >&2
         tail -n 20 "$TARGET_DIR/logs/sandbox_mirror.log" >&2 || true
         exit 1
     fi

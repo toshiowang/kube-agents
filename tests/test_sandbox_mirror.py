@@ -798,11 +798,11 @@ class ClusterIdentities(unittest.TestCase):
 class MirrorExitCodes(unittest.TestCase):
     """Which failures hold the gateway container down, and which do not.
 
-    The agent pod's entrypoint exits 1 on any code other than EXIT_RETRY, so
-    this is the boundary between "the model's files are stranded, refuse to
+    The agent pod's entrypoint exits 1 on any code other than 0 and EXIT_RETRY,
+    so this is the boundary between "a restart cannot fix this, refuse to
     start" and "the next start fixes it". Getting it wrong in the permissive
-    direction hides data loss; getting it wrong in the strict direction lets a
-    prompt injection stop the agent for good.
+    direction hides a broken install behind a Ready CR; getting it wrong in the
+    strict direction lets a prompt injection stop the agent for good.
     """
 
     def drive(self, remote, transfer=lambda *a, **k: None):
