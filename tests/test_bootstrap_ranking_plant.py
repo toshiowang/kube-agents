@@ -77,6 +77,7 @@ _IN_POD = {
     "local.state_file": "/opt/data/.bench-onboarding-jobs.json",
     "local.settle_wait": "120",
     "local.settle_poll": "2",
+    "local.queue_project": "onboarding-demo-prod",
 }
 
 
@@ -104,6 +105,7 @@ _INTERPOLATIONS = {
     "local.greeted": "/opt/data/.bootstrap_greeted",
     "base64encode(local.arm_py)": base64.b64encode(_in_pod("arm_py", _IN_POD).encode()).decode(),
     "base64encode(local.disarm_py)": base64.b64encode(_in_pod("disarm_py", _IN_POD).encode()).decode(),
+    "base64encode(local.queue_py)": base64.b64encode(_in_pod("queue_py", _IN_POD).encode()).decode(),
     "var.project_id": "kube-agents-evals",
     "var.host_cluster_name": "platform-agent-host",
     "var.host_cluster_location": "us-central1",
@@ -130,6 +132,7 @@ _DESTROY_INTERPOLATIONS = {
     "self.triggers.key_like": _INTERPOLATIONS["local.key_like"],
     "self.triggers.inventory": _INTERPOLATIONS["local.inventory"],
     "self.triggers.disarm_b64": _INTERPOLATIONS["base64encode(local.disarm_py)"],
+    "self.triggers.queue_b64": _INTERPOLATIONS["base64encode(local.queue_py)"],
 }
 
 # Records every call to $CALLS, tagging the in-pod Python by what it reads, and
@@ -172,7 +175,11 @@ target = next(a for a in argv if a.startswith(("deployment/", "pod/")))
 script = cmd[2] if cmd[:2] == ["sh", "-c"] else ""
 stdin = sys.stdin.read() if cmd[1:2] == ["-"] or "base64 -d" in script else ""
 
-if "_jobs_lock" in stdin:
+if "DELETE FROM findings" in stdin:
+    record("clear_queue")
+    if os.environ.get("QUEUE_FAIL") == "1":
+        unreachable()
+elif "_jobs_lock" in stdin:
     record("disarm")
     if os.environ.get("DISARM_FAIL") == "1":
         unreachable()
@@ -340,6 +347,10 @@ class BootstrapRankingPlantTest(unittest.TestCase):
         self.assertLess(archive[0], clear[0])
         self.assertLess(clear[0], plant[0])
         self.assertLess(clear_agent[0], plant[0])
+        clear_queue = self._indices(calls, "[clear_queue]")
+        self.assertEqual(len(clear_queue), 1, calls)
+        self.assertLess(clear[0], clear_queue[0])
+        self.assertLess(clear_queue[0], plant[0])
         self.assertLess(plant[0], create[0])
         self.assertLess(create[0], runs[0])
         self.assertLess(runs[-1], arm[0])
@@ -504,6 +515,7 @@ class BootstrapRankingPlantTest(unittest.TestCase):
         archived = self._indices(calls, "archive t_card [archive]")
         self.assertEqual(len(archived), 1, calls)
         self.assertLess(self._indices(calls, "[create]")[0], archived[0])
+        self.assertEqual(len(self._indices(calls, "[clear_queue]")), 2)
 
     def test_step_5_reports_a_card_no_worker_picked_up(self):
         completed, calls = self._run(RUN_STATES="0 0 0")
@@ -610,6 +622,7 @@ class BootstrapRankingPlantTest(unittest.TestCase):
         disarm = self._indices(calls, "[disarm]")
         self.assertEqual(len(disarm), 1)
         self.assertLess(clear[0], disarm[0])
+        self.assertEqual(len(self._indices(calls, "[clear_queue]")), 1)
 
     def test_destroy_carries_on_past_a_failed_step_and_names_it(self):
         completed, calls = self._run(
@@ -626,11 +639,64 @@ class BootstrapRankingPlantTest(unittest.TestCase):
         completed, calls = self._run(self._destroy_script, DISARM_FAIL=1)
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("could not disarm the delivery job.", completed.stderr)
+        self._clear()
+        completed, calls = self._run(self._destroy_script, QUEUE_FAIL=1)
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertEqual(len(self._indices(calls, "[disarm]")), 1)
+        self.assertIn("could not delete the planted findings from the queue.", completed.stderr)
 
     def test_destroy_names_a_failed_sandbox_listing(self):
         completed, _ = self._run(self._destroy_script, SANDBOX_LIST_FAIL=1)
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("could not list the sandbox pods.", completed.stderr)
+
+
+class QueueClearTest(unittest.TestCase):
+    """The plant's and teardown's findings-queue cleanup against a sqlite store."""
+
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self._db = pathlib.Path(directory.name) / "session_kv.db"
+        self._env = {**os.environ, "SESSION_KV_DB_PATH": str(self._db)}
+        self._code = _in_pod("queue_py", _IN_POD)
+
+    def _py(self):
+        return subprocess.run(
+            [sys.executable, "-"], input=self._code, env=self._env, capture_output=True, text=True, timeout=60
+        )
+
+    def test_only_the_planted_projects_inventory_rows_are_deleted(self):
+        conn = sqlite3.connect(self._db)
+        conn.execute("CREATE TABLE findings (id INTEGER PRIMARY KEY, source TEXT, project TEXT)")
+        conn.executemany(
+            "INSERT INTO findings (source, project) VALUES (?, ?)",
+            [
+                ("inventory", "onboarding-demo-prod"),
+                ("inventory", "onboarding-demo-prod"),
+                ("inventory", "acme-prod"),
+                ("audit", "onboarding-demo-prod"),
+            ],
+        )
+        conn.commit()
+        conn.close()
+        out = self._py()
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertIn("deleted 2 queued finding(s) for onboarding-demo-prod", out.stdout)
+        conn = sqlite3.connect(self._db)
+        left = conn.execute("SELECT source, project FROM findings ORDER BY id").fetchall()
+        conn.close()
+        self.assertEqual(left, [("inventory", "acme-prod"), ("audit", "onboarding-demo-prod")])
+
+    def test_no_store_or_no_table_is_nothing_to_delete(self):
+        out = self._py()
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertIn("no findings queue at", out.stdout)
+        self.assertFalse(self._db.exists())
+        sqlite3.connect(self._db).close()
+        out = self._py()
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertIn("no findings table in", out.stdout)
 
 
 class RunStateQueryTest(unittest.TestCase):
