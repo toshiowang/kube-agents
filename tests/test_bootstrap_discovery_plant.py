@@ -581,7 +581,11 @@ class Step1StateQueryTest(unittest.TestCase):
         self.assertEqual(self._state([{"id": "other", "enabled": False}, {"id": "bootstrap-inventory-scan", "enabled": True}]), "clear")
 
     def test_a_paused_scan_job_reads_paused(self):
-        self.assertEqual(self._state([{"id": "bootstrap-inventory-scan", "enabled": False}]), "paused")
+        # A pod start re-enables a job `hermes cron pause` paused and leaves its
+        # `state` and `paused_at`, which still keep the scheduler from firing it.
+        for job in ({"enabled": False}, {"enabled": True, "state": "paused"}, {"enabled": True, "paused_at": "t0"}):
+            with self.subTest(job=job):
+                self.assertEqual(self._state([{"id": "bootstrap-inventory-scan", **job}]), "paused")
 
     def test_a_missing_scan_job_reads_nojob(self):
         self.assertEqual(self._state([{"id": "other", "enabled": True}]), "nojob")

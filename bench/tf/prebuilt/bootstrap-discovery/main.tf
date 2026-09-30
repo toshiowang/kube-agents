@@ -279,7 +279,12 @@ resource "null_resource" "sweep" {
           except FileNotFoundError:
               jobs = []
           job = next((j for j in jobs if j.get("id") == sys.argv[1]), None)
-          print("nojob" if job is None else "clear" if job.get("enabled", True) else "paused")
+          # As Hermes is_job_runnable reads it: a pause also sets state and
+          # paused_at, and a pod start re-enables the job but leaves both. No
+          # quote marks here: bash 3.2 misreads them in a heredoc inside $().
+          runnable = job is not None and job.get("enabled", True) and not (
+              job.get("state") == "paused" or job.get("paused_at"))
+          print("nojob" if job is None else "clear" if runnable else "paused")
       PY
       )"
       case "$state" in
@@ -294,7 +299,7 @@ resource "null_resource" "sweep" {
           echo "ERROR: the bootstrap-inventory-scan cron job is not in ${local.home}/cron/jobs.json on ${var.host_cluster_name}, so nothing will file a sweep." >&2
           exit 1 ;;
         paused)
-          echo "ERROR: the ${local.scan_job} cron job is paused (\"enabled\": false in ${local.home}/cron/jobs.json) on ${var.host_cluster_name}, so nothing will file a sweep. The agent pod's next start re-enables it." >&2
+          echo "ERROR: the ${local.scan_job} cron job is paused on ${var.host_cluster_name}, so nothing will file a sweep. Resume it with '${local.hermes} cron resume ${local.scan_job}' in the agent container." >&2
           exit 1 ;;
         *)
           echo "ERROR: could not read the onboarding markers or ${local.home}/cron/jobs.json on ${var.host_cluster_name} (got '$state')." >&2
