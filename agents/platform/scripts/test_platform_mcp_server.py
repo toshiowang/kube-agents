@@ -1569,6 +1569,17 @@ class TestRegisterInventoryScores(unittest.TestCase):
         self.assertTrue(result.startswith("ERROR: could not read the inventory files"), result)
         self.assertEqual(self.captured, [])
 
+    def test_an_inventory_file_the_sandbox_cannot_read_registers_nothing(self):
+        def unreadable(path, **kwargs):
+            raise sandbox_exec.SandboxReadFailed(f"{path} is not a readable regular file")
+
+        with patch.object(sandbox_exec, "sandbox_enabled", lambda path=None: True), \
+                patch.object(sandbox_exec, "read_bytes", unreadable):
+            result = platform_mcp_server.register_inventory_scores()
+        self.assertTrue(result.startswith("ERROR: could not read the inventory files"), result)
+        self.assertIn(platform_mcp_server.INVENTORY_ITEMS_PATH, result)
+        self.assertEqual(self.captured, [])
+
     def test_a_failed_batch_leads_with_the_error_and_returns_no_ranked_order(self):
         import urllib.error
 

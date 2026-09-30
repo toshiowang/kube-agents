@@ -1184,7 +1184,13 @@ def register_inventory_scores() -> str:
         # No ranked order: the queue's would silently leave out the clusters
         # that did not send, so the report is ranked from the worker's scores.
         return "\n".join(["ERROR: some findings did not register:", *errors, failure.hint, "", *lines])
-    except (sandbox_exec.SandboxUnavailable, sandbox_exec.SandboxMisconfigured, subprocess.TimeoutExpired, OSError) as e:
+    except (
+        sandbox_exec.SandboxUnavailable,
+        sandbox_exec.SandboxMisconfigured,
+        sandbox_exec.SandboxReadFailed,
+        subprocess.TimeoutExpired,
+        OSError,
+    ) as e:
         return (
             f"ERROR: could not read the inventory files: {e}. Nothing was registered. Write the report "
             "from the scores you computed, and say in the card summary that the queue was not updated."
