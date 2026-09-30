@@ -35,6 +35,14 @@ list is what ``agents/platform/SOUL.md`` tells the agent to use for a
 deliverable, and a path recovered from prose is dropped exactly as it is
 dropped today.
 
+The same screen is why a path the prose names can still send the wrong file.
+On an upgraded install the gateway pod keeps pre-migration copies at the paths
+the agent now writes in the sandbox. The wrapper keeps a declared path out of
+the list unless the sandbox said it has no such file, but a path in the summary
+or ``task.result`` reaches the original through ``extract_local_files``, whose
+``isfile`` passes on that copy. Suppressing it would mean relying on the
+original's basename dedup between its sources, which is internal to it.
+
 Nor the artifact that never reaches a completion event at all. ``kanban_db.py``
 validates the declared list at ``kanban_complete`` time, and for a path *under
 the card's managed scratch workspace* it expands, resolves, containment-checks
@@ -194,7 +202,7 @@ def _candidates(event_payload) -> list[str]:
         found.append(expanded)
         if len(found) >= MAX_STAGED_ARTIFACTS:
             LOGGER.warning(
-                "more than %d artifacts declared; the rest are not staged",
+                "more than %d artifacts declared; the rest are not delivered",
                 MAX_STAGED_ARTIFACTS,
             )
             break
@@ -296,11 +304,12 @@ def _screen(paths: list[str]) -> list[str]:
     return kept
 
 
-def _stage(paths: list[str]) -> tuple[list[str], str | None]:
+def _stage(paths: list[str]) -> tuple[list[str], str | None, set[str]]:
     """Copy each path that the sandbox holds into a fresh temp directory here.
 
-    Returns the staged paths and the directory holding them, or an empty list
-    and ``None`` when there was nothing to bring across. Never raises: it is
+    Returns the staged paths, the directory holding them (``None`` when there
+    was nothing to bring across), and the paths the sandbox answered it does
+    not have. Never raises: it is
     called from the notifier's own coroutine, where an exception aborts the
     delivery and -- because the cursor is written after delivery -- leaves the
     card to be retried on every tick.
@@ -313,10 +322,13 @@ def _stage(paths: list[str]) -> tuple[list[str], str | None]:
     pre-migration copy. Preferring it would deliver last month's report as this
     month's, with nothing in any log to say so. A path the sandbox does not
     have falls through unstaged, and the original method's own ``isfile``
-    screen picks up the local copy if there is one.
+    screen picks up the local copy if there is one. Only those paths: one the
+    sandbox holds but that failed to stage is withheld by the wrapper, for the
+    same reason.
     """
     staged: list[str] = []
     directory: str | None = None
+    absent: set[str] = set()
     remaining = STAGE_TOTAL_MAX_BYTES
     deadline = time.monotonic() + STAGE_DEADLINE_SECONDS
 
@@ -358,6 +370,7 @@ def _stage(paths: list[str]) -> tuple[list[str], str | None]:
             if raw is None:
                 # Not over there either, so it is the "mentioned for reference
                 # only" case the original method already tolerates.
+                absent.add(path)
                 continue
             if len(raw) > STAGE_MAX_BYTES:
                 LOGGER.warning(
@@ -396,9 +409,9 @@ def _stage(paths: list[str]) -> tuple[list[str], str | None]:
     except Exception:
         LOGGER.warning("staging this card's artifacts failed", exc_info=True)
         _cleanup(staged, directory)
-        return [], None
+        return [], None, absent
 
-    return staged, directory
+    return staged, directory, absent
 
 
 def _sandbox_on() -> bool:
@@ -501,7 +514,7 @@ def install() -> None:
             # sit for `STAGE_READ_TIMEOUT_SECONDS`. On the event loop that is
             # every chat connection this gateway holds, frozen, because a card
             # completed -- and the far side runs a `~/.bashrc` the model owns.
-            staged, directory = await asyncio.to_thread(_stage, wanted)
+            staged, directory, absent = await asyncio.to_thread(_stage, wanted)
         except Exception:
             LOGGER.warning(
                 "could not stage this card's artifacts; delivering without "
@@ -509,19 +522,22 @@ def install() -> None:
             )
             return await deliver(event_payload)
 
-        if not staged:
-            _cleanup([], directory)
+        if not wanted:
             return await deliver(event_payload)
 
-        # The staged paths go in front of whatever the payload already carried.
-        # The originals are left in place rather than removed: they name files
-        # that do not exist here, so the method's own `isfile` screen drops
-        # them, and leaving them means this wrapper never has to be right about
-        # which of the three sources a given path came from.
+        # Only a declared path the sandbox said it has no file at stays in the
+        # list. Any other -- staged, failed to stage, or past the cap and never
+        # asked about -- may also be a file here, the pre-migration copy
+        # `_stage`'s docstring describes, and the original method's `isfile`
+        # screen would pass it. What stays is expanded against the sandbox's
+        # home, the path that was asked about.
         payload = dict(event_payload) if isinstance(event_payload, dict) else {}
         carried = payload.get("artifacts")
         carried = list(carried) if isinstance(carried, (list, tuple)) else []
-        payload["artifacts"] = staged + carried
+        payload["artifacts"] = staged + [
+            _expand(item) for item in carried
+            if isinstance(item, str) and _expand(item) in absent
+        ]
 
         try:
             return await deliver(payload)

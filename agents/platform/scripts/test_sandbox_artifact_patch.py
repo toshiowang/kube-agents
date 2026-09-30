@@ -115,7 +115,7 @@ class StageTest(unittest.TestCase):
 
     def test_copies_the_bytes_and_keeps_the_basename(self):
         self.fake_read({"/opt/data/report.md": b"# findings\n"})
-        staged, directory = sandbox_artifact_patch._stage(["/opt/data/report.md"])
+        staged, directory, _ = sandbox_artifact_patch._stage(["/opt/data/report.md"])
         self.addCleanup(sandbox_artifact_patch._cleanup, staged, directory)
 
         self.assertEqual(len(staged), 1)
@@ -134,7 +134,7 @@ class StageTest(unittest.TestCase):
             handle.write("last month")
         self.fake_read({both: b"this month"})
 
-        staged, directory = sandbox_artifact_patch._stage([both])
+        staged, directory, _ = sandbox_artifact_patch._stage([both])
         self.addCleanup(sandbox_artifact_patch._cleanup, staged, directory)
 
         self.assertEqual(len(staged), 1)
@@ -147,7 +147,7 @@ class StageTest(unittest.TestCase):
             handle.write("written here")
         self.fake_read({})
 
-        staged, directory = sandbox_artifact_patch._stage([local])
+        staged, directory, _ = sandbox_artifact_patch._stage([local])
         self.assertEqual(staged, [])
         self.assertIsNone(directory)
 
@@ -155,7 +155,7 @@ class StageTest(unittest.TestCase):
         # `sandbox_exec.run` waits forever when handed no timeout, and the far
         # side sources a `~/.bashrc` the model owns.
         self.fake_read({"/opt/data/report.md": b"body"})
-        staged, directory = sandbox_artifact_patch._stage(["/opt/data/report.md"])
+        staged, directory, _ = sandbox_artifact_patch._stage(["/opt/data/report.md"])
         self.addCleanup(sandbox_artifact_patch._cleanup, staged, directory)
         self.assertEqual(
             self.reads[0][2]["timeout"],
@@ -173,7 +173,7 @@ class StageTest(unittest.TestCase):
             return b"body"
 
         sandbox_exec.read_bytes = read_bytes
-        staged, directory = sandbox_artifact_patch._stage(
+        staged, directory, _ = sandbox_artifact_patch._stage(
             ["/opt/data/bad\x00.md", "/opt/data/good.md"]
         )
         self.addCleanup(sandbox_artifact_patch._cleanup, staged, directory)
@@ -195,7 +195,7 @@ class StageTest(unittest.TestCase):
                 "/opt/data/c.log": b"c" * chunk,
             }
         )
-        staged, directory = sandbox_artifact_patch._stage(
+        staged, directory, _ = sandbox_artifact_patch._stage(
             ["/opt/data/a.log", "/opt/data/b.log", "/opt/data/c.log"]
         )
         self.addCleanup(sandbox_artifact_patch._cleanup, staged, directory)
@@ -224,15 +224,16 @@ class StageTest(unittest.TestCase):
         # The original method's "mentioned for reference only" case, which is
         # a legitimate outcome rather than a failure to report.
         self.fake_read({})
-        staged, directory = sandbox_artifact_patch._stage(["/opt/data/ghost.md"])
+        staged, directory, absent = sandbox_artifact_patch._stage(["/opt/data/ghost.md"])
         self.assertEqual(staged, [])
         self.assertIsNone(directory)
+        self.assertEqual(absent, {"/opt/data/ghost.md"})
 
     def test_reads_one_byte_past_the_cap_and_refuses_what_exceeds_it(self):
         oversized = b"x" * (sandbox_artifact_patch.STAGE_MAX_BYTES + 1)
         self.fake_read({"/opt/data/huge.log": oversized})
 
-        staged, directory = sandbox_artifact_patch._stage(["/opt/data/huge.log"])
+        staged, directory, _ = sandbox_artifact_patch._stage(["/opt/data/huge.log"])
         self.assertEqual(staged, [])
         self.assertIsNone(directory)
         # The extra byte is what makes "at the cap" distinguishable from
@@ -246,7 +247,7 @@ class StageTest(unittest.TestCase):
     def test_a_file_exactly_at_the_cap_is_staged(self):
         exact = b"x" * sandbox_artifact_patch.STAGE_MAX_BYTES
         self.fake_read({"/opt/data/big.log": exact})
-        staged, directory = sandbox_artifact_patch._stage(["/opt/data/big.log"])
+        staged, directory, _ = sandbox_artifact_patch._stage(["/opt/data/big.log"])
         self.addCleanup(sandbox_artifact_patch._cleanup, staged, directory)
         self.assertEqual(len(staged), 1)
 
@@ -257,7 +258,7 @@ class StageTest(unittest.TestCase):
                 "/opt/data/b/report.md": b"cluster b",
             }
         )
-        staged, directory = sandbox_artifact_patch._stage(
+        staged, directory, _ = sandbox_artifact_patch._stage(
             ["/opt/data/a/report.md", "/opt/data/b/report.md"]
         )
         self.addCleanup(sandbox_artifact_patch._cleanup, staged, directory)
@@ -277,7 +278,7 @@ class StageTest(unittest.TestCase):
             raise sandbox_exec.SandboxUnavailable("ssh: connect: no route to host")
 
         sandbox_exec.read_bytes = explode
-        staged, directory = sandbox_artifact_patch._stage(["/opt/data/report.md"])
+        staged, directory, _ = sandbox_artifact_patch._stage(["/opt/data/report.md"])
         self.assertEqual(staged, [])
         self.assertIsNone(directory)
 
@@ -289,16 +290,17 @@ class StageTest(unittest.TestCase):
 
         sandbox_exec.read_bytes = read_bytes
         with self.assertLogs(sandbox_artifact_patch.LOGGER, "WARNING") as logs:
-            staged, directory = sandbox_artifact_patch._stage(
+            staged, directory, absent = sandbox_artifact_patch._stage(
                 ["/opt/data/scratch", "/opt/data/report.md"]
             )
         self.addCleanup(sandbox_artifact_patch._cleanup, staged, directory)
         self.assertEqual([os.path.basename(path) for path in staged], ["report.md"])
+        self.assertEqual(absent, set())
         self.assertIn("/opt/data/scratch is not staged", logs.output[0])
 
     def test_cleanup_removes_the_files_and_the_translations(self):
         self.fake_read({"/opt/data/report.md": b"body"})
-        staged, directory = sandbox_artifact_patch._stage(["/opt/data/report.md"])
+        staged, directory, _ = sandbox_artifact_patch._stage(["/opt/data/report.md"])
         target = staged[0]
         self.assertEqual(
             sandbox_artifact_patch.original_path(target), "/opt/data/report.md"
@@ -499,11 +501,75 @@ class InstallTest(unittest.TestCase):
 
         self.assertEqual(len(self.calls), 1)
         paths = self.calls[0]["paths"]
-        # The agent's own path rides along behind the staged one; the original
-        # method's `isfile` screen is what drops it.
-        self.assertIn("/opt/data/report.md", paths)
+        self.assertEqual(len(paths), 1)
         self.assertEqual(self.calls[0]["bodies"][0], b"# findings")
         self.assertNotEqual(paths[0], "/opt/data/report.md")
+
+    def stale_copy_here(self):
+        # `sandbox_mirror` left the agent pod's pre-migration files in place,
+        # so on an upgraded install the declared path is a real file here too.
+        path = os.path.join(self.tmp.name, "audit.csv")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write("last month")
+        return path
+
+    def test_the_copy_here_is_not_sent_beside_the_staged_one(self):
+        path = self.stale_copy_here()
+        self.enable_sandbox({path: b"this month"})
+        sandbox_artifact_patch.install()
+        self.deliver({"artifacts": [path]})
+        self.assertEqual(self.calls[0]["bodies"], [b"this month"])
+
+    def test_the_copy_here_is_not_sent_when_the_sandbox_copy_fails_to_stage(self):
+        path = self.stale_copy_here()
+        oversized = b"x" * (sandbox_artifact_patch.STAGE_MAX_BYTES + 1)
+        cases = {
+            "unreadable": sandbox_exec.SandboxReadFailed(f"{path} is not a readable regular file"),
+            "unreachable": sandbox_exec.SandboxUnavailable("ssh: connect: no route to host"),
+            "misconfigured": sandbox_exec.SandboxMisconfigured("config.yaml could not be read"),
+            "oversized": oversized,
+        }
+        for name, answer in cases.items():
+            with self.subTest(name):
+                self.calls.clear()
+                forget_sandbox_state(self)
+
+                def read_bytes(requested, *, max_bytes, answer=answer, **kwargs):
+                    if isinstance(answer, Exception):
+                        raise answer
+                    return answer[:max_bytes]
+
+                sandbox_exec.sandbox_enabled = lambda path=None: True
+                sandbox_exec.read_bytes = read_bytes
+                sandbox_artifact_patch.install()
+                with self.assertLogs(sandbox_artifact_patch.LOGGER, "WARNING"):
+                    self.deliver({"artifacts": [path]})
+                self.assertEqual(self.calls[0]["paths"], [])
+
+    def test_a_path_past_the_cap_is_not_sent_from_here(self):
+        path = self.stale_copy_here()
+        ahead = [f"/opt/data/{n}.md" for n in range(sandbox_artifact_patch.MAX_STAGED_ARTIFACTS)]
+        self.enable_sandbox({})
+        sandbox_artifact_patch.install()
+        with self.assertLogs(sandbox_artifact_patch.LOGGER, "WARNING"):
+            self.deliver({"artifacts": ahead + [path]})
+        self.assertNotIn(path, self.calls[0]["paths"])
+
+    def test_a_home_relative_path_reaches_the_original_as_the_sandbox_home(self):
+        self.enable_sandbox({})
+        sandbox_artifact_patch.install()
+        self.deliver({"artifacts": ["~/report.md"]})
+        self.assertEqual(
+            self.calls[0]["paths"],
+            [os.path.join(sandbox_artifact_patch.SANDBOX_HOME, "report.md")],
+        )
+
+    def test_a_path_only_this_pod_has_still_reaches_the_original(self):
+        path = self.stale_copy_here()
+        self.enable_sandbox({})
+        sandbox_artifact_patch.install()
+        self.deliver({"artifacts": [path]})
+        self.assertEqual(self.calls[0]["bodies"], [b"last month"])
 
     def test_the_staged_copy_is_gone_once_delivery_returns(self):
         self.enable_sandbox({"/opt/data/report.md": b"# findings"})

@@ -1582,7 +1582,11 @@ built for this one caller. `agents/platform/scripts/sandbox_artifact_patch.py` w
 notifier, reads each declared path out of the sandbox over the connection that is already
 there, and hands the original method local copies to deliver — bounded at 8 MiB a file,
 16 files and 16 MiB a card, two minutes for the lot, deleted as soon as the delivery
-returns. Upstream's media-delivery denylist is applied to the path the model declared
+returns. A declared path stays in the list the original method checks only when the sandbox
+reports no file there, because on an upgraded install the gateway pod still holds a
+pre-migration copy at the same path. A path that only the card's summary names can still
+reach that copy through the original's own prose scan. Upstream's media-delivery denylist
+is applied to the path the model declared
 rather than to the staged copy, because staging rewrites every path to one under the
 system temp directory that no denylist covers. The notice the Google Chat adapter posts
 when it cannot attach a file names the path the agent wrote, not the temporary one.
