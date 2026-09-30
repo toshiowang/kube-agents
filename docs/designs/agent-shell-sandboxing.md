@@ -1689,8 +1689,11 @@ explicit allowlist: `sandbox_exec.py`, `forge.py`, `pr_triggers.py`,
 `stall_report.py` and `inventory_findings.py` — the entry points an agent is told to run,
 plus the transitive closure of what they import. Only `inventory_findings.py extract` works
 there: `register` and `ranked` call the Session KV server on the agent pod's loopback and
-exit 13 from the sandbox, and the prioritization SOP answers that exit by ranking from its own
-scores and writing the report without the findings queue.
+exit 13 from the sandbox. The prioritization SOP registers through the platform MCP server's
+`register_inventory_scores` tool instead, which runs in the agent pod, reads
+`INVENTORY.items.json` and `INVENTORY.scores.json` off the sandbox with
+`sandbox_exec.read_bytes`, and puts both through `register`'s checks before anything reaches
+the queue.
 
 **The test for whether a script qualifies is what it needs, not how it is called.** An
 earlier version of this proposed "shell call sites, and absent from every `jobs.json`",

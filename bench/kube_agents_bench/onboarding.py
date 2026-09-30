@@ -21,7 +21,8 @@ not mount. ``harness._agent_shell`` execs into the agent's Service, so it
 cannot see them. :func:`sandbox_shell` execs into the sandbox pod instead,
 named the way ``hack/ci-eval-pr.sh`` names it. The delivery job runs in the
 agent pod and writes its marker there, which :func:`agent_shell` reads, along
-with the scheduler's record of the job's runs.
+with the scheduler's record of the job's runs and the findings queue the
+stage registers into.
 
 A reply without a sentinel is a failed read, never an empty one: both shells
 return ``""`` on any kubectl failure.
@@ -42,12 +43,15 @@ __all__ = [
     "DELIVERED_FILE",
     "DELIVERY_JOB_ID",
     "EXECUTIONS_DB",
+    "INVENTORY_SOURCE",
     "ITEMS_FILE",
+    "QUEUE_DB",
     "REPORT_FILE",
     "agent_shell",
     "read_delivery_runs",
     "read_files",
     "read_items",
+    "read_queue",
     "sandbox_pod",
     "sandbox_shell",
 ]
@@ -125,6 +129,38 @@ if out["marker"] is not None:
             continue
         out["runs"].append({"status": status, "claimed_at": claimed, "finished_at": finished,
                             "error": error, "delivery_outcome": outcome})
+print(sentinel)
+print(json.dumps(out))
+"""
+
+
+# The findings queue's store in the agent pod: session_kv_server.py reads its
+# path from SESSION_KV_DB_PATH and defaults to QUEUE_DB. Every row
+# inventory_findings.py registers carries its SOURCE.
+QUEUE_DB = "/var/lib/kube-agents/session/session_kv.db"
+QUEUE_DB_ENV = "SESSION_KV_DB_PATH"
+INVENTORY_SOURCE = "inventory"
+QUEUE_READ = "__ONBOARDING_QUEUE_READ__"
+
+# Prints the queue's inventory rows for one project, read-only. A store that
+# cannot be opened, or has no findings table, is an error rather than no rows.
+_QUEUE_SCRIPT = """
+import json, os, sqlite3, sys
+default, env, source, project, sentinel = sys.argv[1:6]
+SQLITE_BUSY_TIMEOUT = 10
+db = os.environ.get(env) or default
+out = {"db": db, "rows": None, "error": None}
+try:
+    con = sqlite3.connect("file:" + db + "?mode=ro", uri=True, timeout=SQLITE_BUSY_TIMEOUT)
+    out["rows"] = [
+        {"check": check, "object": obj, "cluster": cluster, "state": state}
+        for check, obj, cluster, state in con.execute(
+            "SELECT check_slug, object, cluster, state FROM findings WHERE source = ? AND project = ?"
+            " ORDER BY check_slug, object", (source, project))
+    ]
+    con.close()
+except sqlite3.Error as exc:
+    out["error"] = str(exc)
 print(sentinel)
 print(json.dumps(out))
 """
@@ -253,3 +289,32 @@ def read_delivery_runs(shell: Callable[[str, float], str], timeout: float) -> di
     if not isinstance(parsed, dict) or not isinstance(parsed.get("runs"), list):
         return None
     return parsed
+
+
+def queue_command(project: str) -> str:
+    """The ``sh -c`` line that runs the queue read in the agent container."""
+    argv = [AGENT_PYTHON, "-c", _QUEUE_SCRIPT, QUEUE_DB, QUEUE_DB_ENV, INVENTORY_SOURCE, project, QUEUE_READ]
+    return " ".join(shlex.quote(a) for a in argv)
+
+
+def read_queue(shell: Callable[[str, float], str], project: str, timeout: float) -> tuple[list[dict[str, Any]] | None, str]:
+    """The findings queue's inventory rows for ``project``, or ``None`` and why not.
+
+    ``shell`` is :func:`agent_shell`, a parameter so the tests can fake it.
+    """
+    reply = shell(queue_command(project), timeout)
+    marker = reply.rfind(QUEUE_READ)
+    if marker < 0:
+        return None, "the agent pod could not be read (kubectl exec failed or the command did not run)"
+    try:
+        parsed = json.loads(reply[marker + len(QUEUE_READ) :])
+    except json.JSONDecodeError as exc:
+        return None, f"the queue read did not return JSON: {exc}"
+    if not isinstance(parsed, dict):
+        return None, "the queue read returned something other than an object"
+    if parsed.get("error"):
+        return None, f"the findings queue at {parsed.get('db')} could not be read: {parsed['error']}"
+    rows = parsed.get("rows")
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        return None, "the queue read returned no list of rows"
+    return rows, ""

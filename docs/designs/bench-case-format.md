@@ -203,6 +203,13 @@ sandbox too, and passes when onboarding's delivery job has claimed the ranked re
 `INVENTORY.delivered.md`, which it does after reading it. `bootstrap_delivered` reads the
 agent pod's `cron/executions.db` instead and passes when the delivery job's run that claimed
 the report completed, which is the condition for the scheduler to post what it printed.
+`bootstrap_queued` reads the findings queue's store on the agent pod and passes when its
+`inventory` rows for `project` carry exactly the `expected_findings` pairs; the queue outlives
+a run, so the stack deletes those rows before it plants. `card_tool_called` is `tool_called`
+for a card a stack or a cron job filed, whose worker the harness does not capture because no
+`kanban_create` of the front agent's returned it: it finds the newest card with
+`idempotency_key` on the agent pod's board and counts that card's worker's calls as
+`scope: workers` does.
 
 Two limits are worth knowing before choosing one. `tool_called` defaults to
 `scope: router`, the delegating turn's calls only — the harness appends the delegated

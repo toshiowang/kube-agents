@@ -31,10 +31,11 @@ import json
 import logging
 import shlex
 from collections.abc import Callable
+from typing import Any, Literal
 
 from kube_agents_bench.worker_trajectory import DATA_ROOT, FALLBACK_PYTHON, HERMES_PYTHON
 
-__all__ = ["read_statuses"]
+__all__ = ["read_card_by_key", "read_statuses"]
 
 _log = logging.getLogger("kube_agents_bench.board")
 
@@ -72,6 +73,35 @@ try:
     conn.close()
     for tid, status in rows:
         out["statuses"][str(tid)] = str(status)
+except sqlite3.Error as exc:
+    out["error"] = "kanban board: %s" % exc
+print(SENTINEL)
+print(json.dumps(out))
+"""
+
+
+KEY_PRESENT = "__KANBAN_CARD_BY_KEY__"
+
+CardState = Literal["found", "absent", "error"]
+
+# The newest card filed with one idempotency key, archived or not: a stack
+# that files a card archives the previous run's first, so the newest is this
+# run's. Positional arguments: data root, board file, sentinel, key.
+_KEY_SCRIPT = r"""
+import json, sqlite3, sys
+
+ROOT, BOARD, SENTINEL, KEY = sys.argv[1:5]
+SQLITE_BUSY_TIMEOUT = 10
+out = {"card": None, "error": None}
+try:
+    conn = sqlite3.connect("file:%s/%s?mode=ro" % (ROOT, BOARD), uri=True, timeout=SQLITE_BUSY_TIMEOUT)
+    row = conn.execute(
+        "SELECT id, status FROM tasks WHERE idempotency_key = ? ORDER BY created_at DESC, id DESC LIMIT 1",
+        (KEY,),
+    ).fetchone()
+    conn.close()
+    if row is not None:
+        out["card"] = {"id": str(row[0]), "status": str(row[1])}
 except sqlite3.Error as exc:
     out["error"] = "kanban board: %s" % exc
 print(SENTINEL)
@@ -126,3 +156,42 @@ def read_statuses(
     if not isinstance(statuses, dict):
         return None
     return {str(k): str(v) for k, v in statuses.items() if k in task_ids}
+
+
+def key_command(key: str) -> str:
+    """The ``sh -c`` line that reads the newest card filed with ``key``."""
+    args = " ".join(shlex.quote(a) for a in [DATA_ROOT, BOARD_FILE, KEY_PRESENT, key])
+    return (
+        f'PY={shlex.quote(HERMES_PYTHON)}; [ -x "$PY" ] || PY={shlex.quote(FALLBACK_PYTHON)}; '
+        f'"$PY" -c {shlex.quote(_KEY_SCRIPT)} {args}'
+    )
+
+
+def read_card_by_key(
+    shell: Callable[[str, float], str], key: str, timeout: float
+) -> tuple[CardState, dict[str, Any] | None, str]:
+    """The newest card filed with idempotency key ``key``, as ``(state, card, why)``.
+
+    ``card`` is ``{"id", "status"}`` when ``state`` is ``found``. ``absent``
+    means the board answered and holds no card with the key; ``error`` means
+    it could not be read. ``shell`` is an agent-pod exec, a parameter so the
+    tests can run the script locally.
+    """
+    reply = shell(key_command(key), timeout)
+    marker = reply.find(KEY_PRESENT)
+    if marker < 0:
+        return "error", None, "the agent pod could not be read (kubectl exec failed or the script did not run)"
+    try:
+        payload = json.loads(reply[marker + len(KEY_PRESENT) :].strip())
+    except json.JSONDecodeError as exc:
+        return "error", None, f"the board read did not return JSON: {exc}"
+    if not isinstance(payload, dict):
+        return "error", None, "the board read returned something other than an object"
+    if payload.get("error"):
+        return "error", None, str(payload["error"])
+    card = payload.get("card")
+    if card is None:
+        return "absent", None, f"no card on the board has idempotency key {key!r}"
+    if not isinstance(card, dict) or not card.get("id"):
+        return "error", None, "the board read returned a card without an id"
+    return "found", {"id": str(card["id"]), "status": str(card.get("status"))}, ""

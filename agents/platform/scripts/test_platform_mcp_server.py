@@ -1442,5 +1442,162 @@ class TestClusterAgentRoster(unittest.TestCase):
         self.assertEqual([], json.loads(platform_mcp_server.list_cluster_profiles()))
 
 
+
+class TestRegisterInventoryScores(unittest.TestCase):
+    """The tool reads the SOP's two files itself; the model hands it nothing.
+
+    The items file is `extract`'s real output for the raw report the
+    bootstrap-ranking case plants.
+    """
+
+    PLANTED_RAW = Path(__file__).resolve().parents[3] / "bench" / "tf" / "prebuilt" / "bootstrap-ranking" / "inventory-raw.txt"
+    SCORE = {
+        "rubric": {"B": 3, "L": 6, "detect": 3, "recover": 2, "C": 1.0},
+        "recommendation": {"action": "add a readinessProbe", "rationale": "traffic", "risk": "5xx"},
+        "remediation": {"kind": "manifest", "path": "k8s/api.yaml", "note": "add the probe"},
+        "verification": {"kind": "kubectl", "command": "kubectl get deploy api", "still_failing_when": "empty"},
+    }
+
+    def setUp(self):
+        import inventory_findings
+
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.items = Path(tmp.name) / "INVENTORY.items.json"
+        self.scores = Path(tmp.name) / "INVENTORY.scores.json"
+        with patch("sys.stdout"):
+            self.assertEqual(
+                inventory_findings.main(["extract", "--raw", str(self.PLANTED_RAW), "--out", str(self.items)]), 0
+            )
+        self.extracted = json.loads(self.items.read_text())
+        self.write_scores({item["id"]: self.SCORE for item in self.extracted["items"]})
+        for name, value in (("INVENTORY_ITEMS_PATH", str(self.items)), ("INVENTORY_SCORES_PATH", str(self.scores))):
+            patcher = patch.object(platform_mcp_server, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+        self.captured = []
+
+        def fake_request(method, path, body=None):
+            self.captured.append((method, path, body))
+            if method == "POST":
+                return {"results": [{"id": f["object"], "outcome": "created"} for f in body["findings"]]}
+            return {"findings": [
+                {"check": f["check"], "project": "onboarding-demo-prod", "cluster": "prod-east",
+                 "object": f["object"], "title": f["title"], "rank_score": 40, "severity": "high"}
+                for f in self.extracted["items"]
+            ]}
+
+        patcher = patch.object(platform_mcp_server, "_findings_request", fake_request)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def write_scores(self, scores, complete=("onboarding-demo-prod/prod-east",)):
+        self.scores.write_text(json.dumps({"complete_clusters": list(complete), "scores": scores}))
+
+    def posted(self):
+        return [body for method, _, body in self.captured if method == "POST"]
+
+    def test_it_takes_no_findings_from_the_model(self):
+        import inspect
+
+        self.assertEqual(inspect.signature(platform_mcp_server.register_inventory_scores).parameters, {})
+
+    def test_every_extracted_finding_is_registered_and_the_ranked_order_returned(self):
+        result = platform_mcp_server.register_inventory_scores()
+        (body,) = self.posted()
+        self.assertEqual(
+            sorted((f["check"], f["object"]) for f in body["findings"]),
+            sorted((i["check"], i["object"]) for i in self.extracted["items"]),
+        )
+        self.assertEqual(body["scope"], {"project": "onboarding-demo-prod", "cluster": "prod-east", "complete": True})
+        self.assertIn("registered 6 of 6 extracted findings", result)
+        self.assertIn("total: 6", result)
+        self.assertEqual(self.captured[-1][:2], ("GET", "/v1/findings/ranked"))
+
+    def test_the_sandbox_copy_is_read_capped_as_the_terminal_user(self):
+        reads = []
+
+        def fake_read(path, *, max_bytes, **kwargs):
+            reads.append((path, max_bytes, kwargs))
+            return Path(path).read_bytes()
+
+        with patch.object(sandbox_exec, "sandbox_enabled", lambda path=None: True), \
+                patch.object(sandbox_exec, "read_bytes", fake_read):
+            result = platform_mcp_server.register_inventory_scores()
+        self.assertIn("registered 6 of 6", result)
+        self.assertEqual([r[0] for r in reads], [str(self.items), str(self.scores)])
+        self.assertTrue(all(r[1] == platform_mcp_server.INVENTORY_FILE_MAX_BYTES + 1 for r in reads))
+        # No principal override: read_bytes' own default is the terminal user,
+        # who wrote the files.
+        self.assertTrue(all("principal" not in r[2] for r in reads))
+
+    def test_a_tampered_items_file_registers_nothing(self):
+        self.extracted["items"][0]["source"] = "audit"
+        self.items.write_text(json.dumps(self.extracted))
+        result = platform_mcp_server.register_inventory_scores()
+        self.assertTrue(result.startswith("ERROR: nothing was registered."), result)
+        self.assertIn("unknown field(s) source", result)
+        self.assertEqual(self.captured, [])
+
+    def test_an_unscored_finding_registers_nothing(self):
+        self.write_scores({"f001": self.SCORE})
+        result = platform_mcp_server.register_inventory_scores()
+        self.assertTrue(result.startswith("ERROR: nothing was registered."), result)
+        self.assertIn("unscored: f002", result)
+        self.assertEqual(self.captured, [])
+
+    def test_a_file_over_the_cap_is_not_parsed(self):
+        with patch.object(platform_mcp_server, "INVENTORY_FILE_MAX_BYTES", 64):
+            result = platform_mcp_server.register_inventory_scores()
+        self.assertIn("is larger than 64 bytes", result)
+        self.assertEqual(self.captured, [])
+
+    def test_an_absent_scores_file_is_named(self):
+        self.scores.unlink()
+        result = platform_mcp_server.register_inventory_scores()
+        self.assertIn(f"there is no scores file at {self.scores}", result)
+        self.assertEqual(self.captured, [])
+
+    def test_an_unreachable_sandbox_registers_nothing(self):
+        def gone(path, **kwargs):
+            raise sandbox_exec.SandboxUnavailable("connection refused")
+
+        with patch.object(sandbox_exec, "sandbox_enabled", lambda path=None: True), \
+                patch.object(sandbox_exec, "read_bytes", gone):
+            result = platform_mcp_server.register_inventory_scores()
+        self.assertTrue(result.startswith("ERROR: could not read the inventory files"), result)
+        self.assertEqual(self.captured, [])
+
+    def test_a_failed_batch_still_returns_the_ranked_order(self):
+        import urllib.error
+
+        real = platform_mcp_server._findings_request
+
+        def refuse_post(method, path, body=None):
+            if method == "POST":
+                raise urllib.error.URLError("connection reset")
+            return real(method, path, body)
+
+        with patch.object(platform_mcp_server, "_findings_request", refuse_post):
+            result = platform_mcp_server.register_inventory_scores()
+        self.assertIn("ERROR: some findings did not register:", result)
+        self.assertIn("registered 0 of 6", result)
+        self.assertIn("total: 6", result)
+
+    def test_an_unreadable_ranked_order_says_to_rank_by_the_scores(self):
+        real = platform_mcp_server._findings_request
+
+        def refuse_get(method, path, body=None):
+            if method == "GET":
+                raise OSError("connection refused")
+            return real(method, path, body)
+
+        with patch.object(platform_mcp_server, "_findings_request", refuse_get):
+            result = platform_mcp_server.register_inventory_scores()
+        self.assertIn("registered 6 of 6", result)
+        self.assertIn("Rank by the scores you computed instead", result)
+
+
 if __name__ == '__main__':
     unittest.main()

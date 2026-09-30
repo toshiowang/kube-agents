@@ -303,6 +303,12 @@ CHECK_ASSERTIONS: dict[str, tuple[str, ...]] = {
     # No field: whether the run that delivered the report completed is the
     # whole assertion.
     "bootstrap_delivered": (),
+    # This repository, agent-disk-reading: the findings the prioritization
+    # stage registered in the queue.
+    "bootstrap_queued": ("expected_findings",),
+    # This repository, agent-disk-reading: the calls of a card's worker, for
+    # a card the conversation did not file.
+    "card_tool_called": ("tool_names",),
 }
 
 # Check types that read live cluster state. A case using one is asserting on

@@ -118,3 +118,59 @@ def test_the_command_prefers_hermes_interpreter_and_names_the_cards() -> None:
     assert board.FALLBACK_PYTHON in cmd
     assert board.DATA_ROOT in cmd
     assert cmd.index(FRONT) < cmd.index(CHILD)
+
+
+# --- the card an idempotency key names -------------------------------------
+
+KEY = "bootstrap-inventory-prioritize"
+
+
+def _local_shell(script: str, timeout: float) -> str:
+    return subprocess.run(["sh", "-c", script], capture_output=True, text=True, timeout=timeout, check=True).stdout
+
+
+@pytest.fixture
+def keyed_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A board with an archived earlier card under ``KEY``, read by the real command line."""
+    with sqlite3.connect(tmp_path / board.BOARD_FILE) as conn:
+        conn.execute("CREATE TABLE tasks (id TEXT PRIMARY KEY, status TEXT, idempotency_key TEXT, created_at INTEGER)")
+        conn.executemany(
+            "INSERT INTO tasks (id, status, idempotency_key, created_at) VALUES (?, ?, ?, ?)",
+            [("t_old", "archived", KEY, 100), (FRONT, "done", KEY, 200), (CHILD, "running", "other-key", 300)],
+        )
+    monkeypatch.setattr(board, "DATA_ROOT", str(tmp_path))
+    monkeypatch.setattr(board, "HERMES_PYTHON", sys.executable)
+    return tmp_path
+
+
+def test_read_card_by_key_returns_the_newest_card_filed_with_it(keyed_root: Path) -> None:
+    assert board.read_card_by_key(_local_shell, KEY, 5.0) == ("found", {"id": FRONT, "status": "done"}, "")
+
+
+def test_read_card_by_key_is_absent_when_the_board_has_no_such_card(keyed_root: Path) -> None:
+    state, card, why = board.read_card_by_key(_local_shell, "no-such-key", 5.0)
+    assert (state, card) == ("absent", None)
+    assert "'no-such-key'" in why
+
+
+def test_read_card_by_key_is_an_error_without_a_board(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(board, "DATA_ROOT", str(tmp_path))
+    monkeypatch.setattr(board, "HERMES_PYTHON", sys.executable)
+    state, card, why = board.read_card_by_key(_local_shell, KEY, 5.0)
+    assert (state, card) == ("error", None)
+    assert "kanban board" in why
+
+
+@pytest.mark.parametrize(
+    "reply,expected",
+    [
+        ("", "could not be read"),
+        (f"{board.KEY_PRESENT}\nnot json", "did not return JSON"),
+        (f"{board.KEY_PRESENT}\n[]", "other than an object"),
+        (f'{board.KEY_PRESENT}\n{{"card": {{"status": "done"}}, "error": null}}', "without an id"),
+    ],
+)
+def test_read_card_by_key_is_an_error_on_a_reply_it_cannot_use(reply: str, expected: str) -> None:
+    state, card, why = board.read_card_by_key(lambda s, t: reply, KEY, 5.0)
+    assert (state, card) == ("error", None)
+    assert expected in why

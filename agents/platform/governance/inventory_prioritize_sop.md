@@ -2,14 +2,14 @@
 
 **Purpose:** Turns the raw findings produced by the discovery sweep into two things — the durable
 findings queue that later publishers read, and the short ranked report the user receives now. Reads
-`/opt/data/INVENTORY.raw.md`, registers every finding through
-`/opt/data/scripts/inventory_findings.py`, writes `/opt/data/INVENTORY.md`.
+`/opt/data/INVENTORY.raw.md`, extracts every finding with `/opt/data/scripts/inventory_findings.py`,
+registers them with the `register_inventory_scores` tool, writes `/opt/data/INVENTORY.md`.
 
 **You do not decide what the findings are, and you do not make the registration call.** The sweep
 wrote a machine-readable block into the raw file; `inventory_findings.py extract` turns it into a
-numbered list, `register` refuses to send anything until every number on that list carries a score,
-and `ranked` reads the order back. Your job between those commands is judgement — scoring, and
-choosing what the report shows — and nothing else.
+numbered list, and the `register_inventory_scores` tool refuses to send anything until every number
+on that list carries a score, then reads the order back. Your job between those two steps is
+judgement — scoring, and choosing what the report shows — and nothing else.
 
 This is the last stage before delivery. The file you write is posted to the user **verbatim** by the
 `bootstrap-inventory-delivery` job — no agent edits or reformats it afterward.
@@ -47,9 +47,10 @@ records or other reports, and no `gcloud`, `kubectl`, `lookout` or any other too
 context to gather. The findings file plus the rules below are sufficient, and anything else you read
 is either irrelevant or will tempt you into reporting something the sweep did not find.
 
-`inventory_findings.py` is the exception, and it runs the other direction: it reads the raw file
-you already have, records it, and reads back the order the queue computed. It is not a place to
-look for findings the raw file does not contain, and it is not a licence to run anything else.
+`inventory_findings.py` and the `register_inventory_scores` tool are the exception, and they run the
+other direction: they read the raw file you already have, record it, and read back the order the
+queue computed. They are not a place to look for findings the raw file does not contain, and they
+are not a licence to run anything else.
 
 **The findings file is complete, however short it looks.** Read it once, whole. Do not page through
 it in line ranges, and do not read past its end to check for more: a read that returns nothing means
@@ -110,8 +111,8 @@ object on purpose: a missing `readinessProbe` on three Deployments is three rows
 because each has its own manifest to change and its own life — one gets fixed next week and the other
 two do not. Step 5 gathers them back into a single report line ("3 Deployments in `payments`").
 
-`extract` writes the list to `/opt/data/INVENTORY.items.json`, which is what Step 4's `register`
-reads. Leave both at their defaults.
+`extract` writes the list to `/opt/data/INVENTORY.items.json`, which is what Step 4's tool reads.
+Leave both at their defaults.
 
 **Cross-check against the prose plan you read in Step 1 — by problem, not by count.** The two are the
 same findings said twice, but at different grain: the plan groups a recommendation over several
@@ -133,7 +134,8 @@ Any other non-zero exit is the command itself being wrong — a mistyped flag, a
 Read the error and fix the command; it says nothing about the sweep.
 
 Zero findings is a success, not one of those cases: a clean fleet writes an empty block, `extract`
-prints `extracted 0 findings`, and you go to Step 5 with nothing to register.
+prints `extracted 0 findings`, and Step 4 writes an empty `scores` map and still calls the tool,
+whose reply carries the ranked order Step 5 works from.
 
 ---
 
@@ -244,8 +246,8 @@ penalty would let a B=8 observation float back above work someone could actually
 
 ## Step 4: Register Everything
 
-Write one score entry per extracted id to `/opt/data/INVENTORY.scores.json`, then hand the file to
-the script:
+Write one score entry per extracted id to `/opt/data/INVENTORY.scores.json`, then call the
+`register_inventory_scores` tool:
 
 ```json
 {
@@ -271,27 +273,30 @@ the script:
 }
 ```
 
-```
-python3 /opt/data/scripts/inventory_findings.py register --scores /opt/data/INVENTORY.scores.json
-```
+**`register_inventory_scores` is a tool call, like `kanban_complete`, not a shell command.** Step 2
+ran a script in your shell; this step does not. There is no script by that name, and
+`inventory_findings.py register` cannot reach the queue from your shell, so do not run it. The tool
+takes no arguments: it reads `/opt/data/INVENTORY.items.json` and `/opt/data/INVENTORY.scores.json`
+from where your shell wrote them.
 
 **It validates all of it before it sends any of it.** Every id, every required field and every rubric
-is checked before a connection is opened, and every problem is printed in one list — so a rejected
-run costs you one edit, not one round trip per field. If it exits 12, fix everything it named and run
-it again. Do not register a subset by hand and do not fall back to calling the queue directly; a
+is checked before a connection is opened, and every problem is listed at once — so a rejected call
+costs you one edit, not one round trip per field. If its reply starts `ERROR: nothing was
+registered.`, fix everything it named and call it again. Do not register a subset by hand and do not
+fall back to calling the queue directly; a
 partial batch is the silent drop this stage exists to prevent, and two instrumented runs of the old
 hand-rolled call registered seven and three of the same nine findings.
 
 Sending is per cluster, so it is not all-or-nothing on the wire. If one cluster's POST fails the
-others stay registered, the script names which failed, and `registered N of M` will genuinely differ.
-Treat that as what it says — some of it landed — and follow the exit 13 branch below.
+others stay registered, the tool names which failed, and `registered N of M` will genuinely differ.
+Treat that as what it says — some of it landed — and follow the `some findings did not register` branch below.
 
-The identity of a row is `check` + `project` + `cluster` + `namespace` + `object`, which the script
-takes from the extracted item — you cannot set them, and a re-run of this card updates the same rows
+The identity of a row is `check` + `project` + `cluster` + `namespace` + `object`, which the
+tool takes from the extracted item — you cannot set them, and a re-run of this card updates the same rows
 instead of duplicating them.
 
 `complete_clusters` lists the clusters the raw file says were scanned in full, each as
-`<project>/<cluster>` — the same pair the register output prints per batch. Leave a cluster out
+`<project>/<cluster>` — the same pair the tool's reply prints per batch. Leave a cluster out
 when the file records a gap, a skipped category, a failed credential mint, or a cluster in `ERROR`.
 Being listed lowers the confidence of queued rows this run did not re-report, which re-ranks them
 down; a sweep that died halfway produces the same silence as a fleet that got healthier overnight,
@@ -338,20 +343,26 @@ each is a YAML edit — there is no stream to route a pull request through until
 The vocabulary the slugs come from is the sweep's to choose from; it lives in
 [`inventory.md`](inventory.md) Step 4 beside the block that carries them.
 
-### If the script fails
+### If the tool reports an error
 
-Its exit code says which of two failures you are looking at, and they want opposite things.
+The start of its reply says which failure you are looking at, and they want opposite things.
 
-**Exit 12 — your scores are incomplete or malformed, or the scores file is not valid JSON.** Nothing
-was sent. Fix every problem it listed and run it again; the run is repeatable and registering twice
-is safe.
+**`ERROR: nothing was registered.` — your scores are incomplete or malformed, the scores file is not
+valid JSON, or the items file is not what `extract` wrote.** Nothing was sent. Fix every problem it
+listed and call it again; the call is repeatable and registering twice is safe. A problem with the
+items file is fixed by running Step 2's `extract` again, not by editing the file.
 
-**Exit 13 — one or more clusters could not be sent.** **Write the report anyway.** The clusters it
+**`ERROR: could not read the inventory files` — nothing was registered.** Write the report anyway,
+ranked by your own scores as Step 5 describes, and say in the card summary that the queue was not
+updated.
+
+**`ERROR: some findings did not register:` — one or more clusters could not be sent.** **Write the
+report anyway.** The clusters it
 did not name are registered; the ones it named are not. Say which in the card's completion summary,
 do not block the card, do not retry more than once, and do not skip Step 5. A user waiting on their
 first report is not served by a stage that stops because a background queue was unavailable.
 
-On success the script prints each cluster's outcomes and a final `registered N of N`. It also names
+On success the reply lists each cluster's outcomes and a final `registered N of N`. It also names
 any finding that came back **`suppressed`**, meaning the user has already dismissed it permanently: a
 suppressed finding must not appear in the report or in the roll-up count.
 
@@ -359,9 +370,8 @@ suppressed finding must not appear in the report or in the roll-up count.
 
 ## Step 5: Select What to Show
 
-```
-python3 /opt/data/scripts/inventory_findings.py ranked
-```
+Step 4's reply ends with the queue's ranked order and a `total:` line. Work from that; there is
+nothing more to run or call.
 
 **Take the order it gives you.** It is computed from the vectors you just registered, by the same
 rule for every source, and it is the reason this stage is reproducible. Do not re-sort it, do not
@@ -369,7 +379,8 @@ second-guess a placement, and do not promote a finding because it reads worse th
 Each row carries its score, severity, check, object and the `provider_managed` and `not_actionable`
 flags the rules below turn on, and the `total:` line is what the roll-up counts from.
 
-If it exits 13 the queue is unreachable: rank by the scores you computed in Step 3 instead —
+If the reply says it could not read the ranked order, or Step 4 could not read the inventory files,
+rank by the scores you computed in Step 3 instead —
 actionable before unactionable, then highest score first — and say so in the card summary.
 
 From the top of that order:
@@ -392,7 +403,7 @@ From the top of that order:
   it. Informational findings never occupy more than one slot while any `major` finding exists.
 - **Anything not shown is rolled up**, not dropped: one line giving the count and where it lives,
   e.g. `Also found: 14 more items, tracked in the findings queue — ask for the full list.` The count
-  is the `total:` line `ranked` printed minus the rows you showed or gathered into a shown line —
+  is the `total:` line the tool returned minus the rows you showed or gathered into a shown line —
   count it off that list, not off what you remember registering. A run that
   reported "6 more items" against a queue holding three, all three of them shown, is what this
   sentence is here to stop. **Omit

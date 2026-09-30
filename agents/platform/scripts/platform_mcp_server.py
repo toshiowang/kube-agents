@@ -17,6 +17,7 @@ from typing import Any
 from pathlib import Path
 from datetime import datetime
 from mcp.server import MCPServer
+import inventory_findings
 import sandbox_exec
 from agent_common_server import _run_env, CONFIG_PATH
 from cluster_agent_profile import RESERVED_PROFILES, profile_name, read_cluster_identity
@@ -49,6 +50,16 @@ DEFAULT_AGENT_HOME = "/opt/data"
 # reads the same finding twice. The measured relay is ~9s; the old 10s bound
 # left that one second of headroom.
 CRON_REPORT_TIMEOUT_SECONDS = 360.0
+
+# The prioritization SOP's two working files, which `register_inventory_scores`
+# reads from wherever the worker's shell commands run. The model's shell writes
+# both, so they are read with a cap and checked before anything reaches the
+# queue. The cap is far above a real fleet's: an item or a score is a few
+# hundred bytes.
+INVENTORY_ITEMS_PATH = inventory_findings.DEFAULT_ITEMS_PATH
+INVENTORY_SCORES_PATH = inventory_findings.DEFAULT_SCORES_PATH
+INVENTORY_FILE_MAX_BYTES = 1 << 20
+INVENTORY_READ_TIMEOUT_SECONDS = 30
 
 # Initialize the MCP server
 mcp = MCPServer("GKE Platform Control Plane")
@@ -1102,6 +1113,92 @@ def register_findings(findings: list, scope: dict | None = None) -> str:
             partial or failed run.
     """
     return _findings_call("POST", "/v1/findings", {"findings": findings, "scope": scope})
+
+
+def _read_inventory_file(path: str, what: str, in_sandbox: bool) -> object:
+    """One of the SOP's two working files, parsed, from where the worker's shell wrote it.
+
+    Raises `inventory_findings.Failure` for a file that is absent, over the cap
+    or not JSON; the sandbox's own errors propagate.
+    """
+    if in_sandbox:
+        raw = sandbox_exec.read_bytes(
+            path, max_bytes=INVENTORY_FILE_MAX_BYTES + 1, timeout=INVENTORY_READ_TIMEOUT_SECONDS
+        )
+    else:
+        try:
+            with open(path, "rb") as handle:
+                raw = handle.read(INVENTORY_FILE_MAX_BYTES + 1)
+        except FileNotFoundError:
+            raw = None
+    if raw is None:
+        raise inventory_findings.Failure(inventory_findings.EXIT_INCOMPLETE, [f"there is no {what} file at {path}"])
+    if len(raw) > INVENTORY_FILE_MAX_BYTES:
+        raise inventory_findings.Failure(
+            inventory_findings.EXIT_INCOMPLETE, [f"{path} is larger than {INVENTORY_FILE_MAX_BYTES} bytes"]
+        )
+    try:
+        return json.loads(raw.decode("utf-8"))
+    except UnicodeDecodeError:
+        raise inventory_findings.Failure(inventory_findings.EXIT_INCOMPLETE, [f"{path} is not UTF-8"]) from None
+    except json.JSONDecodeError as exc:
+        raise inventory_findings.Failure(
+            inventory_findings.EXIT_INCOMPLETE,
+            [f"{path} is not valid JSON: {exc.msg} at line {exc.lineno} column {exc.colno}"],
+        ) from None
+
+
+def _post_inventory_batch(batch: list[dict], scope: dict | None) -> Any:
+    body: dict[str, Any] = {"findings": batch}
+    if scope:
+        body["scope"] = scope
+    return _findings_request("POST", "/v1/findings", body)
+
+
+@mcp.tool()
+def register_inventory_scores() -> str:
+    """
+    Register the onboarding inventory's findings in the durable queue, and
+    return the queue's ranked order and total.
+
+    Takes no arguments: it reads /opt/data/INVENTORY.items.json, which
+    `inventory_findings.py extract` wrote, and /opt/data/INVENTORY.scores.json,
+    which you wrote, from the same place your shell commands run. Every
+    extracted finding needs a valid score. If any is missing or invalid,
+    nothing is registered and the reply lists every problem at once: fix the
+    scores file and call this again.
+
+    The reply ends with the ranked backlog and its total, which the report's
+    order and roll-up count come from.
+    """
+    lines: list[str] = []
+    try:
+        in_sandbox = sandbox_exec.sandbox_enabled()
+        items = _read_inventory_file(INVENTORY_ITEMS_PATH, "items", in_sandbox)
+        scores = _read_inventory_file(INVENTORY_SCORES_PATH, "scores", in_sandbox)
+        inventory_findings.register_scored(items, scores, INVENTORY_ITEMS_PATH, _post_inventory_batch, lines.append)
+    except inventory_findings.Failure as failure:
+        if failure.code != inventory_findings.EXIT_POST_FAILED:
+            return "\n".join(
+                ["ERROR: nothing was registered.", *(f"  - {error}" for error in failure.errors), failure.hint]
+            ).rstrip()
+        # Some batches did register, so the ranked order below is still the
+        # queue's, with those clusters missing from it.
+        lines.extend(["ERROR: some findings did not register:", *(f"  - {e}" for e in failure.errors), failure.hint])
+    except (sandbox_exec.SandboxUnavailable, sandbox_exec.SandboxMisconfigured, subprocess.TimeoutExpired, OSError) as e:
+        return (
+            f"ERROR: could not read the inventory files: {e}. Nothing was registered. Write the report "
+            "from the scores you computed, and say in the card summary that the queue was not updated."
+        )
+
+    try:
+        ranked = _findings_request("GET", "/v1/findings/ranked").get("findings") or []
+    except Exception as exc:
+        lines.append(f"ERROR: could not read the ranked order from the findings queue: {exc}")
+        lines.append("Rank by the scores you computed instead, and say so in the card summary.")
+        return "\n".join(lines)
+    lines.extend(inventory_findings.format_ranked(ranked))
+    return "\n".join(lines)
 
 
 @mcp.tool()

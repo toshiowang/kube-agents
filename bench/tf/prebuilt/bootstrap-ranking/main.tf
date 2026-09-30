@@ -45,6 +45,12 @@
 # person is sent the report only if a delivery tick claims it before the exit
 # trap clears it. A teardown after the arm removes their `.user_aligned`.
 #
+# The worker registers the planted findings in the findings queue, which
+# outlives a run. They all name `queue_project`, which no install has, and the
+# plant deletes that project's inventory rows so the queue check reads only
+# this run's; the teardown deletes them again so the install's morning nudge
+# never names them.
+#
 # Arming writes the two onboarding job records to `state_file` first. The
 # teardown, and the exit trap on a failed apply, remove `.user_aligned` and
 # `.bootstrap_completed` and put back either job the delivery removed, from
@@ -99,6 +105,30 @@ locals {
     /opt/data/INVENTORY.md.
   EOB
   )
+  # The project every finding in inventory-raw.txt names, and the findings
+  # queue's store (session_kv_server.py: SESSION_KV_DB_PATH and its default).
+  queue_project = "onboarding-demo-prod"
+  queue_py      = <<-EOP
+    import os, sqlite3
+
+    db = os.environ.get("SESSION_KV_DB_PATH") or "/var/lib/kube-agents/session/session_kv.db"
+    if not os.path.exists(db):
+        print("no findings queue at %s" % db)
+        raise SystemExit(0)
+    c = sqlite3.connect(db, timeout=30)
+    try:
+        if not c.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'findings'").fetchone():
+            print("no findings table in %s" % db)
+            raise SystemExit(0)
+        n = c.execute(
+            "DELETE FROM findings WHERE source = 'inventory' AND project = ?", ("${local.queue_project}",)
+        ).rowcount
+        c.commit()
+    finally:
+        c.close()
+    print("deleted %d queued finding(s) for ${local.queue_project}" % n)
+  EOP
+
   run_wait = 900
   poll     = 15
   # deploy/docker/patches/kanban_guardrail_exit.py: RATE_LIMIT_REASON_PREFIX,
@@ -233,6 +263,7 @@ resource "null_resource" "ranking" {
     key_like          = local.key_like
     inventory         = local.inventory
     disarm_b64        = base64encode(local.disarm_py)
+    queue_b64         = base64encode(local.queue_py)
   }
 
   provisioner "local-exec" {
@@ -272,9 +303,10 @@ resource "null_resource" "ranking" {
             agent ${local.hermes} kanban archive "$id" >&2 || failed="$failed, archive $id"
           done
           clear_inventory || failed="$failed, remove the INVENTORY files"
+          clear_queue >&2 || failed="$failed, delete the planted findings from the queue"
           disarm >&2 || failed="$failed, disarm the delivery job"
           if [ -n "$failed" ]; then
-            echo "Cleanup incomplete: could not$${failed#,}. The next run archives the cards, removes the files and disarms delivery." >&2
+            echo "Cleanup incomplete: could not$${failed#,}. The next run archives the cards, removes the files, deletes the planted findings and disarms delivery." >&2
           fi
         fi
         rm -rf "$kubeconfig_dir"
@@ -327,6 +359,9 @@ resource "null_resource" "ranking" {
         fi
         agent rm -f ${local.inventory} || clear_status=1
         return "$clear_status"
+      }
+      clear_queue() {
+        printf '%s' '${base64encode(local.queue_py)}' | base64 -d | agent_py
       }
       # Run after clear_inventory, so no report is left for a run to claim.
       disarm() {
@@ -422,6 +457,7 @@ resource "null_resource" "ranking" {
         exit 1
       fi
       clear_inventory
+      clear_queue
 
       # ---- 3. Plant the raw report on the sandbox ------------------------
       printf '%s' '${local.raw_b64}' | kubectl exec -i -n "${var.agent_namespace}" "$sandbox_pod" -c "${var.sandbox_container}" -- \
@@ -555,12 +591,15 @@ resource "null_resource" "ranking" {
       else
         failed="$failed, list the sandbox pods"
       fi
+      printf '%s' '${self.triggers.queue_b64}' | base64 -d | \
+        kubectl exec -i -n "$ns" "$target" -c "${self.triggers.container}" --pod-running-timeout=${self.triggers.pod_wait}s -- \
+        ${self.triggers.python} - || failed="$failed, delete the planted findings from the queue"
       # After the INVENTORY files, so no report is left for a run to claim.
       printf '%s' '${self.triggers.disarm_b64}' | base64 -d | \
         kubectl exec -i -n "$ns" "$target" -c "${self.triggers.container}" --pod-running-timeout=${self.triggers.pod_wait}s -- \
         ${self.triggers.python} - || failed="$failed, disarm the delivery job"
       if [ -n "$failed" ]; then
-        echo "Cleanup incomplete: could not$${failed#,}. The next run archives the cards, removes the files and disarms delivery." >&2
+        echo "Cleanup incomplete: could not$${failed#,}. The next run archives the cards, removes the files, deletes the planted findings and disarms delivery." >&2
         exit 1
       fi
     EOT

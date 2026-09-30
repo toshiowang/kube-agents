@@ -25,6 +25,7 @@ import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
+from typing import Callable
 
 sys.path.insert(0, str(Path(__file__).parent.absolute()))
 
@@ -32,6 +33,7 @@ import findings_queue as fq
 
 DEFAULT_RAW_PATH = "/opt/data/INVENTORY.raw.md"
 DEFAULT_ITEMS_PATH = "/opt/data/INVENTORY.items.json"
+DEFAULT_SCORES_PATH = "/opt/data/INVENTORY.scores.json"
 DEFAULT_ENDPOINT = "http://127.0.0.1:8699"
 POST_TIMEOUT_SECONDS = 30
 
@@ -48,6 +50,10 @@ BLOCK_RE = re.compile(
 ITEM_REQUIRED = ("check", "project", "cluster", "object", "title")
 ITEM_OPTIONAL = ("namespace", "detail", "severity_hint", "provider_managed")
 ITEM_STRINGS = ITEM_REQUIRED + ("namespace", "detail", "severity_hint")
+# The ids `extract` assigns, and the keys it adds to each item beside the raw
+# line's own fields.
+ITEM_ID_RE = re.compile(r"f\d{3,}")
+ITEM_ADDED = ("id", "line")
 
 SCORE_REQUIRED = ("rubric", "recommendation", "remediation", "verification")
 SCORE_OPTIONAL = ("actionable", "provider_managed", "root_cause")
@@ -58,6 +64,8 @@ EXIT_NO_BLOCK = 10
 EXIT_BAD_BLOCK = 11
 EXIT_INCOMPLETE = 12
 EXIT_POST_FAILED = 13
+
+ROLLUP_HINT = "The roll-up count is this total minus the rows you show or gather into a shown line."
 
 
 class Failure(Exception):
@@ -109,8 +117,9 @@ def parse_block(text: str) -> list[dict]:
             if not isinstance(raw, dict):
                 errors.append(f"line {lineno}: expected a JSON object, got {type(raw).__name__}")
                 continue
-            item = _clean_item(raw, lineno, errors)
+            item = _clean_item(raw, f"line {lineno}", errors)
             if item is not None:
+                item["line"] = lineno
                 items.append(item)
 
     if errors:
@@ -123,11 +132,11 @@ def parse_block(text: str) -> list[dict]:
     return items
 
 
-def _clean_item(raw: dict, lineno: int, errors: list[str]) -> dict | None:
+def _clean_item(raw: dict, where: str, errors: list[str]) -> dict | None:
     unknown = sorted(set(raw) - set(ITEM_REQUIRED) - set(ITEM_OPTIONAL))
     if unknown:
         errors.append(
-            f"line {lineno}: unknown field(s) {', '.join(unknown)}; "
+            f"{where}: unknown field(s) {', '.join(unknown)}; "
             f"allowed: {', '.join(ITEM_REQUIRED + ITEM_OPTIONAL)}"
         )
         return None
@@ -137,17 +146,17 @@ def _clean_item(raw: dict, lineno: int, errors: list[str]) -> dict | None:
     bad = False
     mistyped = [key for key in ITEM_STRINGS if raw.get(key) is not None and not isinstance(raw[key], str)]
     if mistyped:
-        errors.append(f"line {lineno}: {', '.join(mistyped)} must be a string")
+        errors.append(f"{where}: {', '.join(mistyped)} must be a string")
         bad = True
     if not isinstance(raw.get("provider_managed", False), bool):
-        errors.append(f"line {lineno}: provider_managed must be true or false, not a string")
+        errors.append(f"{where}: provider_managed must be true or false, not a string")
         bad = True
     if bad:
         return None
 
     missing = [key for key in ITEM_REQUIRED if not (raw.get(key) or "").strip()]
     if missing:
-        errors.append(f"line {lineno}: missing {', '.join(missing)}")
+        errors.append(f"{where}: missing {', '.join(missing)}")
         return None
 
     item = {key: raw[key].strip() for key in ITEM_REQUIRED}
@@ -157,7 +166,6 @@ def _clean_item(raw: dict, lineno: int, errors: list[str]) -> dict | None:
             item[key] = value
     if raw.get("provider_managed"):
         item["provider_managed"] = True
-    item["line"] = lineno
     return item
 
 
@@ -196,6 +204,59 @@ def cmd_extract(args: argparse.Namespace) -> int:
 # --------------------------------------------------------------------------
 # register
 # --------------------------------------------------------------------------
+
+
+def load_items(payload: object, source: str) -> list[dict]:
+    """The items `extract` wrote, checked again before anything is built from them.
+
+    The file sits where the model's shell can rewrite it, so each item goes back
+    through the check `extract` ran on its raw line, and the ids have to be the
+    unique `fNNN` ids `extract` assigns. One bad item fails the whole file, for
+    the reason one bad line fails `parse_block`.
+    """
+    items = payload.get("items") if isinstance(payload, dict) else None
+    if not isinstance(items, list):
+        raise Failure(
+            EXIT_INCOMPLETE,
+            [f"{source} has no `items` list -- run `extract` first, or point --items at its output"],
+        )
+
+    errors: list[str] = []
+    cleaned: list[dict] = []
+    seen: set[str] = set()
+    for index, raw in enumerate(items, 1):
+        if not isinstance(raw, dict):
+            errors.append(f"item {index}: expected a JSON object, got {type(raw).__name__}")
+            continue
+        fid = raw.get("id")
+        if not isinstance(fid, str) or not ITEM_ID_RE.fullmatch(fid) or fid in seen:
+            errors.append(f"item {index}: id must be a unique extracted id such as f001")
+            continue
+        seen.add(fid)
+        item = _clean_item({k: v for k, v in raw.items() if k not in ITEM_ADDED}, fid, errors)
+        if item is not None:
+            item["id"] = fid
+            cleaned.append(item)
+
+    if errors:
+        raise Failure(EXIT_INCOMPLETE, errors, "Nothing was registered. Re-run `extract` to rewrite the items file.")
+    return cleaned
+
+
+def load_scores(payload: object) -> tuple[dict, set[str]]:
+    """The scores map and the clusters declared complete, from the scores file."""
+    if not isinstance(payload, dict) or not isinstance(payload.get("scores"), dict):
+        raise Failure(
+            EXIT_INCOMPLETE,
+            ["the scores file must be an object with a `scores` map keyed by finding id"],
+        )
+    complete = payload.get("complete_clusters") or []
+    if not isinstance(complete, list) or not all(isinstance(name, str) for name in complete):
+        raise Failure(
+            EXIT_INCOMPLETE,
+            ["complete_clusters must be a list of '<project>/<cluster>' strings"],
+        )
+    return payload["scores"], set(complete)
 
 
 def build_payloads(items: list[dict], scores: dict) -> list[dict]:
@@ -316,24 +377,31 @@ def _read_json(path: str, what: str) -> dict:
         ) from None
 
 
-def cmd_register(args: argparse.Namespace) -> int:
-    items = _read_json(args.items, "items").get("items")
-    if not isinstance(items, list):
-        raise Failure(
-            EXIT_INCOMPLETE,
-            [f"{args.items} has no `items` list -- run `extract` first, or point --items at its output"],
-        )
-    raw_scores = _read_json(args.scores, "scores")
-    if not isinstance(raw_scores, dict) or not isinstance(raw_scores.get("scores"), dict):
-        raise Failure(
-            EXIT_INCOMPLETE,
-            ["the scores file must be an object with a `scores` map keyed by finding id"],
-        )
-    complete = {str(name) for name in raw_scores.get("complete_clusters") or []}
-    payloads = build_payloads(items, raw_scores["scores"])
+def register_scored(
+    items_payload: object,
+    scores_payload: object,
+    items_source: str,
+    post: Callable[[list[dict], dict | None], dict],
+    emit: Callable[[str], None],
+    *,
+    dry_run: bool = False,
+) -> None:
+    """Check the items and scores files' contents, then register one batch per cluster.
+
+    `register` and the platform MCP server's `register_inventory_scores` both
+    call this, so the files the model's shell wrote pass one set of checks
+    whichever of the two reads them. `post(batch, scope)` sends one batch and
+    `emit(line)` takes each line of the report.
+
+    Raises `Failure` before anything is sent when either file does not check
+    out, and after the last batch when any batch failed to send.
+    """
+    items = load_items(items_payload, items_source)
+    scores, complete = load_scores(scores_payload)
+    payloads = build_payloads(items, scores)
     if not payloads:
-        print("nothing to register: the sweep extracted no findings")
-        return 0
+        emit("nothing to register: the sweep extracted no findings")
+        return
 
     by_cluster: dict[tuple[str, str], list[dict]] = {}
     for payload in payloads:
@@ -344,12 +412,12 @@ def cmd_register(args: argparse.Namespace) -> int:
     for (project, cluster), batch in sorted(by_cluster.items()):
         where = f"{project}/{cluster}"
         scope = {"project": project, "cluster": cluster, "complete": True} if where in complete else None
-        if args.dry_run:
-            print(f"{where}: {len(batch)} finding(s), scope={'complete' if scope else 'omitted'} (dry run)")
+        if dry_run:
+            emit(f"{where}: {len(batch)} finding(s), scope={'complete' if scope else 'omitted'} (dry run)")
             sent += len(batch)
             continue
         try:
-            result = post_batch(args.endpoint, batch, scope)
+            result = post(batch, scope)
         except (urllib.error.URLError, OSError, ValueError) as exc:
             detail = exc.read().decode("utf-8", "replace") if isinstance(exc, urllib.error.HTTPError) else str(exc)
             failures.append(f"{where}: {detail}")
@@ -360,21 +428,21 @@ def cmd_register(args: argparse.Namespace) -> int:
         for entry in outcomes:
             tally[entry.get("outcome", "?")] = tally.get(entry.get("outcome", "?"), 0) + 1
         summary = ", ".join(f"{count} {name}" for name, count in sorted(tally.items()))
-        print(f"{where}: {summary}, scope={'complete' if scope else 'omitted'}")
+        emit(f"{where}: {summary}, scope={'complete' if scope else 'omitted'}")
         for entry in outcomes:
             if entry.get("outcome") == "suppressed":
-                print(f"  suppressed (do not report or count): {entry.get('id')}")
+                emit(f"  suppressed (do not report or count): {entry.get('id')}")
 
     # An unmatched entry is a silent no-op with a real cost: the absence rule
     # never runs, so a fixed critical keeps its floor severity and the nudge
     # nags about it every morning with no exit.
     for entry in sorted(complete - {f"{p}/{c}" for p, c in by_cluster}):
-        print(
+        emit(
             f"warning: complete_clusters entry {entry!r} matched no registered batch; "
             "entries are '<project>/<cluster>' and the absence rule did not run for it"
         )
 
-    print(f"registered {sent} of {len(items)} extracted findings")
+    emit(f"registered {sent} of {len(items)} extracted findings")
     if failures:
         raise Failure(
             EXIT_POST_FAILED,
@@ -383,6 +451,17 @@ def cmd_register(args: argparse.Namespace) -> int:
             "scores you computed, and name the clusters above in the card summary as missing "
             "from the queue.",
         )
+
+
+def cmd_register(args: argparse.Namespace) -> int:
+    register_scored(
+        _read_json(args.items, "items"),
+        _read_json(args.scores, "scores"),
+        args.items,
+        lambda batch, scope: post_batch(args.endpoint, batch, scope),
+        print,
+        dry_run=args.dry_run,
+    )
     return 0
 
 
@@ -401,6 +480,14 @@ def cmd_ranked(args: argparse.Namespace) -> int:
             "Rank by the scores you computed instead, and say so in the card summary.",
         ) from None
 
+    for line in format_ranked(ranked):
+        print(line)
+    return 0
+
+
+def format_ranked(ranked: list[dict]) -> list[str]:
+    """The queue's order as the report is written from it, ending with the total."""
+    lines = []
     for index, finding in enumerate(ranked, 1):
         where = "/".join(
             x
@@ -413,13 +500,13 @@ def cmd_ranked(args: argparse.Namespace) -> int:
         if not finding.get("actionable", True):
             flags.append("not_actionable")
         suffix = f"  [{','.join(flags)}]" if flags else ""
-        print(
+        lines.append(
             f"{index:>3}. {finding.get('rank_score'):>4} {finding.get('severity'):<8} "
             f"{finding.get('check')}  {where}{suffix}\n     {finding.get('title')}"
         )
-    print(f"\ntotal: {len(ranked)}")
-    print("The roll-up count is this total minus the rows you show or gather into a shown line.")
-    return 0
+    lines.append(f"\ntotal: {len(ranked)}")
+    lines.append(ROLLUP_HINT)
+    return lines
 
 
 # --------------------------------------------------------------------------

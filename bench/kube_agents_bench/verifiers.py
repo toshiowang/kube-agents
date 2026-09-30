@@ -63,7 +63,7 @@ from devops_bench.verification.base import (
 )
 from devops_bench.verification.verifiers import ResourcePropertyVerifier
 
-from kube_agents_bench import discovery, github_writes, onboarding, transcript
+from kube_agents_bench import board, discovery, github_writes, onboarding, transcript, worker_trajectory
 from kube_agents_bench.fleet import (
     ROLE_PATTERN,
     FleetRoleUnresolved,
@@ -2313,7 +2313,7 @@ class ExpectedFinding(BaseModel):
 
 
 class _OnboardingPollVerifier(BaseVerifier):
-    """Polls :meth:`_check`, reading onboarding's files off the install.
+    """Polls :meth:`_check`, reading state off the install's pods.
 
     A ``fail`` from an earlier poll outranks a final read that errors: a read
     that could not reach a pod does not un-observe what an earlier one saw.
@@ -2485,3 +2485,111 @@ class BootstrapDeliveredVerifier(_OnboardingPollVerifier):
         if status in ("claimed", "running"):
             return "fail", f"the {job} run that claimed the report at {claimed} is still {status}", read
         return "fail", f"the {job} run that claimed the report at {claimed} ended {status}: {run.get('error') or 'no error recorded'}", read
+
+
+@VERIFIERS.register("bootstrap_queued")
+class BootstrapQueuedVerifier(_OnboardingPollVerifier):
+    """Checks the findings the onboarding prioritization stage registered in the queue.
+
+    The card's worker registers through the ``register_inventory_scores``
+    platform tool, which reads what ``extract`` and the worker's scoring wrote
+    off the sandbox and posts it to the findings queue in the agent pod. This
+    reads the queue's store there (:func:`onboarding.read_queue`): the rows
+    with the inventory source and ``project``.
+
+    ``project`` is the project the raw report's findings name, and
+    ``expected_findings`` their ``(check, object)`` pairs. Passes when those
+    rows carry exactly those pairs. The queue outlives a run, so a stack using
+    this check deletes the project's inventory rows before it plants; a row
+    read here was then registered during the run.
+
+    An unreadable store is ``status="error"``. No rows, or a different set,
+    is a fail.
+    """
+
+    type: Literal["bootstrap_queued"]
+    project: str = Field(min_length=1)
+    expected_findings: list[ExpectedFinding] = Field(min_length=1)
+
+    def _check(self, read_timeout: float) -> tuple[VerificationStatus, str, dict[str, Any] | None]:
+        rows, why = onboarding.read_queue(onboarding.agent_shell, self.project, read_timeout)
+        if rows is None:
+            return "error", why, None
+        where = f"the findings queue's {onboarding.INVENTORY_SOURCE} rows for {self.project}"
+        found = Counter((str(r.get("check")), str(r.get("object"))) for r in rows)
+        expected = Counter((f.check, f.object) for f in self.expected_findings)
+        raw = {"found": sorted(found.elements())}
+        if not rows:
+            return "fail", f"{where}: none; the stage registered nothing", raw
+        missing = sorted((expected - found).elements())
+        extra = sorted((found - expected).elements())
+        if missing or extra:
+            parts = [f"{where}: {len(rows)} row(s) for {len(self.expected_findings)} expected"]
+            if missing:
+                parts.append(f"missing {missing}")
+            if extra:
+                parts.append(f"not in the raw report's block {extra}")
+            return "fail", "; ".join(parts), raw
+        return "pass", f"{where}: the {len(rows)} expected finding(s)", raw
+
+
+@VERIFIERS.register("card_tool_called")
+class CardToolCalledVerifier(_OnboardingPollVerifier):
+    """Checks that the worker of a card filed outside the conversation called a tool.
+
+    ``tool_called`` cannot see such a card: the harness captures the workers
+    of the cards the front agent's ``kanban_create`` calls returned, so a card
+    a stack or a cron job files never has its worker's calls in the
+    trajectory. This finds the newest card filed with ``idempotency_key`` on
+    the agent pod's board (:func:`board.read_card_by_key`) and reads that
+    card's worker sessions with the harness's own read
+    (:func:`worker_trajectory.capture`). Only calls made working that card
+    count, not those of cards its worker filed.
+
+    ``tool_names``, ``minimum_calls`` and ``require_success`` mean what they
+    mean for ``tool_called`` under ``scope: workers``, including a match
+    inside a ``tool_call`` wrapper entry.
+
+    No card with the key is a fail. An unreadable board or session store, or
+    a card whose worker left no call the read could see, is
+    ``status="error"``: a worker that ran made at least one call. Too few
+    matching calls in a read with gaps is also an error, since the missing
+    calls may sit in what it could not read.
+    """
+
+    type: Literal["card_tool_called"]
+    idempotency_key: str = Field(min_length=1)
+    tool_names: list[str] = Field(min_length=1)
+    minimum_calls: int = Field(default=1, ge=1)
+    require_success: bool = False
+
+    def _check(self, read_timeout: float) -> tuple[VerificationStatus, str, dict[str, Any] | None]:
+        state, card, why = board.read_card_by_key(onboarding.agent_shell, self.idempotency_key, read_timeout)
+        if state == "error":
+            return "error", why, None
+        if card is None:
+            return "fail", why, None
+        where = f"card {card['id']} ({card['status']})"
+        capture = worker_trajectory.capture(onboarding.agent_shell, [card["id"]], read_timeout)
+        if capture is None:
+            return "error", f"{where}: its worker sessions could not be read (kubectl exec failed or the read did not run)", None
+        entries = [e for e in capture.entries if e.get("task") == card["id"]]
+        gaps = worker_trajectory.gaps(capture.summary) or []
+        wanted = set(self.tool_names)
+        calls = [
+            e
+            for e in entries
+            if (e.get("name") in wanted or _wrapped_tool_names(e) & wanted)
+            and not (self.require_success and e.get("status") == "error")
+        ]
+        called = sorted({n for e in entries for n in {str(e.get("name") or ""), *_wrapped_tool_names(e)} if n})
+        raw = {"card": card, "matching_calls": len(calls), "called": called, "gaps": gaps}
+        count = f"{len(calls)} call(s) to {sorted(wanted)} (minimum {self.minimum_calls})"
+        if len(calls) >= self.minimum_calls:
+            return "pass", f"{where}: its worker made {count}", raw
+        unread = f"; could not read: {'; '.join(gaps)}" if gaps else ""
+        if not entries:
+            return "error", f"{where}: the read found no call by its worker{unread}", raw
+        if gaps:
+            return "error", f"{where}: {count} in what could be read{unread}", raw
+        return "fail", f"{where}: its worker made {count}; it called {called}", raw

@@ -230,7 +230,7 @@ class SpecToolRegistryTest(unittest.TestCase):
 
             def walk(node):
                 if isinstance(node, dict):
-                    if node.get("type") == "tool_called":
+                    if node.get("type") in ("tool_called", "card_tool_called"):
                         for name in node.get("tool_names") or []:
                             wanted.append((task_path, name))
                     for value in node.values():

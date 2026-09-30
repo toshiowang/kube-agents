@@ -943,19 +943,27 @@ class SopRubricParityTests(unittest.TestCase):
 
     def test_the_sop_names_the_commands_and_enum_values_it_tells_the_worker_to_send(self):
         self.assertIn("inventory_findings.py extract", self.text)
-        self.assertIn("inventory_findings.py register", self.text)
-        self.assertIn("inventory_findings.py ranked", self.text)
+        self.assertIn("`register_inventory_scores`", self.text)
+        # `ranked` reads from the Session KV server, which the shell sandbox cannot reach.
+        self.assertNotIn("inventory_findings.py ranked", self.text)
         for kind in fq.REMEDIATION_KINDS:
             self.assertIn(f"`{kind}`", self.text)
         for kind in fq.VERIFICATION_KINDS:
             self.assertIn(f"`{kind}`", self.text)
 
+    def test_the_tool_the_sop_names_is_a_platform_mcp_tool(self):
+        server = (Path(__file__).parent / "platform_mcp_server.py").read_text(encoding="utf-8")
+        self.assertIn("@mcp.tool()\ndef register_inventory_scores() -> str:", server)
+
+    def test_the_sop_calls_its_one_queue_tool_a_tool_and_not_a_script(self):
+        # A live run blocked outright looking for `get_ranked_findings` as a
+        # third script once the steps either side of it became shell commands.
+        self.assertIn("**`register_inventory_scores` is a tool call", self.text)
+
     def test_the_sop_does_not_send_the_worker_at_the_queue_directly(self):
-        # `source` and the identity fields moved out of the worker's hands when
-        # `inventory_findings.py` took over the call; an SOP that still names
-        # the MCP tools is telling it to bypass the completeness gate — and a
-        # live run blocked outright looking for `get_ranked_findings` as a third
-        # script once the steps either side of it became shell commands.
+        # `source` and the identity fields are out of the worker's hands; an SOP
+        # that names the tools taking findings from the model is telling it to
+        # bypass the completeness gate.
         self.assertNotIn("register_findings", self.text)
         self.assertNotIn("get_ranked_findings", self.text)
 

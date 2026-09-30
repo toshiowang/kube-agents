@@ -10,6 +10,10 @@ sys.path.insert(0, str(Path(__file__).parent.absolute()))
 
 import inventory_findings as inv
 
+# The raw report the bootstrap-ranking case plants, whose `extract` output the
+# items-file tests start from.
+PLANTED_RAW = Path(__file__).resolve().parents[3] / "bench" / "tf" / "prebuilt" / "bootstrap-ranking" / "inventory-raw.txt"
+
 RUBRIC = {"B": 3, "L": 6, "detect": 3, "recover": 2, "C": 1.0}
 SCORE = {
     "rubric": RUBRIC,
@@ -340,6 +344,97 @@ class RegisterTests(unittest.TestCase):
         )
         self.assertEqual(code, 0)
         self.assertEqual(self.sent, [])
+
+
+class ItemsFileTests(unittest.TestCase):
+    """`load_items` and `register_scored` over `extract`'s output for the planted report.
+
+    The items file is written where the model's shell can rewrite it, so every
+    tampered copy below is one that shell could produce.
+    """
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        out = Path(tmp.name) / "items.json"
+        with unittest.mock.patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(inv.main(["extract", "--raw", str(PLANTED_RAW), "--out", str(out)]), 0)
+        self.extracted = json.loads(out.read_text(encoding="utf-8"))
+        self.ids = [item["id"] for item in self.extracted["items"]]
+        self.sent = []
+        self.lines = []
+
+    def post(self, findings, scope):
+        self.sent.append((findings, scope))
+        return {"results": [{"id": f["object"], "outcome": "created"} for f in findings]}
+
+    def register(self, items_payload, scores_payload):
+        inv.register_scored(items_payload, scores_payload, "items.json", self.post, self.lines.append)
+
+    def tampered(self, change):
+        payload = json.loads(json.dumps(self.extracted))
+        change(payload["items"])
+        return payload
+
+    def test_extract_output_loads_back_as_it_was_written(self):
+        loaded = inv.load_items(self.extracted, "items.json")
+        self.assertEqual(len(loaded), 6)
+        self.assertEqual(
+            loaded,
+            [{k: v for k, v in item.items() if k != "line"} for item in self.extracted["items"]],
+        )
+
+    def test_every_extracted_finding_registers_with_its_cluster_scope(self):
+        self.register(
+            self.extracted,
+            {"complete_clusters": ["onboarding-demo-prod/prod-east"], "scores": {fid: SCORE for fid in self.ids}},
+        )
+        self.assertEqual(len(self.sent), 1)
+        findings, scope = self.sent[0]
+        self.assertEqual(scope, {"project": "onboarding-demo-prod", "cluster": "prod-east", "complete": True})
+        self.assertEqual(
+            sorted((f["check"], f["object"]) for f in findings),
+            sorted((item["check"], item["object"]) for item in self.extracted["items"]),
+        )
+        self.assertEqual(self.lines[-1], "registered 6 of 6 extracted findings")
+
+    def test_a_tampered_items_file_is_refused_whole(self):
+        def set_field(index, key, value):
+            return lambda items: items[index].__setitem__(key, value)
+
+        cases = {
+            "an item that is not an object": lambda items: items.__setitem__(2, "f003"),
+            "an item without an id": lambda items: items[0].pop("id"),
+            "a repeated id": set_field(1, "id", "f001"),
+            "an id extract does not assign": set_field(0, "id", "x1"),
+            "a queue field extract never writes": set_field(0, "source", "audit"),
+            "an identity field that is not a string": set_field(0, "cluster", ["prod-east", "prod-west"]),
+            "provider_managed as a string": set_field(0, "provider_managed", "false"),
+            "an emptied required field": set_field(4, "object", " "),
+        }
+        scores = {"scores": {fid: SCORE for fid in self.ids}}
+        for name, change in cases.items():
+            with self.subTest(name):
+                with self.assertRaises(inv.Failure) as caught:
+                    self.register(self.tampered(change), scores)
+                self.assertEqual(caught.exception.code, inv.EXIT_INCOMPLETE)
+                self.assertEqual(self.sent, [])
+
+    def test_an_items_file_that_is_not_an_object_is_refused(self):
+        for payload in ([], "items", None, {"items": {"f001": {}}}):
+            with self.subTest(payload=payload):
+                with self.assertRaises(inv.Failure) as caught:
+                    inv.load_items(payload, "items.json")
+                self.assertEqual(caught.exception.code, inv.EXIT_INCOMPLETE)
+
+    def test_complete_clusters_must_be_a_list_of_strings(self):
+        # A bare string would otherwise be read one character per cluster.
+        for complete in ("onboarding-demo-prod/prod-east", [["onboarding-demo-prod", "prod-east"]], {"a": 1}):
+            with self.subTest(complete=complete):
+                with self.assertRaises(inv.Failure) as caught:
+                    self.register(self.extracted, {"complete_clusters": complete, "scores": {fid: SCORE for fid in self.ids}})
+                self.assertEqual(caught.exception.code, inv.EXIT_INCOMPLETE)
+                self.assertEqual(self.sent, [])
 
 
 class RankedTests(unittest.TestCase):
