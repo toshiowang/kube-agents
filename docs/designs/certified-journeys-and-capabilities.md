@@ -634,6 +634,67 @@ before mid-November. Step 6 with step 4's install. Steps 7 and 8 follow PR 2, by
 model, and the honest expectation from the record is "equal" for the prose and "needed" for the scripts. That every
 skill gets a rating: the one-case skills and the untagged thirty wait on the nightly budget and on PR 2.
 
+## 17. Hard problems: the difficulty tier the record does not have yet
+
+**The hypothesis, and what supports it.** The nightly may be testing mostly easy cases, which would explain why the
+skills show no effect: a strong model passes an easy case with or without help. The record supports this more than it
+contradicts it. The optimizer's seven campaigns found no headroom over the bare model in five suites. On Claude, every
+comparable opened-versus-closed cell is equal. Where the record does show a skill helping, it is on the weaker model and
+on the harder cells: on Gemini, `obtainability-direct-query` passed 15 of 15 with the reliability skill open and 18 of
+40 without it. Most cases plant one defect on a four-cluster fleet and ask for it by name; that is a test of
+correctness, not of difficulty. No case carries a difficulty label, so the question cannot be answered from the record
+today.
+
+**What makes a GKE problem hard**, from the customer epic ([#2597](https://github.com/gke-labs/kube-agents/issues/2597))
+and the drafts: a symptom with no error (a controller that stops making progress silently); a cause that needs a
+chain (a webhook that blocks a drain that stalls an upgrade that strands a pool); knowledge the model does not carry
+(the known-issues catalogue, the removed-API list, release-channel and skew policy, the capacity and calendar-mode
+APIs); a fleet too large to read by hand (the benchmarks of 3 clusters and 200 workloads, 10 clusters and 2,000
+workloads); a long horizon (a rollout over days with a soak and a retrospective); conflicting signals (a declared
+posture beside a real finding, noise beside the one real alert); and hostile input (an object annotation that reads
+like an instruction).
+
+**Three tiers, one label per case** (a `tier:` field beside `skills:`, repo-only, read by the scorecard):
+
+| Tier | Shape                                                                                                    | What it tests                 | Where the harness should matter                                                    |
+| ---- | -------------------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------- |
+| T1   | One planted defect, named by the check, on the seeded fleet                                              | Correctness and authority     | Little; a bare model with the tools passes it                                      |
+| T2   | Two or more signals, one of them misleading; a declared posture; a wording the model must choose against | Judgment and the house rules  | The rules: severity, declared intent, silence on a clean fleet                     |
+| T3   | Fleet scale, a causal chain, a long horizon, or knowledge from a catalogue the model does not hold       | Tools, schedule and knowledge | The collectors, the catalogues, the schedule; a chat session cannot do this at all |
+
+Today's record is almost all T1, with a handful of T2 (the declared-intent cases, the healthy-namespace silence
+cases, the misleading-symptom crashloop case). T3 exists only as drafts and as the customer epic.
+
+**Does the story change on hard problems?** It should, in both directions, and both must be shown. The pitch's claim
+is that the harness matters most where the model alone fails: the catalogue, the collectors and the rules are what a
+bare model does not have. The risk is the opposite: on a T3 problem the trajectory variance grows, the model takes its
+own route past a rule more often (the group of seven in the hill-climb plan is this pattern at T1), and a confident
+wrong answer costs more. A certified line therefore names its tier, and a T1-only certificate says so.
+
+**What the plan adds:**
+
+1. **The tier label** on every case, assigned by the case owner with one line of reason, in the same pass as the skills
+   tags (PR 2); the scorecard reports pass rate, use and the no-skill arm per tier.
+2. **Ten to fifteen T2 and T3 cases from the customer epic**, before any new T1: silent controller deadlock on a cluster
+   with a hundred healthy workloads around it; a rollout stall whose cause is a fail-closed webhook two hops away; an
+   IaC repository where Config Connector and a live change disagree; a declared posture beside a real over-grant; a
+   ten-cluster readiness grade under the nightly's time limit. Each needs its fixture, which is the cost: a larger
+   seeded fleet or a second fleet, sized against the nightly budget in section 10.
+3. **Headroom per tier**: the bare-model arm (section 6.1) run on the T2 and T3 set first, because that is where a gap
+   would show; a tier with no headroom is a tier the skills do not need to serve.
+4. **Scale as its own tier of evidence**: the two fleet benchmarks run on a schedule with the time and token cost
+   recorded, because "reads the whole fleet in one pass inside the budget" is a claim a chat session cannot match and
+   the record should show it.
+
+**How a customer comes to trust kube-agents over a bare Claude or GPT.** Not by a claim that it is smarter: underneath,
+it is that model. By five things the bare model cannot show on the customer's fleet: an authority limit enforced
+outside the model, so the worst case is a wrong pull request, never a wrong change; a record on the customer's kind of
+problems at a named tier, with the bare-model arm beside it, so the gap is measured rather than asserted; a route that
+stays inside an envelope the record has seen (section 5.1), so the behaviour is repeatable, not a good day; a lapse
+when the model or the text changes, so a silent model update is caught by the record before the customer meets it; and
+an answer key from outside the team (the syllabus, the private set, the reviewer) so the claim does not rest on our
+own tests. The hard tier is where all five are tested at once, and it is the tier the record has not run yet.
+
 ## Appendix A. Sources and numbers
 
 - Journey inventory with file:line evidence: [`certified-journeys-inventory.md`](certified-journeys-inventory.md) (47 rows; counts; registered cases per
