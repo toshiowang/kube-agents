@@ -52,11 +52,16 @@ A generic LLM is a chat window: it answers when someone types, with whatever acc
 nobody measures it on your fleet. An agent you build yourself can be made to run on a schedule, but you then own the
 identity, the audit trail, the test fleet and the nightly record, and most teams never get past the first two.
 
-kube-agents is the operator you do not have to hire, with the authority you would give a new one:
+kube-agents is the operator you do not have to hire, with the authority you would give a new one. Each of the six
+points below can be built in-house; the product is that they exist, work together, and are measured every night:
 
-1. **It works while nobody is typing.** Ten audits on a schedule (`agents/platform/cron/jobs.json`), a stall watch every
-   30 minutes, triage when a warning event fires, one Cluster Agent per cluster kept current every hour. Its output is
-   a ledger issue and a pull request, not a chat transcript.
+1. **It ships the operator's calendar and procedures, not a cron slot.** Anyone can schedule an agent. What runs on
+   the schedule here is the content: ten fleet audits, each with a written procedure of numbered checks, a flag rule,
+   a do-not-flag rule, a severity and a remediation; a readiness pre-flight before upgrades; a stall watch every 30
+   minutes; triage on a warning event; a ledger per audit that is rewritten in place; a pull request per critical fix;
+   and a paced chat delivery of two critical items a day. An in-house agent starts with an empty calendar and writes
+   all of this itself, then keeps it current as GKE changes; a chat model has no calendar at all. The value is the
+   months of operating procedure already written, wired to delivery, and re-tested every night.
 2. **It cannot do more than you allowed.** One read-only identity in your project, a credential proxy that refuses
    every merge and every cluster write, every change as a pull request you merge. The authority limit is enforced by
    IAM and the proxy, not by a prompt.
