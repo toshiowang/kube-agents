@@ -66,7 +66,7 @@ kube-agents is the operator you do not have to hire, with the authority you woul
    maintenance schedule, airworthiness directives for known issues, an approved work order for every change), which
    also gives the word "certified" its precise meaning: an inspector outside the crew signs the airworthiness
    certificate against a standard.
-6. **It stays in your project.** Your model choice, your billing; telemetry stays in your project; prompts go to your
+6. **It stays in your project, on the model you choose, with the line to prove it.** Your model choice, measured on the same journeys; your billing; telemetry stays in your project; prompts go to your
    model provider and web searches to DuckDuckGo by default (`reference/security-and-iam.md`, "What leaves for the
    model provider"). Nothing about your fleet reaches us.
 
@@ -238,6 +238,26 @@ What the plan adds, in order: (0) the certification-task pilot as the first exte
 on; (4) a human baseline on the first four HOOTL journeys: one SRE runs each journey by hand once and we record the
 time and the findings as the reference line on the certified claim. Principle: a certified line states the answer key
 it was graded against, and the answer key must come from somewhere a customer trusts more than us.
+
+### 6.1 Other frontier models: the comparison we can make, and the one we cannot
+
+kube-agents is not a model. It runs on the model the install chooses (Gemini, Claude, OpenAI, or an OpenAI-compatible
+endpoint), so "better than a frontier model" is the wrong claim: it compares a harness with an engine. Two comparisons
+are the right ones, and the record supports one of them today.
+
+| Comparison                                                              | What it answers                                                                                     | Today                                                                                                                                                                                                                                                                                                                                                                                                                                    | How it is measured                                                                                                                                                  |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **The same journeys across models, inside kube-agents**                 | Which model does which journey best, and what the install should run                                | Yes, two models: Gemini 3.1 Pro for 29 nights to 10-19 and Claude Opus 5.5 since 10-20, the same cases. On 14 shared skills Claude is 10 points or more ahead on 5, behind on 5, within 10 on 4; Claude is far ahead on the large audit skills, behind on some small ones; Claude opens the Cluster Agent skills on 2 of 11 cases where Gemini opened them on all 11. The installer default (Gemini Flash) has no line yet (decision 4). | The per-model rating: one window per journey, model and text; the dashboard's opened-versus-closed and who-is-ahead views                                           |
+| **kube-agents on model X against the bare model X with the same tools** | How much the harness adds: the schedule, the authority limit, the fleet collectors, the house rules | No. Not measured; the earlier optimizer campaigns on Gemini found no gain from skill text alone in 5 of 7 suites, which is the nearest number                                                                                                                                                                                                                                                                                            | The no-skill arm (C5) for the skill text; for the whole harness, the certification-task pilot's second arm (a bare model with the GKE MCP server) on the same tasks |
+
+What kube-agents can claim against any frontier model, with evidence: it runs that model unattended on a fleet with an
+authority limit the model cannot talk its way past; it measures that model on your journeys every night and tells you
+when a model update or a text change moved the result; and it lets you switch models and read the same line for the
+new one. What it cannot claim yet: that it does a Kubernetes task better than the same model without it. That number
+comes from the bare-model arm, and it should be run per release on the rated journeys, not every night.
+
+Cost of keeping the first comparison honest: one nightly lane per model. The budget in section 10 holds one lane today
+with a second half in flight; a Gemini Flash lane (decision 4) is the next, and a third model is a budget decision.
 
 ## 7. Effectiveness: does it find real problems and get them fixed?
 
