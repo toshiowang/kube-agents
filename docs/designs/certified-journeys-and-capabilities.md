@@ -79,13 +79,20 @@ points below can be built in-house; the product is that they exist, work togethe
    benchmark does not re-run your journeys when the model changes. The competence claim is earned later, by the hard
    tier and the bare-model arm; the no-silent-regression claim is the one the record supports now, and the last three
    nights (22, 0 and 26 cases recorded) show it only holds when the record is whole.
-4. **It carries GKE know-how as rules, catalogues and collectors, not as prose.** 15 governance SOPs, 10 with 117
-   numbered checks; 24 upgrade-readiness rule modules, 33 known GKE issues and 52 removed APIs in the readiness skill;
-   collectors that read a whole fleet in one deterministic pass; 26 of the 31 mirrored Google skills patched for
-   production (counts at `main` 01ab6bd42). A chat model carries general knowledge and none of these lists; an in-house
-   agent writes them. The record says the rules and the scripts are what the model does not invent on its own; the
-   how-to prose adds little on a strong model, and the plan treats it that way. This is the maintainers' practice, not a
-   published standard, and no check cites a Google document yet.
+4. **It executes GKE guidance that is perishable, tested and overridable, and lets you add your own.** A customer
+   can write best practices; most teams have a wiki of them that nothing runs. What is hard to write and harder to
+   keep is the GKE-specific, perishable part: which minor versions each channel serves this month, the 52 removed APIs,
+   the 33 known issues with their affected versions, the skew policy, the capacity and calendar-mode APIs, what the
+   upgrade will refuse. Here each practice is a check that runs: a flag rule, a do-not-flag rule, a severity, a
+   remediation and a planted case that proves it still works, 117 checks across 10 domains, 24 readiness rule
+   modules, collectors that read the whole fleet in one pass. A declared posture overrides any check without an
+   argument, so a customer's own rule wins where they have one, and an operator's own scheduled checks run beside ours.
+   Two honest limits decide how much this is worth. The record says the rules and the scripts are what the model does
+   not invent on its own, while how-to prose adds little on a strong model, so the value sits in the lists and the
+   collectors, not in the text. And today these are the maintainers' practice: no check cites a Google document. The
+   plan (section 16, step 8) gives every check a source line, a Google guide, a release note or a named incident, and
+   labels or retires the ones that have none; a customer should want Google's published guidance for Google's product
+   executed and kept current, not another team's opinions.
 5. **It is kept current, and it is not married to one model.** GKE changes every month: channel defaults, removed APIs,
    new known issues, new capacity APIs. The catalogues and procedures are updated with the product and the nightly
    re-tests them against the same planted fleet, so a change that breaks a journey shows as a red the next morning.
@@ -649,8 +656,10 @@ cases on which the model opened the skill):
 6. **The two persona fixes** (the `gh` miss, the dismissal), on the Claude-served install, with the case as the gate.
 7. **Tag or retire the untagged thirty**, one decision per skill, from PR 2's reader output: a case, or out of the
    shipped set.
-8. **An authoring rule for skill changes**: every change carries its red and three greens (already the repository
-   rule), plus the anti-tuning check, plus a note of which window it restarts; a change that only moves prose on a skill
+8. **Provenance and an authoring rule.** Every check in every SOP and readiness module gets a `source:` line: the
+   Google guide or release note it comes from, or the named incident; a check with no source is labelled "maintainers'
+   practice" and reviewed for retirement. Every skill change carries its red and three greens (already the repository
+   rule), the anti-tuning check, and a note of which window it restarts; a change that only moves prose on a skill
    whose C5 shows no prose value is declined.
 
 **Dates.** Steps 1 and 2 this week and next (PR 1a on the go; the reports on the go; PR 2 after 1a). Step 3 with the
