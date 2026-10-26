@@ -95,6 +95,17 @@ What makes it a habit rather than a slogan, in the product today:
 | Respect for a declared choice      | A posture the repository declares on purpose is listed as declared intent, not raised as a finding, so the habit does not nag                                                                                                     | the declared-intent rules in every audit SOP      |
 | A paced regimen, not alarm fatigue | At most two critical items a day and three non-critical after 16:00, and no new items while one waits for a decision                                                                                                              | the findings nudge                                |
 
+**Where the product is on this scale today.** By design and by volume it is a habit product: 11 of the 17 unattended
+journeys look for latent risk before anything fails (the ten audits and the weekly readiness brief), and about 96 of
+the registered cases grade preventive domains (upgrades 49, security 10, reliability 11, fleet audits 12, capacity 6,
+cost 4, consistency 4) against about 23 that grade the emergency room (incident triage 13, cluster debugging 10). By
+measured maturity the order is reversed: the emergency-room journeys are the reliable ones (the crashloop debugging
+cases block the presubmit and pass; the event triage passes), while the preventive audits carry most of the known
+defects (fleet-audit reads 15 of 23 on Claude, and seven of the eight cases that fail every run are audits). And the
+habit's output is not yet acted on: on the maintainers' own install, 0 of the 18 remediation pull requests the audits
+opened in 30 days were merged. So the honest sentence is: kube-agents promotes the habit, measures the emergency room,
+and has not yet shown that anyone keeps the habit. The roadmap's first journeys are the audits for that reason.
+
 Two honest limits. The standard of care is the maintainers' practice, not a published standard; no check cites a Google
 document yet, and section 6 says how an outside syllabus could change that. And the habit is only worth what the record
 shows: a scheduled check that nobody measures is a promise, which is why section 9 counts outcomes graded, not jobs
