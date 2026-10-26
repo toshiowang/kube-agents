@@ -89,10 +89,13 @@ points below can be built in-house; the product is that they exist, work togethe
    argument, so a customer's own rule wins where they have one, and an operator's own scheduled checks run beside ours.
    Two honest limits decide how much this is worth. The record says the rules and the scripts are what the model does
    not invent on its own, while how-to prose adds little on a strong model, so the value sits in the lists and the
-   collectors, not in the text. And today these are the maintainers' practice: no check cites a Google document. The
-   plan (section 16, step 8) gives every check a source line, a Google guide, a release note or a named incident, and
-   labels or retires the ones that have none; a customer should want Google's published guidance for Google's product
-   executed and kept current, not another team's opinions.
+   collectors, not in the text. And "it follows Google's published GKE guidance" is true only in parts today, measured on `main`: the 31 mirrored
+   Google skills are Google's own text with our patches on 26; the readiness skill's catalogues trace to Google pages
+   (34 links in the known-issues list, citations in 6 of the 24 rule modules and in the removed-API scan); but 14 of the
+   15 audit procedures cite no Google document, and the one SOP with reference lines points at our own mirrored skill
+   files. The 117 audit checks are the maintainers' practice. The plan (section 16, step 8) gives every check a source
+   line, a Google guide, a release note or a named incident, and labels or retires the ones that have none; a customer
+   should want Google's published guidance for Google's product executed and kept current, not another team's opinions.
 5. **It is kept current, and it is not married to one model.** GKE changes every month: channel defaults, removed APIs,
    new known issues, new capacity APIs. The catalogues and procedures are updated with the product and the nightly
    re-tests them against the same planted fleet, so a change that breaks a journey shows as a red the next morning.
