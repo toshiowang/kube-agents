@@ -52,40 +52,45 @@ A generic LLM is a chat window: it answers when someone types, with whatever acc
 nobody measures it on your fleet. An agent you build yourself can be made to run on a schedule, but you then own the
 identity, the audit trail, the test fleet and the nightly record, and most teams never get past the first two.
 
-kube-agents is the operator you do not have to hire, with the authority you would give a new one. Each of the six
+kube-agents is the operator you do not have to hire, with the authority you would give a new one. Each of the five
 points below can be built in-house; the product is that they exist, work together, and are measured every night:
 
 1. **It ships the operator's calendar and procedures, not a cron slot.** Anyone can schedule an agent. What runs on
    the schedule here is the content: ten fleet audits, each with a written procedure of numbered checks, a flag rule,
    a do-not-flag rule, a severity and a remediation; a readiness pre-flight before upgrades; a stall watch every 30
-   minutes; triage on a warning event; a ledger per audit that is rewritten in place; a pull request per critical fix;
-   and a paced chat delivery of two critical items a day. An in-house agent starts with an empty calendar and writes
-   all of this itself, then keeps it current as GKE changes; a chat model has no calendar at all. The value is the
-   months of operating procedure already written, wired to delivery, and re-tested every night.
-2. **It cannot do more than you allowed.** One read-only identity in your project, a credential proxy that refuses
-   every merge and every cluster write, every change as a pull request you merge. The authority limit is enforced by
-   IAM and the proxy, not by a prompt.
-3. **It is measured against planted defects every night.** 230 cases on a seeded fleet, 159 of them scheduled each
-   night, three runs each (the last three nights recorded 22, 0 and 26 cases, and the fix is in flight). Today one
-   skill has a line a customer could read, "version-control on Claude Opus 5.5: 42 of 42 since 10-25"; no journey has
-   one yet. A line starts a new window when the text changes and lapses when the rate falls. A home-built agent has
-   no such record; a model vendor publishes its own benchmarks, not your journeys.
-4. **It carries a best-practice bias: the GKE know-how of people who run production, as code.** Fifteen governance SOPs,
-   ten of them with 117 numbered checks; 24 upgrade-readiness rule modules, 33 known GKE issues and 52 removed APIs
-   in the readiness skill; 26 of the 31 mirrored Google skills patched for production use (counts at `main` 01ab6bd42,
-   the skills story draft 5 (local)). Severity grades, declared intent, version-skew policy, the collectors that read a fleet in one run.
-   On a strong model the how-to text adds little; the rules and the scripts are what the model would otherwise invent
-   differently each time. This is the practice of the maintainers, not a published standard; no check cites a Google
-   document yet.
-5. **It works before the event, not after it.** The audits run on a schedule and name the risk while nothing is broken:
-   the budget that would block a drain, the pool pinned to one zone, the binding that grants too much. The analogy is
-   open: "healthy eating, not the emergency room", or the aviation frame (pre-flight checklist,
-   maintenance schedule, airworthiness directives for known issues, an approved work order for every change), which
-   also gives the word "certified" its precise meaning: an inspector outside the crew signs the airworthiness
-   certificate against a standard.
-6. **It stays in your project, on the model you choose, with the line to prove it.** Your model choice, measured on the same journeys; your billing; telemetry stays in your project; prompts go to your
-   model provider and web searches to DuckDuckGo by default (`reference/security-and-iam.md`, "What leaves for the
-   model provider"). Nothing about your fleet reaches us.
+   minutes; triage on a warning event; a ledger per audit rewritten in place; a pull request per critical fix; and a
+   paced chat delivery of two critical items a day. All of it runs before the incident, which is the habit of section
+   2.1. An in-house agent starts with an empty calendar and writes this itself; a chat model has no calendar. The value
+   is the months of operating procedure already written, wired to delivery, and re-tested every night.
+2. **Its authority limit is enforced outside the model and tested every night.** Read-only IAM is easy to grant; the
+   value is the rest: a credential proxy that refuses every merge, approve and mutating API call whatever the prompt
+   says, a pull-request-only write path with fast-forward rules, one Cluster Agent per cluster pinned to its own
+   kubeconfig, and a gate in which any forbidden action fails the run. An in-house agent gets this boundary when
+   someone builds and tests it; a chat session has whatever credentials the person pasted. The worst case here is a
+   wrong pull request, never a wrong change.
+3. **It is measured against planted defects every night, per journey and per model.** 230 cases on a seeded fleet,
+   159 scheduled each night, three runs each (the last three nights recorded 22, 0 and 26 cases, and the fix is in
+   flight). Today one skill has a line a customer could read, "version-control on Claude Opus 5.5: 42 of 42 since
+   10-25"; no journey has one yet. A line starts a new window when the text changes and lapses when the rate falls.
+   An in-house agent has no record unless the team builds a second product to produce one; a model vendor publishes
+   its own benchmarks, not your journeys. This is the claim only an operator product can make.
+4. **It carries GKE know-how as rules, catalogues and collectors, not as prose.** 15 governance SOPs, 10 with 117
+   numbered checks; 24 upgrade-readiness rule modules, 33 known GKE issues and 52 removed APIs in the readiness skill;
+   collectors that read a whole fleet in one deterministic pass; 26 of the 31 mirrored Google skills patched for
+   production (counts at `main` 01ab6bd42). A chat model carries general knowledge and none of these lists; an in-house
+   agent writes them. The record says the rules and the scripts are what the model does not invent on its own; the
+   how-to prose adds little on a strong model, and the plan treats it that way. This is the maintainers' practice, not a
+   published standard, and no check cites a Google document yet.
+5. **It is kept current, and it is not married to one model.** GKE changes every month: channel defaults, removed APIs,
+   new known issues, new capacity APIs. The catalogues and procedures are updated with the product and the nightly
+   re-tests them against the same planted fleet, so a change that breaks a journey shows as a red the next morning.
+   The same journeys run on Gemini, Claude or an OpenAI-compatible model, and the line is per model, so a customer can
+   switch models and read the same line for the new one. An in-house agent rots at the pace of the team that owns it
+   and is usually bound to the model it was built on; a chat model is one model.
+
+It runs in your project, on your model and your billing, with telemetry in your project and prompts going only to
+your provider (`reference/security-and-iam.md`, "What leaves for the model provider"); that is table stakes against an
+in-house build and is stated here so nobody has to ask.
 
 What is true today, and what is a promise with a date: one skill is at the bar on Claude (version-control, 42 of 42);
 no journey is yet graded end to end as a scheduled outcome; nothing of this reaches a customer's own install until the
