@@ -578,6 +578,62 @@ question 3; "keep eval-tested" is the status quo inside question 1.
 | **13. Does it do the same thing every night, or just get the right answer?**                           | Unknown. The route of every run is recorded, and the named script and forbidden commands are checked, but nothing compares one night's route with the next.                                                                                                                           | Section 5.1: tool-set overlap, step spread, loops and cost spread per window, published on the line.                                   |
 | **14. Does any of this survive the move off Hermes?**                                                  | The definitions, the cases, the ledger checks and the ratings do. The scheduler clock, the pause script and the persona text are Hermes-side and are kept to the minimum.                                                                                                             | The trigger-path method in question 2 is chosen for this reason.                                                                       |
 
+## 16. The plan for skills
+
+The skills work so far lives in pieces: the gap plan's steps, the window rule, the hill-climb plan for the twelve low
+cases, the dashboard, and this document's principle that skills are the per-model adaptation layer. This section is the
+one plan.
+
+**Thesis.** A skill is three things: _rules_ (house decisions the model would otherwise invent differently each run:
+severity grades, declared intent, skew policy), _scripts_ (deterministic collectors and verbs: `fleet_upgrade_report.py`,
+`vcs.py`, the audit collectors), and _how-to prose_ (the route, for a model that needs it). On the rated model today
+the first two carry the value and the third carries the cost: unread text still spends tokens, and any edit restarts
+the window. So every skill moves toward rules and scripts, and prose stays only where a supported model is shown to need
+it. A skill is rated, not certified; the customer's word attaches to the journey or capability it serves.
+
+**What we know per skill today** (Claude Opus 5.5, the local scorecard of 2026-10-26; "used" is the share of tagged
+cases on which the model opened the skill):
+
+| Skill                                                                                                                                                                                        | Window                                             | Used                                      | What the data says                                                                                                                                            | Action                                                                                                                                             |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| version-control                                                                                                                                                                              | 42/42, at the bar                                  | all cases                                 | The one rated skill. 80 of 179 uses ran `vcs.py` without the text. One real miss: the model looked for `gh` against the skill's rule, 2 of 9 before the reset | Keep. No edit before the full window. Then the persona line for the `gh` miss, red and three greens on a Claude-served install. C5 first candidate |
+| fleet-audit                                                                                                                                                                                  | 15/23                                              | all 17 cases                              | 13 cases pass every run; four fail every run on one check each, three of them defects in the SOP, the collector or the check (hill-climb cases 4, 5, 6, 11)   | Fix through the owners' reports; the collector text for the stockout ledger; no prose edit. C5 second candidate on the 13 passing cases            |
+| submit-suggestion                                                                                                                                                                            | 53/60                                              | all 8                                     | Two cases drag it: the cluster-setting request never ends in a proposal; a refusal case 7/9                                                                   | Owners' cases; no skill edit indicated                                                                                                             |
+| fleet-upgrade-verification                                                                                                                                                                   | 17/21                                              | all 7                                     | The rollout-stall wording and the kubectl survey after the script, both agent behaviour                                                                       | A persona line, not a skill edit; the script's verdict line pasted verbatim                                                                        |
+| gke-workload-troubleshooting, gke-reliability, gke-stall-detection, gke-workload-security (Cluster Agent)                                                                                    | 12/12, 11/12, 6/6, 9/9 on the few cases that count | opened on 2 of 11, 2 of 4, 1 of 1, 1 of 1 | The agent passes without opening them; where it opens them, it passes too                                                                                     | Discovery first (D2), after [#3191](https://github.com/gke-labs/kube-agents/pull/3191) lands and one week of nights; no text edit before that      |
+| capacity-obtainability, gke-compute-classes, kube-agents-observability, fleet-audit-reports, gke-alert-configuration                                                                         | 1/12, 9/15, 3/6, 0/6, 0/6                          | all                                       | Low for check reasons in four of five (hill-climb cases 1, 2, 3, 12) and one behaviour miss (the metric, case 7)                                              | Case fixes by the owners and one of ours; the metric miss stays a skill-adherence finding for the owner                                            |
+| eight one-case skills (gke-backup-dr, gke-platform-security, manage-cluster, github-issue-resolver, inspect-repository, cluster-agent-lifecycle, gke-cluster-creation, gcp-config-connector) | 9/9 or fewer                                       | one case each                             | Frozen while the main nightly is cut off; 24 runs need 8 clean main nights                                                                                    | Wait for the record; add no case until the budget grows                                                                                            |
+| the 30 untagged skills                                                                                                                                                                       | no window                                          | unknown                                   | No case names them; 23 of 53 skill names appear in no case at all                                                                                             | Tag or retire: the two-reader tags (PR 2) decide which have a case; a skill no case names gets a case or leaves the shipped set                    |
+
+**The steps, in order:**
+
+1. **Measurement on `main`.** The `skills:` key (PR 1a), the two-reader tags (PR 2), the anti-tuning check (PR 1b), and
+   the rating calculation in ci-health (step 5) with the use rate and the "needed on this model: yes, no, unknown"
+   column. Until then the scorecard runs locally each morning.
+2. **Fix the measurement defects, not the skills.** The hill-climb plan: one case edit of ours, nine reports to owners.
+   No skill text changes on a rating's account.
+3. **Decide the window key** (section 14, question 5), because skills changed on 23 of the last 30 days and no window
+   fills under the exact-digest rule for the audits.
+4. **C5 on the two skills with data**, version-control and fleet-audit's passing cases, through the product's disable
+   setting (step 11b) on a Claude-served install, one lease each. The result sets each skill's shape on that model:
+   prose kept, shrunk to rules and scripts, or retired.
+5. **Discovery for the Cluster Agent skills** (D2), only after #3191 and a week of nights show whether its rewrite
+   changed the opened rate; then the smallest fix with red and three greens.
+6. **The two persona fixes** (the `gh` miss, the dismissal), on the Claude-served install, with the case as the gate.
+7. **Tag or retire the untagged thirty**, one decision per skill, from PR 2's reader output: a case, or out of the
+   shipped set.
+8. **An authoring rule for skill changes**: every change carries its red and three greens (already the repository
+   rule), plus the anti-tuning check, plus a note of which window it restarts; a change that only moves prose on a skill
+   whose C5 shows no prose value is declined.
+
+**Dates.** Steps 1 and 2 this week and next (PR 1a on the go; the reports on the go; PR 2 after 1a). Step 3 with the
+five decisions. Step 4 after Claude is enabled on one project, about one lease per skill. Step 5 after #3191, not
+before mid-November. Step 6 with step 4's install. Steps 7 and 8 follow PR 2, by the end of November.
+
+**What this plan does not promise.** That the skill library beats a bare model: C5 answers that per skill and per
+model, and the honest expectation from the record is "equal" for the prose and "needed" for the scripts. That every
+skill gets a rating: the one-case skills and the untagged thirty wait on the nightly budget and on PR 2.
+
 ## Appendix A. Sources and numbers
 
 - Journey inventory with file:line evidence: [`certified-journeys-inventory.md`](certified-journeys-inventory.md) (47 rows; counts; registered cases per
