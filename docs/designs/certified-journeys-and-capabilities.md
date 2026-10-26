@@ -221,6 +221,32 @@ Options for the definition:
 One hole in the ladder with no owner yet (gap plan D6): what the line shows for the model a default install runs
 (Gemini Flash), and whether the CI model and the installer default should be the same model. Section 14, question 4.
 
+### 3.1 The word: what customers can be guaranteed, and what "certified" would promise
+
+Customers ask for a guarantee, and "certified" reads to many of them as "guaranteed". The word is also overloaded in
+this industry, with four meanings that have nothing to do with each other: a person's exam (CKA, the Google
+Professional certifications), a conformance programme for a distribution ("Certified Kubernetes"), a compliance
+attestation of an organisation's controls (SOC 2, ISO 27001, FedRAMP), and a vendor's partner or solution badge. None of
+them promises an outcome, and a model-driven operator cannot promise one either. What it can promise splits into three
+kinds, and the vocabulary should follow the kind:
+
+| Kind of promise     | What it covers                                                                                                                                                              | How strong                                                                                                     | The word                                                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **A guarantee**     | The authority limit: read-only identity, the proxy that refuses every write verb, every change as a pull request a human merges; nothing it does is applied                 | Hard. Enforced outside the model, testable on every run, breakable only by a change to the install             | **guaranteed**: "guaranteed read-only", "guaranteed to propose, never apply"                                               |
+| **A measured rate** | The outcome on a journey or capability: the window's lower bound on a named model and text, re-measured every night, with a lapse                                           | Statistical, like an SLO: a rate with a bound and a date, never a promise about one run                        | **measured** (public today as _eval-tested_): "measured 57 of 60 on Claude Opus 5.5 since 2026-11-20"                      |
+| **An attestation**  | That the rate was produced the way we say: a private set, no forbidden action in the window, the model named, a reviewer outside the team who re-derived it from the record | As strong as the reviewer's independence and the record's openness; this is the compliance meaning of the word | **attested**, the top step; "certified" if the programme keeps that word, with its definition printed beside it every time |
+
+This is the same three-step ladder as section 3 with the words made honest: the customer gets a guarantee about
+authority, a measured rate about outcomes, and an attestation about how the rate was made. A certificate that promised
+the outcome would be false the first night the model changed; the lapse rule exists because it would.
+
+Options for the programme's name: a) keep "certified" for the top step and print its definition beside it
+everywhere; b) use "attested" for the top step and never use "certified" except for the industry exams; c) do less:
+"eval-tested" for everything above the floor, no top-step word until the private set and the reviewer exist. Rec: b
+for the word, c for the timing, because "attested" says exactly what the top step is and is not yet claimed by the
+Kubernetes vocabulary, and nothing meets the top step before 12-14 anyway. Principle: one word, one meaning, and the
+guarantee word only where it is enforced.
+
 ## 4. The two metrics, defined so they can be counted
 
 **HOOTL journeys** (human out of the loop). A journey counts as HOOTL when the agent takes it from trigger to outcome
