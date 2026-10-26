@@ -99,7 +99,7 @@ points below can be built in-house; the product is that they exist, work togethe
    the schedule here is the content: ten fleet audits, each with a written procedure of numbered checks, a flag rule,
    a do-not-flag rule, a severity and a remediation; a readiness pre-flight before upgrades; a stall watch every 30
    minutes; triage on a warning event; a ledger per audit rewritten in place; a pull request per critical fix; and a
-   paced chat delivery of two critical items a day. All of it runs before the incident, which is the habit of section
+   paced chat delivery of two critical items a day. All of it runs before the incident, which is the preventive care of section
    2.1. An in-house agent starts with an empty calendar and writes this itself; a chat model has no calendar. The value
    is the months of operating procedure already written, wired to delivery, and re-tested every night.
 2. **Its authority limit is enforced outside the model and tested every night.** Read-only IAM is easy to grant; the
@@ -163,46 +163,45 @@ pod reports the digests it loaded (phase 3). The roadmap in section 13 grades th
 outcomes from their first nightly, about 11-09, and uses the word "certified" only when a reviewer outside the team
 can check the claim from the record.
 
-### 2.1 Healthy habits, not the emergency room
+### 2.1 Preventive care, not the emergency room
 
-A model you ask when something is broken is the emergency room: good at the visit, silent until the ambulance. Your own
-chat session, and an agent you built to answer questions, both work this way; they start when a person notices a
-symptom, which is after the outage has begun. kube-agents is meant to be the healthy habit: the checks and the hygiene
-that keep the fleet out of the emergency room, run on a schedule while nothing is wrong, so the budget that would block
-a drain, the pool pinned to one zone, the binding that grants too much and the control plane one minor behind are named
-before the upgrade, the stockout or the audit that would have found them.
+Most Kubernetes tooling is the emergency room. Something breaks, a person notices, and only then does anyone ask the
+tool a question. The visit may be excellent, and the patient still arrived by ambulance. kube-agents is preventive
+care: the scheduled check-up that finds the problem while the fleet is still healthy, so the outage never happens and
+the emergency room stays empty.
 
-What makes it a habit rather than a slogan, in the product today:
+The analogy maps part for part:
 
-| Habit                              | What runs, and when                                                                                                                                                                                                               | Where it comes from                               |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| The scheduled check-ups            | Ten audits on a cron: compliance and reliability daily, cost, drift and patch readiness weekly, AI security, stockout, networking and GCE daily, the upgrade retrospective on Sundays; the first five also run once at onboarding | `agents/platform/cron/jobs.json`                  |
-| The pre-flight before a change     | Upgrade readiness graded per cluster before anyone schedules the upgrade: drain-blocking budgets, fail-closed webhooks, exclusions, version skew, 24 rule modules, 33 known GKE issues, 52 removed APIs                           | the fleet-upgrade-verification skill              |
-| The written standard of care       | 15 governance SOPs, 10 of them with 117 numbered checks, each with a flag rule, a do-not-flag rule, a severity and a remediation; 26 of the 31 mirrored Google skills patched for production use                                  | `agents/platform/governance/`, the skill overlays |
-| Respect for a declared choice      | A posture the repository declares on purpose is listed as declared intent, not raised as a finding, so the habit does not nag                                                                                                     | the declared-intent rules in every audit SOP      |
-| A paced regimen, not alarm fatigue | At most two critical items a day and three non-critical after 16:00, and no new items while one waits for a decision                                                                                                              | the findings nudge                                |
+| In preventive care                                      | In kube-agents                                                                                                                                                                           |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The scheduled check-up                                  | Ten audits that run on a calendar, daily and weekly, with nobody asking                                                                                                                  |
+| The chart the doctor reads                              | Collectors that read every cluster in one pass, the same way every time                                                                                                                  |
+| The standard of care                                    | Written procedures: 117 numbered checks, each with when to flag, when not to, how bad it is, and what the fix is                                                                         |
+| "Your blood pressure is high; here is the prescription" | A finding with its evidence and a pull request that fixes it, ready for you to approve                                                                                                   |
+| The doctor never operates without consent               | The agent cannot change a cluster or merge anything; every change is a pull request you merge                                                                                            |
+| Your history, visit after visit                         | A ledger per audit, rewritten each run, so you see what appeared, what cleared, and what is still open                                                                                   |
+| The pre-operative check                                 | Upgrade readiness graded per cluster before anyone schedules the upgrade: the budget that would block a drain, the webhook that would fail closed, the known issue on the target version |
+| A patient's declared choice                             | A posture your repository declares on purpose is recorded as declared intent, not raised as a finding                                                                                    |
+| No scare letters                                        | Two critical items a day, three non-critical after four in the afternoon, and nothing new while one waits for your decision                                                              |
+| A specialist on call for each organ                     | One Cluster Agent per cluster, with access to that cluster only, for the deep read when a check-up finds something                                                                       |
 
-**Where the product is on this scale today.** By design and by volume it is a habit product: 11 of the 17 unattended
-journeys look for latent risk before anything fails (the ten audits and the weekly readiness brief), and about 96 of
-the registered cases grade preventive domains (upgrades 49, security 10, reliability 11, fleet audits 12, capacity 6,
-cost 4, consistency 4) against about 23 that grade the emergency room (incident triage 13, cluster debugging 10). By
-measured maturity the order is reversed: the emergency-room journeys are the reliable ones (the crashloop debugging
-cases block the presubmit and pass; the event triage passes), while the preventive audits carry most of the known
-defects (fleet-audit reads 15 of 23 on Claude, and seven of the eight cases that fail every run are audits). And the
-habit's output is not yet acted on: on the maintainers' own install, 0 of the 18 remediation pull requests the audits
-opened in 30 days were merged. So the honest sentence is: kube-agents promotes the habit, measures the emergency room,
-and has not yet shown that anyone keeps the habit. The roadmap's first journeys are the audits for that reason.
+The sentence to remember: **kube-agents keeps your fleet out of the emergency room, and keeps the chart that shows it
+did.**
 
-Two honest limits. The standard of care is the maintainers' practice, not a published standard; no check cites a Google
-document yet, and section 6 says how an outside syllabus could change that. And the habit is only worth what the record
-shows: a scheduled check that nobody measures is a promise, which is why section 9 counts outcomes graded, not jobs
-scheduled.
+**Where the product is on this scale today.** By design and by volume it is preventive: 11 of the 17 unattended
+journeys look for latent risk before anything fails, and about 96 of the registered test cases grade preventive
+domains against about 23 that grade emergency-room work. By measured maturity the order is reversed: the
+emergency-room journeys are the reliable ones today (crashloop debugging blocks the presubmit and passes; event triage
+passes), while the preventive audits carry most of the known defects (the fleet-audit skill reads 15 of 23 on Claude,
+and seven of the eight cases that fail every run are audits), and on the maintainers' own install none of the 18
+remediation pull requests the audits opened in 30 days was merged. So the honest sentence is: kube-agents gives the
+check-up, measures the emergency room, and has not yet shown that anyone fills the prescription. The roadmap's first
+journeys are the audits for that reason, and the first effectiveness counter is prescriptions filled: pull requests
+accepted.
 
-The analogy is still open. "Healthy eating" is the plainer phrase. The aviation frame maps every part (pre-flight
-checklist, maintenance interval, airworthiness directives for the known issues, an approved work order for every change)
-and gives the word "certified" its exact meaning: an inspector outside the crew signs against a standard. Whichever is
-chosen, the sentence a customer should remember is the same: the agent is there to keep you out of the emergency room,
-and it keeps a record that shows whether it did.
+**Two honest limits.** The standard of care is the maintainers' practice, not a published standard; appendix D maps
+it against the published guides and names the gaps. And a check-up nobody measures is a promise, which is why section
+9 counts outcomes graded, not jobs scheduled.
 
 ## 3. What "certified" means (proposal, not decided)
 
