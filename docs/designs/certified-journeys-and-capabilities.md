@@ -1,0 +1,573 @@
+# Certified journeys and capabilities: the metrics, the evidence bar and the engineering roadmap
+
+Status: design draft 4, 2026-10-26. Built on a journey inventory of the same day ([`certified-journeys-inventory.md`](certified-journeys-inventory.md),
+47 rows with file:line evidence). Reviews so far: a blind red-team of draft 1 (10 findings, 8 changed the plan), a
+chief-of-staff check of draft 3 (10 facts corrected) and an expert panel of five on draft 3 (unanimous concerns, nothing
+blocking; five items folded). Records at the end. Work in progress on a branch, not merged; nothing it proposes is built. Tracking issue:
+[#3978](https://github.com/gke-labs/kube-agents/issues/3978).
+
+The questions this document answers: which core metrics we track (unattended journeys, certified capabilities), the engineering
+roadmap that delivers them, how many journeys can run with no human and which, how many we add a week and how the loop
+scales, how a journey or skill is certified, what testing in the loop means here, and what customers want.
+
+## 1. Summary
+
+**The two counters.** _Unattended journeys_ (HOOTL): a schedule or an event starts the journey, no person acts before
+the outcome, and a deterministic check reads the ledger, the pull request or the chat post the product exports.
+_Certified capabilities and skills_: the newest 60 nightly runs on one model and one exact text pass at a 95% lower
+bound of 0.85; the word "certified" is reserved for the top step of a four-step ladder with evidence from outside the
+team.
+
+**Where we stand.** 47 journeys claimed or tested; 17 can run with no human; 0 are graded as scheduled outcomes; one
+skill is at the eval-tested bar on Claude Opus 5.5 (version-control, 42 of 42 since 2026-10-25); 20 documented promises
+have no test. The nightly that feeds every counter is past its ceiling and recorded 22, 0 and 26 cases on the last
+three nights; the fix is in flight.
+
+| Counter                                                 | Today | 2026-12-14 target | What it depends on                                                                    |
+| ------------------------------------------------------- | ----- | ----------------- | ------------------------------------------------------------------------------------- |
+| Skills and capabilities at the eval-tested bar (Claude) | 1     | 2 to 4            | a whole nightly record; 8 clean nights per one-case skill                             |
+| Journeys graded as scheduled outcomes                   | 0     | 5 to 12           | five checks on an existing case (about 11-09); a chat-capable install for the rest    |
+| Journeys at the eval-tested bar                         | 0     | 0 to 2            | the audits pass 0.21 to 0.65 today; the rated text changes 22 of 30 days (decision 5) |
+| Certified lines                                         | 0     | 0                 | the private set is not built in this window                                           |
+
+**The five open decisions** (section 14): what "certified" requires; how an unattended journey is counted; how chat
+evidence and the paused audits are graded; what the line says for a default install's model; the window key when the
+text changes almost daily.
+
+## 2. The story: why a customer runs kube-agents instead of their own agent or a generic LLM
+
+A generic LLM is a chat window: it answers when someone types, with whatever access that person pastes in, and
+nobody measures it on your fleet. An agent you build yourself can be made to run on a schedule, but you then own the
+identity, the audit trail, the test fleet and the nightly record, and most teams never get past the first two.
+
+kube-agents is the operator you do not have to hire, with the authority you would give a new one:
+
+1. **It works while nobody is typing.** Ten audits on a schedule (`agents/platform/cron/jobs.json`), a stall watch every
+   30 minutes, triage when a warning event fires, one Cluster Agent per cluster kept current every hour. Its output is
+   a ledger issue and a pull request, not a chat transcript.
+2. **It cannot do more than you allowed.** One read-only identity in your project, a credential proxy that refuses
+   every merge and every cluster write, every change as a pull request you merge. The authority limit is enforced by
+   IAM and the proxy, not by a prompt.
+3. **It is measured against planted defects every night.** 230 cases on a seeded fleet, 159 of them scheduled each
+   night, three runs each (the last three nights recorded 22, 0 and 26 cases, and the fix is in flight). Today one
+   skill has a line a customer could read, "version-control on Claude Opus 5.5: 42 of 42 since 10-25"; no journey has
+   one yet. A line starts a new window when the text changes and lapses when the rate falls. A home-built agent has
+   no such record; a model vendor publishes its own benchmarks, not your journeys.
+4. **It carries a best-practice bias: the GKE know-how of people who run production, as code.** Fifteen governance SOPs,
+   ten of them with 117 numbered checks; 24 upgrade-readiness rule modules, 33 known GKE issues and 52 removed APIs
+   in the readiness skill; 26 of the 31 mirrored Google skills patched for production use (counts at `main` 01ab6bd42,
+   the skills story draft 5 (local)). Severity grades, declared intent, version-skew policy, the collectors that read a fleet in one run.
+   On a strong model the how-to text adds little; the rules and the scripts are what the model would otherwise invent
+   differently each time. This is the practice of the maintainers, not a published standard; no check cites a Google
+   document yet.
+5. **It works before the event, not after it.** The audits run on a schedule and name the risk while nothing is broken:
+   the budget that would block a drain, the pool pinned to one zone, the binding that grants too much. The analogy is
+   open: "healthy eating, not the emergency room", or the aviation frame (pre-flight checklist,
+   maintenance schedule, airworthiness directives for known issues, an approved work order for every change), which
+   also gives the word "certified" its precise meaning: an inspector outside the crew signs the airworthiness
+   certificate against a standard.
+6. **It stays in your project.** Your model choice, your billing; telemetry stays in your project; prompts go to your
+   model provider and web searches to DuckDuckGo by default (`reference/security-and-iam.md`, "What leaves for the
+   model provider"). Nothing about your fleet reaches us.
+
+What is true today, and what is a promise with a date: one skill is at the bar on Claude (version-control, 42 of 42);
+no journey is yet graded end to end as a scheduled outcome; nothing of this reaches a customer's own install until the
+pod reports the digests it loaded (phase 3). The roadmap in section 13 grades the five first-run audits as scheduled
+outcomes from their first nightly, about 11-09, and uses the word "certified" only when a reviewer outside the team
+can check the claim from the record.
+
+## 3. What "certified" means (proposal, not decided)
+
+The word is a ladder of claims. Each step adds one piece of evidence a customer can check without trusting us. A
+claim sits on the highest step whose evidence exists; the word "certified" is the top step only.
+
+| Step | Word                           | What must be true                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Who can check it                                              | Today                             |
+| ---- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | --------------------------------- |
+| 0    | Claimed                        | The docs say the agent does it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Nobody.                                                       | 20 promises sit here              |
+| 1    | Tested                         | At least one case or journey test exists, runs in the nightly, and has passed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Anyone with the nightly record.                               | most journeys and skills          |
+| 2    | Eval-tested (today's "Rated")  | The newest 60 nightly runs on one model, on the exact text and scripts, pass with a 95% lower bound of 0.85 or more (D1). Lapses below 0.70.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Anyone with the record and the digest.                        | 1 skill (version-control, Claude) |
+| 3    | **Certified**                  | Eval-tested, **and** all of: (a) a **private set**: cases the skill or journey author never saw, owned by the eval crew, passed on the same window rule; (b) **authority**, stated two ways: _enforced_ (RBAC read-only, IAM read-only, the proxy refuses the GitHub write verbs) and _observed_ (0 forbidden actions in the N runs of the window, the C6 audit-log sweep); (c) **the model named**: the claim carries the model and the digest, and a default install's model shows its own line or "untested"; (d) **reproducible**: an independent reviewer, not the author, re-derives the number from the published record, and the record shows the agent took a stable route to it (the trajectory envelope, section 5.1). | A reviewer outside the authoring team, from the record alone. | 0                                 |
+| 3+   | Certified, with measured value | Step 3 plus the no-skill arm (C5): the same cases with the skill removed, so the line can say "helps", "equal" or "hurts".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Same.                                                         | 0                                 |
+
+What a customer reads: one line per journey or skill and per model, for example "Certified: compliance audit on Claude
+Opus 5.5, since 2026-11-20, 60 of 60 on text a1b2c3, private-set 24 of 24, no forbidden action in 60 runs, reviewed
+by <name>". Every clause links to the record that proves it.
+
+Scope, one sentence: **journeys and capabilities (a bench case each) can be certified; skills are rated.** A journey is an outcome a customer buys
+(the compliance audit finds the over-grant and opens the PR); a task is one capability ("grade upgrade readiness");
+a skill is a file, and its rating is derived from the tasks that use it. The independent reviewer of step 3d is a named
+member of the eval crew who did not write the skill or the case, and the name goes on the line.
+
+What step 3 costs, beyond step 2: a private private line (a repository, a runner identity, a bucket and a seeded fleet
+the authors cannot read: one pool project; the gap plan, H, option b), its cases (the panel's estimate is that a private-set
+set roughly doubles the nightly's runs, against a nightly that cannot finish the 159 cases it has today, so its size is
+a numbered decision when the first journey reaches step 2), the C6 safeguard sweep on every declared case (step 8),
+and the named reviewer. The definition costs nothing today; the build does.
+
+Options for the definition:
+
+- a) **Step 3 as written** (private-set, authority, model, reproducible). Rec.
+- b) **Step 3 without the private set**: cheaper and sooner; the claim stays open to "you tuned the skill to your own
+  tests", which is the first question a reviewer asks (the narrative draft, "Questions a reviewer will ask").
+- c) **Do nothing: keep "eval-tested"** (decided 10-19, D4) and return when one journey reaches step 2; none has today.
+  Renaming step 2 "certified" is rejected by that decision.
+  Principle: a certified claim is one a stranger can verify from the record without trusting the author.
+
+One hole in the ladder with no owner yet (gap plan D6): what the line shows for the model a default install runs
+(Gemini Flash), and whether the CI model and the installer default should be the same model. Section 14, question 4.
+
+## 4. The two metrics, defined so they can be counted
+
+**HOOTL journeys** (human out of the loop). A journey counts as HOOTL when the agent takes it from trigger to outcome
+with no human step, and the outcome is graded by evidence the deployed system returns, not by the agent's own report.
+Three parts, each a yes or no per journey:
+
+- _Trigger without a person_: a schedule, a cluster event, or a standing instruction. A chat question is not HOOTL;
+  it is on-demand.
+- _No human step before the outcome_: no approval, no answer to a question, no console click. A pull request the human
+  merges is the end of the agent's part, so "a PR is open with the right change" is the HOOTL outcome; the merge is not.
+- _Graded by evidence the product exports_: the ledger issue, the pull request diff against the planted defect, or the
+  chat message, read on a schedule against a live install. Not a row in the runtime's own database: a check that reads
+  Hermes's `executions.db` over `kubectl exec` proves a start, not an outcome, and dies with Hermes.
+- _How it is run for grading_: the product's own trigger path. The first-run stage marks an audit due with the
+  scheduler's `trigger_job`, and the next scheduler tick runs it through its schedule's own path with the same job
+  definition (`agents/chat/scripts/oobe.py:29-37`); the scheduler and the stage are one path, only the clock differs.
+  So a case can start a scheduled audit the product's way, three times a night, and the one rating rule applies: D1,
+  at least 24 of 24 while the window fills (22 of 22 is the smallest all-pass count that clears 0.85), 57 of 60 when
+  full, lapse below 0.70 on two nightly checks.
+  One liveness line per audit ("last scheduled run at <time>", from the real clock) checks that the clock itself fires.
+  The stronger form, one observation a night from the real clock on an install where nothing pauses it, is the later
+  option (section 14, question 2).
+  Reported as: HOOTL journeys available / journeys claimed, and for each the pass rate on the newest window.
+
+**Certified capabilities** (the "certified employee/tasks" metric). A task is a journey or a skill with a rating: the newest 60
+runs on one model, on its exact text and scripts, pass with a 95% lower bound of 0.85 or more (rule D1; at least 24 of
+24 while the window fills). The word "certified" is reserved until a private private set and an independent reviewer
+exist (D4); until then the public word is **eval-tested**. Reported as: tasks Rated / tasks tracked, per model, with
+the date and the digest, and a lapse when the bound falls below 0.70 on two nightly checks.
+
+Why two metrics and not one: HOOTL counts what the product does without a person; the rating says how reliably it does
+it. A journey can be HOOTL and unrated (new, few runs) or rated and on-demand (version-control today).
+
+## 5. Cost, latency and reproducibility: what is measured, and how each relates to "certified"
+
+| Metric               | Measured today                                                                                                                                                       | Where                                                                                 | In the rating today                                                                                             | Proposed place in "certified"                                                                                                                                                                           |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Latency**          | Yes, per run: agent seconds and first-turn seconds; the dashboard rolls up a per-case latency                                                                        | `results.json` `latency`; `gate.py:515-519`; `scripts/eval_dashboard/collect.py:1259` | No. A run that hits the case's agent cap (600 s) fails its checks, which is the only way time enters the record | The certified line carries the window's median and p90 run time. Lapse rule: p90 above 1.5x the value at certification on two nightly checks in a row flags "lapsed (latency)", reported, not blocking. |
+| **Tokens**           | Yes, per run: input, cached, cache-write, reasoning, output, total                                                                                                   | `results.json` `tokens`                                                               | No                                                                                                              | The line carries median total tokens per run and the cached share. Same 1.5x lapse rule, reported.                                                                                                      |
+| **Cost**             | No. Nothing converts tokens to money; the price depends on the customer's provider and model                                                                         | none (`bench/` has no price table)                                                    | No                                                                                                              | Reported as tokens, with a one-line conversion per model the customer can apply. We do not certify a dollar figure.                                                                                     |
+| **Reproducibility**  | Partly. Three runs a night; the window of 60; the exact text pinned by digest; the model pinned by `setup_id`; the drift tier compares judged scores with a baseline | D1; `testing-strategy.md` §9 (drift); `evidence_store.py`                             | Yes: the lower bound on the window is the reproducibility measure for correctness                               | Certified requires the window (step 2) and the independent re-derivation (step 3d). Not controlled: provider-side model updates under the same name; they show as a lapse, which is the point.          |
+| **Authority**        | Yes, per run: forbidden actions block on any run                                                                                                                     | gate rung 1; safeguards per case                                                      | Not in the rating                                                                                               | Required at step 3 (b): no forbidden action in any run of the window, plus the C6 audit-log sweep.                                                                                                      |
+| **Quality (judged)** | Yes, per run: OutcomeScore and friends                                                                                                                               | `results.json` `scores`                                                               | No; the deterministic checks decide                                                                             | Stays out of the certified claim; shown beside it as context.                                                                                                                                           |
+
+Why report cost and latency but not gate on them: a customer's bill depends on their model and provider, and a slow
+run that still reaches the outcome is a cost, not a failure. A customer reads the typical run time and tokens on the
+line and decides. Why gate on authority and reproducibility: those are the trust properties; a fast cheap wrong answer
+is the failure this product cannot afford (`testing-strategy.md` §8).
+
+Needed to deliver this: tokens written into the record (today the gate records agent and first-turn timing but no
+token counts, `gate.py:515-522`: a small recording change), a tokens and latency roll-up per journey and per skill in
+the scorecard (two columns), a lapse rule for each (two nightly checks, 1.5x), and the tokens-to-price note per model
+in the published line.
+
+### 5.1 Agent trajectories: recorded today, graded for the route, not yet for stability
+
+A trajectory is the ordered list of tool calls a run made, with their arguments and results, for the Planning Agent and
+for every worker it delegated to. The harness records it whole for every run (`results.json` `trajectory`; the workers'
+calls are captured in the pod and tagged, `bench/kube_agents_bench/worker_trajectory.py`). Today the record is used in
+three ways, and not in a fourth:
+
+| Use                                                                                                     | Today                                                                                                                                                                                                         | Where                                                              |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **Route adherence per case**: the named script ran, the named tool was called, no forbidden command ran | Yes, deterministic, blocks on any run                                                                                                                                                                         | `tool_called`, `worker_commands` checks; the gate's authority rung |
+| **Judged tool use**: did the agent call tools sensibly                                                  | Yes, a judged score, context only                                                                                                                                                                             | `ToolInvocation`                                                   |
+| **Re-grading after a check defect**: the typed commands are replayed against a corrected check          | Yes, on the laptop                                                                                                                                                                                            | the display-line re-grade used this week                           |
+| **Stability across repetitions and across the window**                                                  | **No.** Nothing compares one run's route with the next. A journey can pass 60 of 60 by sixty different routes, or by a route that drifts a little every night until it fails, and the record would not say so | none; the one variance measure in the harness is the judge's       |
+
+Why stability belongs in "certified" and not only the outcome: a customer runs the same journey every night. A route
+that changes run to run is a route that costs a different amount each night, hits different quotas, and fails in a way
+nobody has seen before. Reproducible for us means two things, and the second is the one we lack: (1) the same inputs,
+the same exact text and the same model name give the same outcome at the rate the window states; (2) the route to that
+outcome stays inside an envelope the window has seen.
+
+Proposed trajectory measures, all derivable from the record we already keep:
+
+| Measure                        | Definition                                                                                                         | Bound for a certified line (proposal)                                       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| **Tool set overlap**           | The set of distinct tools and scripts a run used, against the window's most common set (Jaccard)                   | median 0.8 or more; a run below 0.5 is flagged                              |
+| **Step spread**                | Number of tool calls per run, p90 over median across the window                                                    | 2.0 or less                                                                 |
+| **Loops**                      | The same command repeated more than three times in one run                                                         | 0 runs in the window                                                        |
+| **Cost spread**                | Tokens and seconds per run, p90 over median (section 5)                                                            | 1.5 or less                                                                 |
+| **Deterministic steps diffed** | Where a step is a script (a collector, `audit_report.py`), its output on the same fixture is diffed night to night | identical, or the difference is the fixture's own clock                     |
+| **Envelope drift**             | The window's tool set or step median moving while the outcome still passes                                         | reported as an early warning; a provider-side model update shows here first |
+
+What this is not: a demand that every run take one route. Different valid routes exist, and the hard part stays the
+route checks the case already states (the named script ran, nothing forbidden ran). The envelope is learned from the
+window per journey and model, and a certified line publishes it beside the pass rate: "median 14 tool calls, p90 21,
+tool set stable at 0.9, no loops". Cost: a per-run summary (tool names, counts, step count) is a small extraction from
+`results.json`; the roll-up is about 100 lines in the same `ratings.py` as the window; no harness change.
+
+## 6. Good or bad against what: the baselines
+
+| Judgement                                                        | Compared against                                                                                                                                                                                                                                                                                                                                    | Who set it                   | Have it?                                                              |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------- |
+| A run **passes or fails**                                        | **Planted truth.** The seeded fleet carries defects we planted (an over-permissioned binding, a Deployment with no PDB, a single-zone pool with a Pending backlog, a control plane one minor behind); the check asks whether the report, the ledger or the PR names that defect and nothing it should not. Absolute: the fixture is the answer key. | Us, per case, before the run | Yes: 230 cases, 134 on a planted fixture; `testing-strategy.md` §10.2 |
+| A run **exceeds its authority**                                  | **Zero.** Any cluster write, Secret read or forbidden GitHub write fails the run; nothing absorbs it.                                                                                                                                                                                                                                               | Us                           | Yes: gate rung 1, safeguards per case                                 |
+| A **judged score** (where the agent chose the words)             | **Our own past.** The case's score on `main` at the same key (model, judge, fleet, verifier, mode); must not fall much below it. Relative, and only to ourselves.                                                                                                                                                                                   | The record                   | Yes: `bench/kube_agents_bench/baselines.py`, the evidence store       |
+| A **rating** (Rated, lapsed)                                     | **A fixed bar.** Lower bound 0.85 on the newest 60; lapse below 0.70 twice. The bar is a convention we chose, not a measured external standard.                                                                                                                                                                                                     | the project lead, D1         | Yes, locally                                                          |
+| **Is the skill better than nothing?**                            | **The same model with the skill disabled through the product setting** (C5 through step 11b, `skills.disabled` behind one `PlatformAgent` field; the gap plan, D3 rejects the optimizer's directory move for this)                                                                                                                                  | Not yet                      | No. The setting is not built; one lease per skill version once it is  |
+| **Is it better than another model?**                             | **A second model on the same cases.** Gemini 3.1 Pro for 29 nights is the only other record; it caught 8 check defects this week as a control.                                                                                                                                                                                                      | Not yet, as a rule           | Partly: the dashboard; not in the rating                              |
+| **Is it as good as a competent operator?**                       | **A human baseline.** Nobody has run the cases by hand and recorded what a GKE SRE finds in the same time.                                                                                                                                                                                                                                          | Not yet                      | No                                                                    |
+| **Is it better than "your own Claude plus the GKE MCP server"?** | The story's question.                                                                                                                                                                                                                                                                                                                               | Not yet                      | No; C5 is the nearest proxy                                           |
+| **Does it find what customers lose sleep over?**                 | **Real customer failures** triaged into cases (gap plan step 10).                                                                                                                                                                                                                                                                                   | Not yet                      | No                                                                    |
+
+So today "good" means: found what we planted, touched nothing it must not, and did not get worse than our own past.
+That is a strong floor and a weak ceiling. Three things it cannot say: that the skill text adds anything (C5), that
+the agent matches an expert (human baseline), or that the planted defects are the ones customers have (step 10).
+
+**An answer key from outside the team: industry certification tasks.** The real exams cannot be sat by an agent, and multiple-choice exams (KCNA, KCSA, Google's DevOps and
+Architect) measure the model, not the harness. The performance-task exams (CKA, CKAD, CKS) fit the bench: a task with a
+scratch cluster, a change proposed as a PR and applied there, the end state checked. A pilot of 20 to 30 tasks across
+the CKA curriculum domains, two arms (kube-agents against a bare model with the GKE MCP server), three runs each, gives
+the first pass rate against a syllabus we did not write. It does not replace the private set (the tasks are public and a
+skill can be tuned to them), but it is the cheapest external answer key, and the repo has none today.
+
+What the plan adds, in order: (0) the certification-task pilot as the first external answer key, if approved;
+(1) the second model as a standing control for check defects (cheap: the record exists);
+(2) C5 through the product's disable setting on two skills in phase 3; (3) step 10, customer failures into cases, as the source of new fixtures from phase 2
+on; (4) a human baseline on the first four HOOTL journeys: one SRE runs each journey by hand once and we record the
+time and the findings as the reference line on the certified claim. Principle: a certified line states the answer key
+it was graded against, and the answer key must come from somewhere a customer trusts more than us.
+
+## 7. Effectiveness: does it find real problems and get them fixed?
+
+Nothing in the plan so far measures effect; it measures correctness on planted defects. The proxies we have, and the
+measures we lack:
+
+| Measure                                      | Definition                                                                 | Today                                                                                                                                                                                                                                                       | Source                                                           |
+| -------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **Detection on planted defects** (recall)    | Share of planted defects the journey names in its ledger or report         | High on Claude for the big audits: fleet-audit's 13 clean cases 39/39; the whole record per case on the dashboard                                                                                                                                           | the nightly                                                      |
+| **False positives** (precision)              | Findings raised on a clean fleet or against a declared posture             | Partial: the declared-intent cases pass 9/9 on Claude for compliance and cost; no clean second fleet exists, so "silent on a clean fleet" is unmeasured for every scheduled audit                                                                           | cases; `DRAFTS.md:238-239`                                       |
+| **PR acceptance**                            | Agent pull requests merged / opened, per journey, on real installs         | On our own install's GitOps repository, last 30 days: **0 merged of 18 opened** (6 open, 12 closed unmerged); the owner merged 3 of his own 4. A test install, so nobody is expected to merge, but it is the only real-world number we hold, and it is zero | `toshiowang-labs/gke-infra`, `gh pr list`, 10-26                 |
+| **Findings acted on**                        | Findings accepted, snoozed or dismissed with a reason / findings surfaced  | Not computed; the findings queue holds the states                                                                                                                                                                                                           | `findings_queue.py` on each install                              |
+| **Time to first finding**                    | Minutes from install to the first ranked report and the first audit ledger | Measured per case in the eval (the first-run audits start at onboarding); not reported as a product number                                                                                                                                                  | `oobe-first-run-audits`; first-24-hour spec says T+1 h and T+6 h |
+| **Incidents found before a person**          | Stalls and warning events the agent reported before anyone noticed         | Not measured; no incident log on any install joins the agent's alert to a human's first action                                                                                                                                                              | needs a customer or a staged fleet                               |
+| **Versus doing nothing, or versus a person** | The no-skill arm; a human run of the same journey                          | Not measured (section 6)                                                                                                                                                                                                                                    | C5; a human baseline                                             |
+
+What this says: we can show that the agent finds what we plant and stays quiet on declared intent. We cannot yet show
+that anyone merges what it proposes, that it finds a problem before a person does, or that it saves time. The PR number
+on our own install is the uncomfortable one, and the cheapest to improve: a merge is the human's step, so the measure
+for the agent is the quality of the PR (does the diff fix the planted defect, does CI pass on it), and the measure for
+the product is how many a customer merges.
+
+Proposed effectiveness counters, in order of cost: (1) PR acceptance and PR quality per journey from the GitOps
+repositories we already read (one query); (2) findings acted on from the queue (one script, data exists); (3) silence on
+a clean fleet, which needs a second clean fleet in the pool; (4) time to first finding as a product number from the
+oobe record; (5) incidents found first, from a customer deployment with an incident log; (6) C5 and the human baseline.
+Principle: report what the customer does with the output, not only whether the output was right.
+
+## 8. Where the counters stand today (2026-10-26)
+
+| Counter                                                                                                     | Today                                                                                                                                                                                                                                    | Source                                                                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Capabilities and skills Rated on Claude Opus 5.5                                                            | 1 of 21 tagged skills: version-control, 42/42, 0.92, since 10-25                                                                                                                                                                         | scorecard 08:33 EDT 10-26 (local)                                                                                                                               |
+| Skills tracked with a tag                                                                                   | 21 skills on 60 cases (71 prototype tags; not on `main`)                                                                                                                                                                                 | `proto/skills-tags`                                                                                                                                             |
+| Eval cases on `main`                                                                                        | 230 cases, 129 of them declaring a planted fixture (`fixtures:` or a `prebuilt/` stack); 166 registered nightly, 159 after the inject-lane exclusions; 13 presubmit, 12 blocking                                                         | `bench/tasks`, `hack/eval/*.txt`                                                                                                                                |
+| Journey tests against a live install                                                                        | `bench/cuj`: 4 obtainability journeys, 1 responsiveness check, and since 09:47 EDT 10-26 ten Web Console harness journeys with an ephemeral-cluster mode ([#3914](https://github.com/gke-labs/kube-agents/pull/3914)); manual, not in CI | `bench/cuj/README.md`, #3914                                                                                                                                    |
+| HOOTL journeys: scheduled starts graded                                                                     | 5 audits, by one case (`oobe-first-run-audits` reads the cron run records of the five first-run audits: compliance, reliability, cost, stockout, upgrade retrospective)                                                                  | `bench/kube_agents_bench/oobe.py:51-115`                                                                                                                        |
+| HOOTL journeys: scheduled outcomes graded on a stock install                                                | 0                                                                                                                                                                                                                                        | no check reads a clock-started run's ledger or chat line; the nightly pauses the other clock-started audits for the lease (`hack/ci_pause_scheduled_audits.py`) |
+| HOOTL-capable journeys (trigger without a person, no human step before the outcome, an agent does the work) | 17: 10 scheduled audits, 3 watches that hand the work to an agent (stall watch, repo watcher, weekly readiness brief), 3 event-driven, 1 remediation cycle whose outcome is the open PR                                                  | `cron/jobs.json`: 11 of 22 jobs are `no_agent` scripts; a script with a unit test is a test, not a journey (AGENTS.md "Where tests go")                         |
+| of those, graded in part by bench cases on the eval fleet                                                   | 14                                                                                                                                                                                                                                       | inventory §4, recounted by the panel                                                                                                                            |
+| of those, with no registered case                                                                           | 2 audits with a case blocked on its fixture: networking ([#2755](https://github.com/gke-labs/kube-agents/issues/2755)), GCE ([#2483](https://github.com/gke-labs/kube-agents/issues/2483))                                               | inventory §8                                                                                                                                                    |
+| On-demand journeys (a person asks in chat)                                                                  | 18, all with cases; 1 needs a confirmation (`/feedback`)                                                                                                                                                                                 | inventory §4                                                                                                                                                    |
+| Promises in the docs with no journey test and no registered case                                            | 20 rows                                                                                                                                                                                                                                  | inventory §10                                                                                                                                                   |
+| Chat-evidenced journeys readable from CI                                                                    | 0: no CI install has a chat platform (`scripts/validate_bench_cases.py:194-206`)                                                                                                                                                         | the stall watch, the daily recap and every chat line need a chat install                                                                                        |
+
+## 9. Journeys: how many can run with no human, and which
+
+Method: every journey the product claims (README, the site, the SOPs, the cron roster, the project lead's first-24-hour spec)
+or tests (`bench/cuj`, bench cases) is one row in [`certified-journeys-inventory.md`](certified-journeys-inventory.md), with its trigger, its human
+steps, how it is graded today, its owner, and a readiness word. 47 rows.
+
+**How many can be HOOTL: 17.** They have a trigger that needs no person, no human step before the stated outcome, and an
+agent does the work. Eleven of the 22 scheduled jobs are scripts with no model call (findings nudge, sa-role watch,
+daily recap, feedback prompt, board health, workspace GC, chat-delivery watch, the readiness watch and review, and the
+reconcile); they are tested as code, not as journeys, except the three that hand their result to an agent.
+
+| Group                             | Count | Journeys                                                                                                                                                  | Graded today                                                                                                                                                                       |
+| --------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scheduled audits                  | 10    | compliance, reliability, upgrade and patch readiness, cost, consistency drift, AI security, stockout, networking fabric, GCE fleet, upgrade retrospective | 8 have bench cases that grade the SOP's checks on the eval fleet; networking and GCE have none registered                                                                          |
+| Watches that hand off to an agent | 3     | stall watch (a Cluster Agent card), repo watcher (an issue-resolver card), weekly readiness brief (a model turn)                                          | each has a case on a piece                                                                                                                                                         |
+| Event-driven                      | 3     | warning event to triage to `apply` to PR; GitOps drift alert and triage; autoscaler stockout investigator                                                 | 2 have cases; the stockout investigator is off by default with no case                                                                                                             |
+| Remediation cycle                 | 1     | audit opens the critical PRs unasked                                                                                                                      | the HOOTL outcome is the open PR whose diff fixes the planted defect; the close after a merge needs the human and is not counted. 3 ledger cases; no case grades an auto-opened PR |
+
+**How many are HOOTL today, by the definition in section 4: 0 outcomes graded; 5 starts graded.** The nightly pauses
+the clock-started audits for its lease, except the five first-run audits (compliance 06:20, reliability 06:50, cost
+Mondays 07:50, stockout 09:20, upgrade retrospective Sundays 18:00 UTC), which still fire on the clock; nothing reads
+their ledger as a scheduled outcome, and a mid-eval pull request from one of them is charged to unrelated cases
+([#3020](https://github.com/gke-labs/kube-agents/issues/3020), open, unassigned). The live journey suite is manual, and
+no CI install has a chat platform. The 17 run unattended on every customer install; nobody measures that they reach
+their outcome.
+
+**The other 22 journeys are on-demand** (18 chat journeys, 4 install and lifecycle steps). They are the "certified
+tasks" population together with the skills. 17 of the 18 chat journeys have cases; the exception needs a confirmation
+by design (`/feedback`).
+
+**Seven of the 25 need a human next**, by design, after the outcome: reply `apply`, decide a finding, merge a PR,
+run the upgrade. That is the product's authority model, not a gap: the HOOTL outcome is the report or the PR.
+
+**Which first, and how, reusing what exists.** `oobe-first-run-audits` already starts all five first-run audits the
+product's way three times a night and grades that they started. The outcome grade is five `ledger_issue_contains`
+checks added to that same case, with one new `lookup:` field on the verifier (audit label plus a since-time, 40 to 60
+lines), because today the verifier finds the ledger from the run's final message, which a scheduled run has no
+(`verifiers.py:4075-4090`). Zero extra audit runs, no new stack, no new case, no product change. Each outcome check
+carries its silence half: the planted defect is named and the declared posture is not. The upgrade retrospective's
+scheduled outcome on the seeded fleet is silence (`upgrade_retrospective_sop.md:73,230`), so its check asserts no
+report. A GitHub 429 on the lookup is infra, not a fail. The other five audits (AI security, drift, patch readiness,
+networking, GCE) stay paused during the nightly and refuse a trigger (`arm.py:102-107`), so they wait for the install in
+question 3. The stall watch and the event triage need a chat post, also question 3.
+
+## 10. How we add journeys and scale the loop
+
+Historical rate of new eval cases, by ISO week, first commit of each `task.yaml` on `main`: W38 8, W39 12, W40 15,
+W41 26, W42 33, W43 101, W44 (to 10-26) 1. Total 230. The run budget is the binding constraint, not authorship:
+
+- The nightly grades 3 runs per registered case. Its last normal night (10-23) finished 435 runs in 9.4 h; the three
+  nights since launched 151 cases, finished about 305 to 328 runs in the 12 h Prow deadline, and recorded 22, 1 and
+  26 cases, because the harness runs rep 1 of every case, then rep 2, then rep 3, and records a case only after rep 3.
+- So the roster is past the ceiling now: at the last two nights' pace about 95 to 110 cases fit in the 12 h deadline at
+  parallelism 6 (a 151-case round took 4.9 h, the second 6.4 h); 166 are registered, 159 after the inject-lane
+  exclusions. Every case added past that removes a case from the record unless the budget grows.
+
+Two rates, kept apart:
+
+- **Journeys promoted to HOOTL-graded.** Zero until the outcome verifier exists (section 13, phase 1). After that, the
+  five first-run audits first, started through the product's trigger path three times a night, so the usual 60-run
+  rule applies; a journey clears 24 of 24 in eight full-record nights only if it passes every run, and the five audits
+  pass far less than that today (the request-graded compliance audit passes 0.21 on Claude over 34 runs; fleet-audit's
+  window reads 15 of 23), so the first graded journeys are expected to read Not yet for weeks; then about one or two
+  new journeys a week, bounded by the nightly budget above and by the install in question 3 for the rest.
+- **New eval cases.** Bounded by the nightly's run budget, below.
+
+Levers, and who owns them: (1) **the record loss** comes from `finish_case` recording a case only after its third
+repetition (`hack/ci-eval-pr.sh:3948-3950`); the repetition-major order itself is deliberate, because same-case runs
+serialize on the task lock and parked two of four lanes for 12 minutes on 08-31 (`:3959-3963`), so "one sort key" is
+not the fix; per-repetition recording or the launch hold-back bnaylor proposed on
+[#3384](https://github.com/gke-labs/kube-agents/issues/3384) is, and [#3821](https://github.com/gke-labs/kube-agents/issues/3821)
+and [#3940](https://github.com/gke-labs/kube-agents/issues/3940) (lapis2002) track the cut-off nights: teammates own
+this; (2) **the second main job** is in flight, not an ask: the kube-agents half merged this morning
+([#3934](https://github.com/gke-labs/kube-agents/pull/3934)) and the Prow half is open
+(oss-test-infra#2741, 15 cases in `nightly-main-b.txt`); (3) presubmit cost control stays as is; (4) journeys graded
+by `bench/cuj` run on a chat-capable install on a schedule of their own, not inside the nightly. Honest arithmetic: (1)
+and (2) buy one-time headroom of about 40 to 70 cases (a second half at today's pace, less the cases that already fail
+to record), spent in one to three weeks at the W41 to W43 pace; after that, every new case needs a third job or a
+retired case. There is no standing "30 a week".
+
+## 11. The certification loop, and what "testing in the loop" means here
+
+Aligned with `docs/designs/testing-strategy.md` §9-4: every test answers one of three questions, authority (binary,
+blocks on any run), correctness (measured over repetitions), drift (a recorded baseline). The unit is the case: one
+question against a named fixture plus what the answer must contain; a journey is covered by one case or by twenty.
+The gate's verdict ladder already exists (forbidden action first, then missing checks, then an admitted case failing
+all three runs, then judged scores below baseline). Certification adds a window and a bar on top of that ladder.
+
+1. **A case or a journey test exists first.** Red on `main` for the right reason, green three times on the fix, then
+   registered (`eval_driven_development.md`). No fix without its case.
+2. **Nightly repetition builds the record.** 3 runs a night on the exact digest; the window is the newest 60.
+3. **Admission.** A case enters the blocking roster only after a measured clean streak under nightly load (a flaky test
+   is less useful than no test; #3583 precedent).
+4. **The rating is per model and per digest**, and restarts on any edit of the skill (D1); a persona or SOP edit outside
+   the skill directory restarts nothing today (a known gap).
+5. **Testing in the loop for behaviour fixes**: a red run must be seen on an install that serves the rated model. Today
+   none of the three dev installs can serve Claude (checked 10-26); that is the first blocker to lift.
+6. **The no-skill arm (C5)** decides whether a skill helps at all: the same cases with the skill disabled through the
+   product's own setting (step 11b), never by moving a directory (the gap plan, D3); one lease per skill version.
+7. **Publication**: a scorecard only after the pod reports the digests it loaded (step 11a) and one skill is Rated.
+
+## 12. What customers want
+
+From the one customer source we hold, the epic [#2597](https://github.com/gke-labs/kube-agents/issues/2597) (a
+retail platform team before peak: upgrade rollout stalls, IaC and Config Connector compatibility, silent controller
+deadlocks, SecOps guardrails, IaC-aware audits), the story's customer and security reviews
+(a local review file (not in the repository)), the narrative's reviewer questions (the narrative draft, "Questions a reviewer will ask") and the first-24-hour target spec:
+
+- **The journeys of #2597 first**: upgrade rollout that does not stall (the retrospective and the rollout gate), controller
+  deadlocks found without an error (the stall watch), IaC-aware audits that respect declared intent, guardrails a SecOps
+  team can read (the authority limit). The first HOOTL journeys should be drawn from this list, not from what is
+  easiest to grade.
+- **A line they can trust per journey and model**, with the bytes it covers and the date; and the answer to "which
+  journeys pass on the model my install runs", which today is Gemini Flash for a default install and shows as untested.
+- **Proof of authority**: no run modified a cluster, read a Secret or leaked a credential (C6, the safeguard sweep on
+  every declared case; the gate already blocks a forbidden action on any run).
+- **No tuning to the test**: a private private set and an editor that never sees planted names; the word
+  "certified" waits for these (D4).
+- **Quiet by default**: the first-24-hour spec caps the backlog at two critical items a day and three non-critical
+  after 16:00, and stops adding until the backlog clears. A HOOTL journey that spams is a journey nobody keeps on.
+- **A fix arrives as a pull request they merge**, never a direct change; so the HOOTL outcome is the PR, and the merge
+  stays theirs.
+- **A regression is reported before it ships** (a lapse, D5) and the owner is named (step 7).
+
+## 13. Roadmap
+
+Order: reuse the oracle that exists, cost every case against the nightly the plan itself calls full, and promise only
+what the record can carry. One rating rule throughout: D1 (24 of 24 while filling, 57 of 60 full, lapse below 0.70
+twice). Dates run from the cases' first nightly, not from a "first full-record night".
+
+| Phase                                                         | Dates (EDT)                                                                               | What ships                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Owner                                                | Counter after                                                                 |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 0. Fix the measurement, and the record's bookkeeping          | 10-26 to 11-02                                                                            | PR A as one case (`obtainability-design-quota-vs-capacity`, [#3128](https://github.com/gke-labs/kube-agents/issues/3128)) plus a question to bradhoekstra on [#2344](https://github.com/gke-labs/kube-agents/issues/2344) for the observability case his issue plans to rewrite; nine owner reports; Claude enabled on one dev project (a console step for the project owner); PR 1a, the `skills:` key, with the case digest defined as the digest of the declared checks and prompt, not the whole file, so the key's own landing restarts no window. The record itself: oss-test-infra#2741 and [#3384](https://github.com/gke-labs/kube-agents/issues/3384) are the eval crew's. The counters get an owner and a home now: `docs/designs/journeys.yaml` (one line per journey, the entity the rating is keyed on), `ratings.py` in ci-health over data.json's store block, a generated region in the eval dashboard; the record key is (skill digest, SOP digest, model, mode, case digest); the lapse path files an issue when a journey or skill sits below 0.70 on two checks (`nightly_bugs.py` files only three-night 0/3 reds today) | the author; eval crew                                | Rated (skills) 1; HOOTL-graded 0                                              |
+| 1. Grade the five first-run audits' outcomes, zero extra runs | case edit this week; red on `main`, three greens, registration; first nightly about 11-09 | the `lookup:` field on `ledger_issue_contains` (40-60 lines) and five outcome checks, each with its silence half, added to `oobe-first-run-audits`; infra-vs-fail for the lookup (a GitHub 429 is infra); the retrospective's outcome asserted as silence; the write-attribution gap ([#3020](https://github.com/gke-labs/kube-agents/issues/3020)) is not multiplied because no audit run is added, and [#2704](https://github.com/gke-labs/kube-agents/pull/2704) (named writes only) is watched                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | the fleet-audits domain; the case owner by report    | HOOTL-graded 5 from 11-09; Rated 0 (the audits pass well under the bar today) |
+| 2. Chat evidence, the paused five, and journey ratings        | 11-09 to 11-30                                                                            | question 3 decides the install with a chat app where the clock is not paused; on it, the stall watch and event triage outcome checks (chat post plus PR diff) and the five paused audits' outcome checks; the rating per journey and per skill from `journeys.yaml` and the store, with tokens (now recorded) and latency columns; the ledger header line "written by run <id>, started by <scheduler, onboarding, request> at <time>" in `audit_report.py` as the one thing a customer can read on their own ledger                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | the author; eval crew for the install                | HOOTL-graded 5 to 12 depending on question 3; Rated 0 to 2                    |
+| 3. Behaviour fixes, value, and the pod's own report           | 11-16 to 12-14                                                                            | the gh-miss and dismissal persona fixes on the Claude-served install; D2 after [#3191](https://github.com/gke-labs/kube-agents/pull/3191); step 11b (the disable setting) and then C5 on version-control and fleet-audit; step 11a (the pod reports loaded digests); internal scorecard page                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | skill owners; the author; operator owner for 11a/11b | Rated (skills) 2 to 4; HOOTL-graded 5 to 12, Rated 0 to 2                     |
+| 4. The word "certified"                                       | after 12-14                                                                               | the private set (H, sized in numbers against the nightly budget), the named reviewer, the C6 sweep; the first certified journey line                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | eval crew                                            | first public line                                                             |
+
+Why "Rated 0 to 2" and not more: the request-graded compliance audit passes 0.21 on Claude (`compliance-rbac-overgrant`,
+34 runs) and the fleet-audit skill's window reads 15 of 23, so the first graded journeys read Not yet for weeks; and
+the text they are rated on changes almost daily (skills changed on 23 of the last 30 days, fleet-audit on 22, the five
+SOPs on 10 to 12 each), so a 60-run window on a fixed digest cannot fill. Either the five SOPs and fleet-audit get a
+freeze for the window, or the key tolerates a digest change when the declared cases are unchanged (question 5). The
+probability that a true 0.93 journey clears 57 of 60 is 0.39.
+
+Today versus 12-14, the one table: Rated (skills) 1 to 2-4; HOOTL-graded 0 to 5-12; HOOTL Rated 0 to 0-2; certified 0 to
+0 (the private set is not built in this window). Worker time: phase 0 about one worker-week (the `journeys.yaml`,
+`ratings.py` and the generated region are the bulk, 700 to 800 lines by the panel's estimate); phase 1 days, not weeks;
+phase 2 about two worker-weeks plus the eval crew's install; phase 3 the skill owners' loops at about 1.5 h of install
+time each, plus 11a and 11b for the operator owner.
+
+## 14. Open decisions, under [#3978](https://github.com/gke-labs/kube-agents/issues/3978)
+
+1. **Which claim may use the word "certified"?** a) Eval-tested, plus a private set we did not write, plus no forbidden
+   action in any run, plus the model named, plus a named reviewer outside the authoring team who re-derives the number.
+   Cost: the definition is free today; the private line is one pool project and a case set sized when the first journey
+   reaches step 2 (the panel's estimate: it roughly doubles the nightly's runs). First line after 12-14. b) Do less: the
+   same without the private set; cost zero; a reviewer can say we tuned the skill to our own tests. c) Do nothing: keep
+   "eval-tested" (decided 10-19) and return when one journey reaches step 2; none has today. Rec: a as the definition
+   now, and decide the private-set build only when the first journey reaches step 2, with the cost in numbers. Principle: a
+   stranger must be able to check the claim from the record; data before options.
+2. **How do we count a HOOTL journey?** a) One observation a night from the real clock, verified after 20 clean nights;
+   needs an install where nothing pauses the clock. b) Do less: a case marks the audit due with the product's own trigger
+   (the path the first-run stage uses) and grades the ledger; three runs a night; the usual 60-run window; one "last
+   scheduled run at <time>" liveness line checks the clock. First work: one verifier and five cases, about two
+   worker-weeks. c) Do nothing: keep counting starts, as today's one case does. Rec: b. Principle: measure the product
+   path at the rate the record can carry; the clock is a scheduler detail that changes with the move off Hermes.
+3. **How do we read chat evidence in CI, and grade the five audits the nightly pauses?** The code answers the cheap
+   option: the gateway's stored-post table fills only when a chat platform delivers (`audit_chat_report.py` docstring;
+   `validate_bench_cases.py:190-200` keeps the two chat-report cases out of CI for that reason). a) A fourth install with
+   a chat app and the clock unpaused: one pool project, one Slack or Google Chat app with an owner and a secret on a CI
+   install (a threat line to write), about two worker-weeks, first line about 11-30. b) Do less: only the five first-run
+   audits are HOOTL-graded, in the nightly; chat and the paused five stay "not measured" and hand-run on a chat install.
+   c) Do nothing. Rec: b now, a as a phase 2 decision with its cost in a pool project and an owner. Principle: name the
+   install that can read the evidence before promising the count.
+4. **What does the line say for the model a default install runs?** Today the nightly rates `claude-opus-5-5` and the
+   installer default is Gemini Flash, so a default install's line reads "untested" (gap plan D6). a) Rate the installer
+   default too: a second nightly lane on Gemini Flash, cost one more job's budget. b) Do less: show "untested" with the
+   reason, and make the install's model choice carry its rating line. c) Change the installer default to the rated
+   model; cost and billing move to the customer. Rec: b now, a when the nightly budget allows. Principle: no hidden
+   result; the customer sees the line for the model they run.
+5. **The window key when the text changes almost daily.** Skills changed on 23 of the last 30 days and fleet-audit on
+   22, so a 60-run window keyed on the exact digest never fills for the audits. a) Freeze the five SOPs and fleet-audit
+   for the window (about three weeks of no merges to those files). b) Key the window on the text and scripts the agent
+   reads and runs, normalised (the 10-22 window-rule note, option c), so a test or comment edit does not restart it; a behaviour edit
+   still does. c) Tolerate a digest change when the declared cases are unchanged (the panel's suggestion); cheaper, and a
+   loosened SOP then keeps a stale line until a case fails. d) Keep D1 as is and accept that fleet-audit never rates.
+   Rec: b, with the normaliser as the one piece of code; a freeze is a policy nobody keeps. Principle: key the rating on
+   what the agent can see or run, nothing more and nothing less.
+
+PR A after the panel: one case, not two. `observability-trace-latency-brokered` is the case [#2344](https://github.com/gke-labs/kube-agents/issues/2344)
+(bradhoekstra) plans to rewrite, and the `after_result_pattern` lines die when the harness default lands, which restarts
+the window once more; the right move there is a question to him on #2344, not an edit.
+
+Folded or dropped after review: "make the record whole" is in flight and owned by the eval crew; "the first four journeys" is question 2's first
+work item; "the five unverified journeys" are scripts with unit tests, tested as code, and their chat delivery is
+question 3; "keep eval-tested" is the status quo inside question 1.
+
+## 15. The questions senior management will ask, with today's honest answers
+
+| Question                                                                                               | Honest answer today                                                                                                                                                                                                                                                                   | What changes it                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. After a month of this, what does a customer get that they did not have?**                         | One line they can check: "version-control on Claude: 42 of 42 since 10-25". No journey line yet. The audits already run on every install; nobody measures that they reach their outcome.                                                                                              | Phase 1: five audit outcomes graded nightly. Phase 3: the first verified journey.                                                      |
+| **2. Is the skill library worth anything on a frontier model?**                                        | Not shown. On Claude, pass rates with the skill open and closed are the same on every comparable case; 80 of 179 version-control uses ran the script without reading the text. The rules and scripts carry the value; the how-to prose does not.                                      | The no-skill arm (C5) on two skills; cut each skill to rules and scripts if it confirms.                                               |
+| **3. Why should anyone trust a test you wrote and grade yourself?**                                    | They should not, fully. We plant the defects, write the checks, and run the nightly. The checks were validated on one model and eight broke on another.                                                                                                                               | A private set the authors never see and a named reviewer outside the team: step 3 of the ladder. Until then the word is "eval-tested". |
+| **4. You run 166 cases a night and the job dies at the deadline. Is the measurement itself reliable?** | No, not this week: three nights recorded 22, 0 and 26 cases. The fix is in flight (the split job, the recording order), owned by the eval crew.                                                                                                                                       | The first night that records every case sets every date in this plan.                                                                  |
+| **5. What does it cost per night, per journey, per customer?**                                         | We record tokens and latency per run; nobody converts them to money, and the price depends on the customer's model. A typical run: minutes and tens of thousands of tokens; the nightly: about 300 to 435 runs.                                                                       | Two scorecard columns and a per-model price note; never a certified dollar figure.                                                     |
+| **6. Which model are you certifying for, and is it the one you ship?**                                 | We rate Claude Opus 5.5 in the nightly; the installer default is Gemini Flash; a default install shows "untested". Our own dev installs cannot serve Claude.                                                                                                                          | Question 4: rate the installer default, or make the line follow the install's model choice. Enable Claude on one dev project.          |
+| **7. How many of your 47 journeys actually work unattended?**                                          | Unknown as an outcome. 17 are built to run with no human; 5 have their start graded; 0 have their outcome graded; 20 documented promises have no test at all.                                                                                                                         | Phase 1 and 2 counts, and trimming or testing the 20 promises.                                                                         |
+| **8. What stops the agent from doing damage at 3 a.m.?**                                               | IAM and the credential proxy, not the prompt: a read-only identity, no merge, every change as a PR; a forbidden action fails any run. The audit-log sweep that proves it across every run (C6) is planned, not built.                                                                 | Step 8: C6 on every declared case.                                                                                                     |
+| **9. How is this different from the vendor's own benchmark page?**                                     | A vendor scores a model on public tasks. We score a journey on your fleet's kind of defects, on the exact text that shipped, every night, and the line lapses when the model or text changes. That is the claim only an operator product can make, and it is the one we have to earn. | Phase 3's internal scorecard with lapses; later the public line.                                                                       |
+| **10. Why did it take a model change to find eight broken checks?**                                    | Because the checks were written against one model's habits and nothing re-validated them. A second model as a standing control was not a rule.                                                                                                                                        | Make the second-model control a rule of admission; report "Gemini on the same case" beside every red.                                  |
+| **11. What is the headcount and the calendar?**                                                        | About two worker-weeks for phase 1, two for phase 2, the skill owners' time for phase 3, plus the eval crew's record fix and one pool project for the private set. First verified journey about 12-07; first certified line after 12-14 and only if the private set is funded.        | the project lead's answers to questions 1 to 4.                                                                                        |
+| **12. What if the customer's incident is not one you planted?**                                        | Then we would not know. The fixtures come from us; one customer epic (#2597) is the only outside source so far.                                                                                                                                                                       | Step 10: customer failures triaged into cases; #2597's journeys first.                                                                 |
+| **13. Does it do the same thing every night, or just get the right answer?**                           | Unknown. The route of every run is recorded, and the named script and forbidden commands are checked, but nothing compares one night's route with the next.                                                                                                                           | Section 5.1: tool-set overlap, step spread, loops and cost spread per window, published on the line.                                   |
+| **14. Does any of this survive the move off Hermes?**                                                  | The definitions, the cases, the ledger checks and the ratings do. The scheduler clock, the pause script and the persona text are Hermes-side and are kept to the minimum.                                                                                                             | The trigger-path method in question 2 is chosen for this reason.                                                                       |
+
+## Appendix A. Sources and numbers
+
+- Journey inventory with file:line evidence: [`certified-journeys-inventory.md`](certified-journeys-inventory.md) (47 rows; counts; registered cases per
+  domain; promises with no coverage; notes on stale files).
+- Scorecard and dashboard: the local scorecard files (not in the repository), the local dashboard (not in the repository).
+- Case rate per week: first commit of each `bench/tasks/<id>/task.yaml` on `upstream/main` 791b1c102, 10-26.
+- Nightly throughput: build logs of 2113420200605913088 (10-23), 2113782591592075264, 2114144982938947584,
+  2114507375510556672 (the downloaded nightly logs (not in the repository)).
+- Rules: `docs/designs/testing-strategy.md` §9-4; `.agents/rules/eval_driven_development.md`; gap plan D1-D6, H.
+
+## Appendix B. Review records
+
+### B.1 Red-team (blind review of draft 1; 10 findings, 8 changed the plan)
+
+| Finding                                                                                                                                                                | Changed                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| The nightly pauses the clock-started audits for its lease (`hack/ci_pause_scheduled_audits.py`); phase 1 as written could not read a scheduled run on the eval install | Phase 1 rewritten around the four audits the pause leaves on the clock; phase 2 adds an install where the clock runs |
+| No CI install has a chat platform; chat-line evidence is unreadable from CI                                                                                            | Chat-evidenced journeys moved to phase 2 behind decision 5                                                           |
+| The `executions.db` pattern is Hermes-internal and proves a start, not an outcome; it contradicts section 4                                                            | Section 4 now requires evidence the product exports; the ledger header line is the mechanism                         |
+| About 95 to 110 cases fit a night, not 145; the second main job already exists as `main-b` and is a Prow change                                                        | Section 10 corrected; decision 3 added                                                                               |
+| "30 cases a week" is one-time headroom; "3 journeys a week" was an assumption                                                                                          | Section 10 rewritten with honest arithmetic                                                                          |
+| REM-01's close needs the human merge; "PR open" is an outcome only if the check reads the diff                                                                         | Definition and §9 row corrected                                                                                      |
+| Three of the 25 are `no_agent` plumbing scripts; networking and GCE have cases blocked on issues                                                                       | Count is 22; the "no verification" list is 5 with issue links                                                        |
+| 24-of-24 passes a true 0.95 skill 29% of the time; "8 to 10 Rated by 12-14" not credible                                                                               | Targets cut; the 20-night window stated                                                                              |
+| A cut-off night can leave the eval install's audits paused into the next day                                                                                           | Added to phase 1 as a fix in the resume path                                                                         |
+| Mid-eval audit writes get charged to unrelated cases (#2611, #3020)                                                                                                    | The dedicated install in phase 2 has no GitHub-writing cases beside the audits                                       |
+
+Not changed: the two-metric split; the ladder in section 3; the first-rating facts.
+
+### B.2 Chief-of-staff check of draft 3 (10 facts corrected)
+
+[#3978](https://github.com/gke-labs/kube-agents/issues/3978) is the tracking issue for this work (cited); the nightly split
+is in flight ([#3934](https://github.com/gke-labs/kube-agents/pull/3934) merged, oss-test-infra#2741 open, 15 cases);
+the repetition-major order is deliberate and the loss is in `finish_case`; `ledger_issue_contains` needs the run's final
+message, so a new lookup is needed; no "started by" signal exists and none is needed under the trigger path; 11 of 22
+jobs are `no_agent`, so 17 journeys, not 22; five first-run audits, not four; the private-set cost is now stated as a
+sized decision; the customer source is #2597; one scope sentence; the D6 question added.
+
+### B.3 Expert panel on draft 3 (five reviewers; unanimous concerns, nothing blocking; full table in Appendix C)
+
+| Recurring item                                                                                                                          | Changed in draft 4                                                                                                                                                                                                     |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase 1 built what exists; `oobe-first-run-audits` already starts the five audits three times a night; a `lookup:` field is 40-60 lines | Phase 1 is five checks on that case plus the field; zero extra audit runs; "two worker-weeks" became days                                                                                                              |
+| Dates from a "first full-record night" and two rating rules; "verified 3-5 by 12-14" had no basis                                       | Dates from the case's first nightly (about 11-09); one rule, D1; target "HOOTL-graded 5, Rated 0-2" with the reasons (pass 0.21; text changes 22 of 30 days)                                                           |
+| C5 by the optimizer's directory move contradicts the decided gap plan                                                                   | C5 through the 11b product setting everywhere                                                                                                                                                                          |
+| No record key, lapse path, infra-vs-fail, owner or home for the counters                                                                | All four in phase 0 and 1: key (skill, SOP, model, mode, case digests), lapse issue below 0.70 twice, a 429 is infra, `journeys.yaml` + `ratings.py` + a generated region                                              |
+| §2 unsourced and over-stated; nothing a customer can check on their own install                                                         | Every claim sourced or cut; the ledger header line returns in phase 2; "nothing before 11a" said plainly                                                                                                               |
+| Counts and words                                                                                                                        | 14 graded in part; 159 a night; headroom 40-70; ten audits; five first-run audits; 129 planted; #3914's ten harness journeys; "private set", "HOOTL-graded", "capability (a bench case)" for the project lead's "task" |
+| PR A edits a case #2344 plans to rewrite                                                                                                | PR A is one case plus a question on #2344                                                                                                                                                                              |
+| Authority stated as observation only                                                                                                    | Enforced and observed, both on the line                                                                                                                                                                                |
+| Question 3b already answered by the code (the stored-post table needs a platform)                                                       | Question 3 rewritten; option b is "the five audits only"                                                                                                                                                               |
+| The window cannot fill while the text changes daily                                                                                     | Question 5 added with four options                                                                                                                                                                                     |
+
+## Appendix C. Expert panel table
+
+Five reviewers on draft 3; code on `upstream/main` 232703e92; line numbers refer to the 376-line draft 3 (+18 to +45 after line 157 in later edits).
+
+| Member          | Verdict  | Blocking | Main concerns (plan line → evidence)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------- | -------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Eval/bench      | concerns | none     | Phase 1 builds what exists: `bench/tf/prebuilt/audit-chat-report/arm.py:21,50,100-118` already fires any job with `trigger_job` and waits; `audit_report_stored` reads the report by `started_at`; `ledger_issue_contains` binds label and stamp; a label-lookup fallback is about 30 lines, not 150, and "two worker-weeks" (l.304) is days. Phase 1 cost and lane missing: each case fires a real audit and `finish` opens PRs on the seeded fleet (#3020 shape); the cases must declare `audit_streams:` or run in the writers lane; about 2-2.5 h a night serialized on stream locks beside `oobe-first-run-audits`' 95 min. Date vs rule conflict (l.298): cases cannot exist on the "first full-record night"; red + 3 greens + registration puts the first nightly at about 11-09; §4 (l.101-103) adopts D1's "24 of 24 while filling" while §13 says 60 runs (Wilson: 22/22 is the smallest all-pass n at 0.85; 57/60 = 0.863). "HOOTL verified 3-5 by 12-14" (l.300, 303) has no basis: request-graded audits on Claude pass 0.21 (`compliance-rbac-overgrant`, 34 runs), fleet-audit skill 15/23; P(≥57/60 at true 0.93) = 0.39; cut to "graded 5; Rated 0-2". Upgrade retrospective's scheduled outcome on the seeded fleet is silence (`upgrade_retrospective_sop.md:73,230`). The trigger path stops at the five first-run audits (`ci_pause_scheduled_audits.py:21-33`; `arm.py:102-107` refuses a paused job). Tokens never reach the record (`gate.py:515-522`, SCHEMA.md). Counts: l.165 "17 graded in part" is 14; l.161 omits the 10 Web Console CUJ journeys (blocked on #2321); headroom 40-70 cases, not 100-145; l.26 "166" should be 159. Question 3b already answered by code (`audit_chat_report.py` docstring; `validate_bench_cases.py:190-200`).                                                                                                                                                                            |
+| Customer        | concerns | none     | §2 story unsourced and over-states 4 of 5 claims (l.20 "nine audits" vs 10; l.26-27 "166 every night" is the roster, last nights recorded 22/1/26; l.28 example uses version-control's numbers, no journey has a line; l.28-29 "lapses" vs "new window"; l.33-34 "nothing else leaves" vs `security-and-iam.md:193-202`, corrected 10-22). The PR outcome is never observed in the customer's configuration: the sweep is off on every eval install (`hack/ci-deploy.sh:690-695`; #3439), so l.187 "no case grades an auto-opened PR" stays true through phase 4 by construction. No window key for a journey (l.95, 101-102, 257-258) while fleet-audit changes 22-23 days in 30; keyed on digests the window never fills, keyed on nothing a loosened SOP keeps a stale line. Phase 1 grades "found the planted defect" with no silence assertion (`testing-strategy.md:82-84`; ten no-finding cases exist). The customer-visible deliverable (ledger header line) was dropped in draft 3 (l.204-208, 346); nothing reaches a customer install before 11a in phase 3. §12 names #2597's journeys first, §13 picks the five audits without saying why. Authority clause (l.55, 135) states observation where the customer needs enforcement (override Security for that clause). C5 via "the optimizer's hide mechanism" (l.138, 261-262) reverts the gap plan:166-172's 11b decision.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| SRE/Day-2       | concerns | none     | The 60-run window cannot fill on the text rated: skills changed on 23 of 30 days (125 commits), governance on 19; `fleet-audit` 22 change-days; the five SOPs 10-12 each; the 12-14 targets need a freeze or a key that tolerates a digest change when declared cases are unchanged (l.50, 101-105, 257-258, 298, 303). §10 overstates headroom (40-70 cases, not 100-145; the 720-min deadline, not 480); phase 1 adds 15 real audit runs a night with no half, no `unit_cost_hint`, no retirement named; `oobe-first-run-audits` already starts all five audits x3, so phase 1 doubles them (fold the five ledger checks into that chain instead). The record key is decided in phase 3 after phase 2 rates on it (`baselines.py:356-377` has no skill or SOP digest; a switch to pod-reported digests restarts every window). No lapse path: `nightly_bugs.py` files only 0/3 three-night reds; a journey at 1/3 for ten nights lapses silently. Infra-vs-fail unstated: a ledger lookup failing on a GitHub 429 as FAILED lapses five journeys in one night (`KUBE_AGENTS_INFRA_FAILURE`). Stale: REM-01 unobservable while #3439 holds (l.187, 193); red-team row 10's "dedicated install" is not in §13. Counters have no owner or home; the rating runs on a laptop at 08:35 until phase 2.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Maintainability | concerns | none     | C5 contradicts the decided gap plan and the no-eval-only rule (l.138, 261-262, 300 vs the gap plan:166-170, 211: control arm only through the 11b product setting). Two rating rules over one record (bench-gate's 20 runs / 0.90 on the version key, `baselines.py:160,165`, vs D1's newest-60 / 0.85 / 0.70 in ci-health) with no file on `main` carrying D1, "Rated", "Eval-tested" or the ladder (zero hits; 12 local docs disagree). Phase 1 not costed against the plan's own ceiling rule (l.219-221): 3.75-5.4 h chain time a night; three hand-kept runner name lists per stack case (`ci-eval-pr.sh:2481, 2492, 2988`). New verifier duplicates bindings that exist; a new type bypasses the stream lock (`ci-eval-pr.sh:1342-1364` greps the literal type); a `lookup:` field on `ledger_issue_contains` is 40-60 lines. "No new measurement in the harness" wrong for tokens. "Per journey" has no data entity (`domains.yaml` has one `journey:` line per domain; the 47-row inventory is a local file; a `journey:` key in task.yaml edits teammates' cases). Liveness line has no reader. Hostages: PR A's `after_result_pattern` lines die with #2344/#3348 and their removal restarts three windows; phase 1 stacks write Hermes' cron store (#3655); D1 revisit options not in §14. Two roadmaps carry the same milestone with different mechanisms (roadmap-10-26.md §8 vs §13). Prose: labels before definition (C6, C5, D1, H, PR A/1a, REM-01, ci-health); "HOOTL-graded" undefined and "verified" was ruled out (D1-D6:27); the rating and lapse rules appear four times each; records disagree with the body (l.356 vs 346; l.360 "22" vs 164 "17"). Simpler design: one `lookup:` field, one parameterized stack, `docs/designs/journeys.yaml`, one `ratings.py` over data.json's store block, one generated region: 700-800 lines, no dashboard page, no schema bump, no install, vs 1,600+ lines, five stacks and an install. |
+| Compatibility   | concerns | none     | PR A edits a case #2344 (bradhoekstra, open) plans to rewrite (`observability-trace-latency-brokered`; `after_result_pattern` on the display path #2344 deletes); both PR A cases are teammates' under the ownership rule; make PR A one case plus a question on #2344. Phase 1 multiplies the #3020 failure mode by five until #2704 (jayantid, open) lands (named writes only); each audit case needs a 600-1300 s `unit_cost_hint` (`test_ci_eval_nightly.py:431-450`); about 3.75 h a night on main-a. PR 1a's `skills:` key on about 60 teammates' cases may restart every window if the case digest is of the whole file (digest definition not on main). "private-set" already means a presubmit seat with no roster line (`eval-gate-roster.md`, 20 uses; bench-case-format.md:436, 498); "task" is a bench case; use "private set", "journey or skill", "HOOTL-graded". §8 "bench/cuj" row stale (#3914 merged 09:47 EDT added ten harness journeys with an ephemeral-cluster mode; lever (4) duplicates it). Phase 1 contract list incomplete (`bench/pyproject.toml:54`, `validate_bench_cases.py:593`, bench-case-format.md:96, CUSTOM-TASKS.md, `testing-strategy.md:125` "no case grades the scheduled path" becomes false). Phase 2 rating needs a key the store does not hold (`evidence_store.py:159` keys on `setup_id`); additive data.json field is compatible; four jayantid PRs on the same files. Dates: phase 1 waits on oss-test-infra#2741 (hold, hers to lift), the cut-off fix (#3384/#3821/#3940/#3936), #2704; 3a needs the eval crew; D2 needs #3191.                                                                                                                                                                                                                                                                                                                                                                     |
+
+Security skip: confirmed for phases 0-2b (the by-label lookup reuses the runner's `issues: read` token; the rating runs in ci-health under the existing identity; `trigger_job` is the product's own path). Overridden for: the certified line's authority clause (state "enforced: RBAC read-only, IAM read-only, proxy refuses GitHub write verbs" beside "observed: 0 forbidden actions in N runs"); question 3a's fourth install (a chat-app secret on a CI install, no threat line); question 4a's Gemini lane and phase 4's private set (new identity, bucket, repository); the #3020/#2704 write-attribution gap phase 1 multiplies.
+Performance skip: overridden for phase 1 (all five members): 15 real audit runs a night serialized on stream locks, 2-5.4 h; the plan's own §10 says the nightly is past the ceiling; no half, hint or retirement named; `oobe-first-run-audits` already runs the same five audits.
+
+Verdict: unanimous concerns, nothing blocking, none approve as written. Five items recur across four or five members and go to the worker before the project lead reads it: (1) phase 1 reuses what exists (`audit-chat-report` stack, a `lookup:` field on `ledger_issue_contains`, or the five checks folded into `oobe-first-run-audits`' chain) and is costed and placed (lane, `audit_streams:`, `unit_cost_hint`, after #2704); (2) the dated targets are rewritten from the cases' first nightly under one rating rule (D1's 24-of-24 while filling), "verified 3-5 by 12-14" cut to "graded 5, Rated 0-2", and a freeze or a tolerant key named for the five SOPs and fleet-audit; (3) C5 through the 11b product setting, not the optimizer's hide; (4) the record key (skill digest, SOP digest, model, mode, case digest), the lapse rule, infra-vs-fail, and an owner and home per counter move to phase 0-1; (5) §2 is sourced or cut, and the customer keeps one thing to check on their own install (the ledger header line or an honest "nothing before 11a"). Counts to fix: 17 graded-in-part → 14; "166 every night" → 159; headroom 100-145 → 40-70; "Seven of the 25"; "nine audits" → 10; "first four" → five; bench/cuj row + 10 harness journeys; "134 on a planted fixture" → 129 with method. Terminology: "private set", "HOOTL-graded", "journey or skill". PR A: one case plus a question to bradhoekstra on #2344.
+
+Rec: draft 4 with the five items above, then the project lead. Principle: reuse the oracle that exists, cost every case against the nightly the plan itself calls full, and promise only what the record can carry.
