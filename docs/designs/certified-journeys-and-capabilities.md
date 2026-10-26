@@ -76,6 +76,36 @@ pod reports the digests it loaded (phase 3). The roadmap in section 13 grades th
 outcomes from their first nightly, about 11-09, and uses the word "certified" only when a reviewer outside the team
 can check the claim from the record.
 
+### 2.1 Healthy habits, not the emergency room
+
+A model you ask when something is broken is the emergency room: good at the visit, silent until the ambulance. Your own
+chat session, and an agent you built to answer questions, both work this way; they start when a person notices a
+symptom, which is after the outage has begun. kube-agents is meant to be the healthy habit: the checks and the hygiene
+that keep the fleet out of the emergency room, run on a schedule while nothing is wrong, so the budget that would block
+a drain, the pool pinned to one zone, the binding that grants too much and the control plane one minor behind are named
+before the upgrade, the stockout or the audit that would have found them.
+
+What makes it a habit rather than a slogan, in the product today:
+
+| Habit                              | What runs, and when                                                                                                                                                                                                               | Where it comes from                               |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| The scheduled check-ups            | Ten audits on a cron: compliance and reliability daily, cost, drift and patch readiness weekly, AI security, stockout, networking and GCE daily, the upgrade retrospective on Sundays; the first five also run once at onboarding | `agents/platform/cron/jobs.json`                  |
+| The pre-flight before a change     | Upgrade readiness graded per cluster before anyone schedules the upgrade: drain-blocking budgets, fail-closed webhooks, exclusions, version skew, 24 rule modules, 33 known GKE issues, 52 removed APIs                           | the fleet-upgrade-verification skill              |
+| The written standard of care       | 15 governance SOPs, 10 of them with 117 numbered checks, each with a flag rule, a do-not-flag rule, a severity and a remediation; 26 of the 31 mirrored Google skills patched for production use                                  | `agents/platform/governance/`, the skill overlays |
+| Respect for a declared choice      | A posture the repository declares on purpose is listed as declared intent, not raised as a finding, so the habit does not nag                                                                                                     | the declared-intent rules in every audit SOP      |
+| A paced regimen, not alarm fatigue | At most two critical items a day and three non-critical after 16:00, and no new items while one waits for a decision                                                                                                              | the findings nudge                                |
+
+Two honest limits. The standard of care is the maintainers' practice, not a published standard; no check cites a Google
+document yet, and section 6 says how an outside syllabus could change that. And the habit is only worth what the record
+shows: a scheduled check that nobody measures is a promise, which is why section 9 counts outcomes graded, not jobs
+scheduled.
+
+The analogy is still open. "Healthy eating" is the plainer phrase. The aviation frame maps every part (pre-flight
+checklist, maintenance interval, airworthiness directives for the known issues, an approved work order for every change)
+and gives the word "certified" its exact meaning: an inspector outside the crew signs against a standard. Whichever is
+chosen, the sentence a customer should remember is the same: the agent is there to keep you out of the emergency room,
+and it keeps a record that shows whether it did.
+
 ## 3. What "certified" means (proposal, not decided)
 
 The word is a ladder of claims. Each step adds one piece of evidence a customer can check without trusting us. A
