@@ -36,6 +36,18 @@ text changes almost daily.
 
 ## 2. The story: why a customer runs kube-agents instead of their own agent or a generic LLM
 
+**The story in one sentence.** kube-agents turns a frontier model into an operator you can leave alone on your fleet:
+it can only propose, it works before the incident, it does the same thing every night, and it shows you the record.
+Each clause is a measure. "Can only propose" is the authority limit, zero forbidden actions in the window. "Before the
+incident" is the habit, journeys graded as scheduled outcomes. "The same thing every night" is the variance we remove:
+the same fleet, text and model give the same outcome at the stated rate and a route inside a known envelope. "Shows you
+the record" is the line per journey and model, with its lapse. Reducing variance is the engineering half of this; the
+value half is that the fleet stays out of the emergency room and the fixes arrive as pull requests someone merges.
+Neither half is the product without the other: a perfectly repeatable agent that prevents nothing is a metronome, and
+a brilliant agent that behaves differently each night cannot be left alone. And not all variance is the enemy: two
+valid routes to the same ledger are fine; the variance to remove is in the outcome and the authority, and in a route
+that drifts without anyone noticing.
+
 A generic LLM is a chat window: it answers when someone types, with whatever access that person pastes in, and
 nobody measures it on your fleet. An agent you build yourself can be made to run on a schedule, but you then own the
 identity, the audit trail, the test fleet and the nightly record, and most teams never get past the first two.
