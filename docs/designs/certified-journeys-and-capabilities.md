@@ -43,22 +43,23 @@ pull requests accepted.
 
 ### 1.2 The steps, in order
 
-| #   | Step                                                                                                                                                    | Done when                                                                              | Depends on                | Owner                      |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------- | -------------------------- |
-| 0   | The decisions: the word and its definition, the unattended-journey unit, the window key, the default install's model line, Claude on one dev project    | Each is answered in [#3978](https://github.com/gke-labs/kube-agents/issues/3978)       | nothing                   | project lead               |
-| 1   | A whole nightly record: the second half scheduled, cases recorded per repetition, the slow tail found                                                   | Three nights in a row record every registered case                                     | in flight                 | eval crew                  |
-| 2   | Measurement on `main`: the `skills:` key, the journey entity, the tier label, tokens in the record, the rating calculation in CI, a generated scorecard | CI produces the scorecard each morning without a laptop                                | 0                         | the author                 |
-| 3   | Scheduled outcomes graded: the lookup field and five outcome checks on the existing first-run case                                                      | Five audits report an outcome every night                                              | 1, 2                      | the author                 |
-| 4   | The twelve measurement defects: one case fix of ours, nine reports to owners                                                                            | Each low case has an owner's answer; the two display-line cases read the typed command | 0                         | the author, owners         |
-| 5   | An install where the clock runs and chat is read                                                                                                        | The stall watch and the event triage report outcomes nightly                           | 0 (question 3), eval crew | eval crew, the author      |
-| 6   | The two behaviour fixes on a Claude-served install: the forge-CLI miss, the dismissal                                                                   | Red on `main`, three greens, registered                                                | 0 (the enable)            | skill owners               |
-| 7   | The hard tier: ten to fifteen tier 2 and 3 cases from the customer epic, with their fixtures                                                            | Graded nightly with tier labels; the fleet sized against the budget                    | 1, 2                      | case authors               |
-| 8   | The bare-model arm, per release: the product's disable setting for skills, and the capability set's second arm                                          | Headroom per tier published beside the rate                                            | 6 (the install), 7        | the author, operator owner |
-| 9   | Provenance: a source line on every audit check                                                                                                          | Every check cites a guide, a release note or an incident, or is labelled and reviewed  | nothing                   | skill owners               |
-| 10  | Skills triage: tag or retire the untagged thirty; shrink to rules and scripts where the arm shows no prose value                                        | Every shipped skill has a case or is gone                                              | 2, 8                      | skill owners               |
-| 11  | The customer's own view: the pod reports its loaded digests; the scorecard page on the install                                                          | A customer reads the line on their install and the digest matches                      | 2                         | operator owner             |
-| 12  | The attested step: the private set, the reviewer, the audit-log sweep across the window                                                                 | One journey carries an attested line                                                   | 1, 7, 11                  | eval crew                  |
-| 13  | The weekly cadence: lapse review, three counters                                                                                                        | Four weeks of reports                                                                  | 2                         | the author                 |
+| #   | Step                                                                                                                                                    | Done when                                                                                | Depends on                               | Owner                          |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------ |
+| 0   | The decisions: the word and its definition, the unattended-journey unit, the window key, the default install's model line, Claude on one dev project    | Each is answered in [#3978](https://github.com/gke-labs/kube-agents/issues/3978)         | nothing                                  | project lead                   |
+| 1   | A whole nightly record: the second half scheduled, cases recorded per repetition, the slow tail found                                                   | Three nights in a row record every registered case                                       | in flight                                | eval crew                      |
+| 2   | Measurement on `main`: the `skills:` key, the journey entity, the tier label, tokens in the record, the rating calculation in CI, a generated scorecard | CI produces the scorecard each morning without a laptop                                  | 0                                        | the author                     |
+| 3   | Scheduled outcomes graded: the lookup field and five outcome checks on the existing first-run case                                                      | Five audits report an outcome every night                                                | 1, 2                                     | the author                     |
+| 4   | The twelve measurement defects: one case fix of ours, nine reports to owners                                                                            | Each low case has an owner's answer; the two display-line cases read the typed command   | 0                                        | the author, owners             |
+| 5   | An install where the clock runs and chat is read                                                                                                        | The stall watch and the event triage report outcomes nightly                             | 0 (question 3), eval crew                | eval crew, the author          |
+| 6   | The two behaviour fixes on a Claude-served install: the forge-CLI miss, the dismissal                                                                   | Red on `main`, three greens, registered                                                  | 0 (the enable)                           | skill owners                   |
+| 7   | The hard tier: ten to fifteen tier 2 and 3 cases from the customer epic, with their fixtures                                                            | Graded nightly with tier labels; the fleet sized against the budget                      | 1, 2                                     | case authors                   |
+| 8   | The bare-model arm, per release: the product's disable setting for skills, and the capability set's second arm                                          | Headroom per tier published beside the rate                                              | 6 (the install), 7                       | the author, operator owner     |
+| 9   | Provenance: a source line on every audit check                                                                                                          | Every check cites a guide, a release note or an incident, or is labelled and reviewed    | nothing                                  | skill owners                   |
+| 10  | Skills triage: tag or retire the untagged thirty; shrink to rules and scripts where the arm shows no prose value                                        | Every shipped skill has a case or is gone                                                | 2, 8                                     | skill owners                   |
+| 11  | The customer's own view: the pod reports its loaded digests; the scorecard page on the install                                                          | A customer reads the line on their install and the digest matches                        | 2                                        | operator owner                 |
+| 12  | The attested step: the private set, the reviewer, the audit-log sweep across the window                                                                 | One journey carries an attested line                                                     | 1, 7, 11                                 | eval crew                      |
+| 13  | The weekly cadence: lapse review, three counters                                                                                                        | Four weeks of reports                                                                    | 2                                        | the author                     |
+| 14  | The intake loop: support patterns of the trailing 60 days triaged monthly into journeys, cases and catalogue entries (section 18)                       | The first monthly report shows the share of support patterns covered by a graded journey | a data agreement for support cases; 2, 7 | an intake owner, domain owners |
 
 Steps 0 to 4 are this month. Steps 5 to 8 are November. Steps 9 to 11 run beside them and finish by mid-December.
 Step 12 is the first line after 12-14. Section 13 carries the dates and the counter targets; section 14 the open
@@ -808,6 +809,56 @@ stays inside an envelope the record has seen (section 5.1), so the behaviour is 
 when the model or the text changes, so a silent model update is caught by the record before the customer meets it; and
 an answer key from outside the team (the syllabus, the private set, the reviewer) so the claim does not rest on our
 own tests. The hard tier is where all five are tested at once, and it is the tier the record has not run yet.
+
+## 18. The intake loop: from the last 60 days of support cases to journeys, cases and skills
+
+Today the fixtures come from us. The only outside sources are the customer epic
+([#2597](https://github.com/gke-labs/kube-agents/issues/2597)), the public GKE known-issues and release-notes pages
+that feed the readiness catalogues, and the `/feedback` command. There is no regular path from what customers actually
+hit to what the nightly grades. This section is that path. It runs monthly over the trailing 60 days, and every step
+ends in an artifact the repository already knows.
+
+**1. Intake (monthly, one owner).** An approved, anonymised export of the period's GKE support cases and postmortems:
+category, symptom, root cause, time to detect, time to fix, whether a configuration change would have prevented it, and
+the GKE version and feature involved. No customer identifiers leave the support system; the export is aggregate
+patterns with one redacted example each. Access to support data is an organisational decision and the first
+prerequisite; until it exists, the proxies are the public known-issues page, the release notes, the customer epics, the
+issues customers file on the product, and the agent's own ledgers on consenting installs.
+
+**2. Triage (weekly, the domain owners).** Each pattern is scored on four axes and sorted: how often it occurs; how
+bad it is; whether a scheduled check could have seen it before the incident (the habit test); and whether the fix is a
+declarative change the agent could propose as a pull request. A pattern that scores high on the first two and low on
+the third is an emergency-room pattern and goes to triage journeys; high on all four is a habit pattern and goes to the
+audits. The output is one line per pattern in the drafts backlog (`bench/tasks/DRAFTS.md`), with its support frequency
+as the priority, and a gap type:
+
+| Gap type              | Meaning                                                               | What it becomes                                                              |
+| --------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Not covered           | No journey looks for it                                               | A new check in an existing audit, or a new journey; a tier 2 or 3 case first |
+| Covered, did not fire | A journey should have caught it and did not                           | A case that plants the pattern (red), then the skill or SOP fix (green)      |
+| Caught, wrong fix     | The finding was right, the remediation was not                        | A case that grades the pull request diff, then the fix                       |
+| Knowledge missing     | A known issue, a removed API, a version behaviour the catalogue lacks | A catalogue entry with its source line                                       |
+| Out of scope          | Not a configuration or operations pattern                             | Recorded with the reason, so the count is honest                             |
+
+**3. Fixture (per pattern, the case author).** The pattern is planted on the seeded fleet or a prebuilt stack so the
+check is exact: the planted object, the symptom it produces, and the end state a correct run reaches. Patterns that
+need scale or a chain are the tier 2 and 3 cases of section 17; the fleet grows against the nightly budget of section
+10, and a pattern that cannot be planted stays a draft with that reason.
+
+**4. Case before change (the repository rule).** The case runs red on `main` for the pattern's reason. Only then does
+the skill, SOP or catalogue change, and it lands with three greens and the case registered. A change to agent text
+restarts that skill's window; the intake owner batches changes per skill per month to restart it once, not weekly.
+
+**5. Close the loop (monthly, with the counters).** Two numbers join the weekly report: the share of the period's
+support patterns now covered by a graded journey or capability, by gap type; and, for consenting installs, the
+findings the habit raised that match a pattern the support data says causes incidents. The second number is the one
+that would show the emergency room emptying, and it needs an install where the ledger can be read back, which is the
+customer's-own-view step (section 1.2, step 11).
+
+**Cadence and cost.** Monthly intake and scoring: about two days of one owner plus an hour per domain owner. Cases:
+the usual authoring cost, one to three days each with its fixture, bounded by the nightly budget, so the intake
+decides which patterns are worth a case and which wait. The first run of the loop can start on the proxies today; the
+support export is the step that makes it real, and it needs the data agreement before anything else.
 
 ## Appendix A. Sources and numbers
 
