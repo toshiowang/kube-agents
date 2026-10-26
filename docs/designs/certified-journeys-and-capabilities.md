@@ -931,3 +931,53 @@ Performance skip: overridden for phase 1 (all five members): 15 real audit runs 
 Verdict: unanimous concerns, nothing blocking, none approve as written. Five items recur across four or five members and go to the worker before the project lead reads it: (1) phase 1 reuses what exists (`audit-chat-report` stack, a `lookup:` field on `ledger_issue_contains`, or the five checks folded into `oobe-first-run-audits`' chain) and is costed and placed (lane, `audit_streams:`, `unit_cost_hint`, after #2704); (2) the dated targets are rewritten from the cases' first nightly under one rating rule (D1's 24-of-24 while filling), "verified 3-5 by 12-14" cut to "graded 5, Rated 0-2", and a freeze or a tolerant key named for the five SOPs and fleet-audit; (3) C5 through the 11b product setting, not the optimizer's hide; (4) the record key (skill digest, SOP digest, model, mode, case digest), the lapse rule, infra-vs-fail, and an owner and home per counter move to phase 0-1; (5) §2 is sourced or cut, and the customer keeps one thing to check on their own install (the ledger header line or an honest "nothing before 11a"). Counts to fix: 17 graded-in-part → 14; "166 every night" → 159; headroom 100-145 → 40-70; "Seven of the 25"; "nine audits" → 10; "first four" → five; bench/cuj row + 10 harness journeys; "134 on a planted fixture" → 129 with method. Terminology: "private set", "HOOTL-graded", "journey or skill". PR A: one case plus a question to bradhoekstra on #2344.
 
 Rec: draft 4 with the five items above, then the project lead. Principle: reuse the oracle that exists, cost every case against the nightly the plan itself calls full, and promise only what the record can carry.
+
+## Appendix D. Where the audit checklists came from: the compliance audit as the worked example
+
+**Origin.** The governance SOPs arrived with the Platform Agent itself (PR #46, 2026-05-28) and have been edited in 29
+commits since by several maintainers. A later requirements document (`docs/designs/fleet-anomaly-detection-checks.md`)
+treats each SOP as the canonical list for its area and adds areas from a team's own incidents (a region lost to zonal
+skew). Every check has the same shape: a flag rule, a do-not-flag rule with suppressions, a severity with its reason, an
+impact sentence, a remediation kind, and the declared-intent override. So the lists are not random: they are curated
+from the maintainers' production experience and incident history. But no check cites the document it comes from, and
+no coverage map against a published benchmark exists. "Comprehensive" cannot be claimed without one.
+
+**The compliance audit's 17 checks against the published guides** (the likely source by topic; the exact benchmark item
+numbers vary by version and are to be verified when the source lines are written):
+
+| Check                                                 | Likely source                                                           | Kind        |
+| ----------------------------------------------------- | ----------------------------------------------------------------------- | ----------- |
+| 2.1 privileged containers                             | CIS GKE Benchmark §5.2 (pod security); Pod Security Standards, baseline | posture     |
+| 2.2 host namespaces                                   | CIS GKE §5.2; PSS baseline                                              | posture     |
+| 2.3 hostPath mounts                                   | PSS baseline                                                            | posture     |
+| 2.4 cluster-admin to non-system subjects              | CIS GKE §5.1 (RBAC)                                                     | posture     |
+| 2.5 wildcard RBAC                                     | CIS GKE §5.1                                                            | posture     |
+| 2.6 namespaces with no enforcing NetworkPolicy        | CIS GKE §5.3; GKE hardening guide                                       | posture     |
+| 2.7 default ServiceAccount token automount            | CIS GKE §5.1                                                            | posture     |
+| 2.8 Workload Identity off                             | CIS GKE §6.2 (identity); hardening guide                                | posture     |
+| 2.9 legacy GCE metadata endpoint                      | CIS GKE §6.4 (node metadata); hardening guide                           | posture     |
+| 2.10 public control plane without authorized networks | CIS GKE §6.6 (networking); hardening guide                              | posture     |
+| 2.11 Pod Security `restricted` gaps                   | PSS restricted; CIS GKE §5.2                                            | posture     |
+| 2.12 Config Connector stopped applying                | none published; GitOps operations                                       | operational |
+| 2.13 image reference without specific bytes           | supply-chain practice (image pinning); not a CIS GKE item               | operational |
+| 2.14 token mounted for an ungranted ServiceAccount    | CIS GKE §5.1 (automount only where needed)                              | posture     |
+| 2.15 LoadBalancer publishing a management port        | network exposure practice; not a CIS item as such                       | operational |
+| 2.16 binding whose subject is everyone                | CIS GKE §5.1; the NSA and CISA hardening guidance on anonymous access   | posture     |
+| 2.17 Config Sync stopped applying                     | none published; GitOps operations                                       | operational |
+
+Twelve of the seventeen are posture checks that a published benchmark also asks for; five are operational checks from
+experience that no benchmark lists but a platform team wants. What the published benchmark asks for and this audit
+does not check as posture: Binary Authorization enforcement, secrets encryption with a customer key, node
+auto-upgrade and auto-repair, Shielded nodes and the hardened node image, private nodes and endpoints, logging and
+monitoring enabled, legacy authentication disabled, Google Groups for RBAC. Several of these appear in the drift audit
+as consistency facets (an outlier against the fleet majority), which is a different question from "is it on".
+
+**The reliability audit's 24 checks** are the Kubernetes production-readiness list: requests and limits, budgets,
+autoscalers, probes, spreading, single replicas, rollout strategies, Service selectors, termination grace, volume
+contention. Google publishes this list across its GKE best-practice pages for reliable and cost-optimised workloads,
+and the Kubernetes documentation carries the rest; again, no check cites them.
+
+**What follows.** Step 9 of section 1.2 (a source line on every check) is this appendix done for all fifteen SOPs,
+plus a coverage map per audit against its benchmark: which items are checked as posture, which as drift, which are
+missing with a reason, and which are ours beyond the benchmark. That map is what turns "curated from experience" into
+"follows the published guide, with these named additions and these named gaps".
