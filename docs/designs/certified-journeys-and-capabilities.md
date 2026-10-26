@@ -68,12 +68,17 @@ points below can be built in-house; the product is that they exist, work togethe
    kubeconfig, and a gate in which any forbidden action fails the run. An in-house agent gets this boundary when
    someone builds and tests it; a chat session has whatever credentials the person pasted. The worst case here is a
    wrong pull request, never a wrong change.
-3. **It is measured against planted defects every night, per journey and per model.** 230 cases on a seeded fleet,
-   159 scheduled each night, three runs each (the last three nights recorded 22, 0 and 26 cases, and the fix is in
-   flight). Today one skill has a line a customer could read, "version-control on Claude Opus 5.5: 42 of 42 since
-   10-25"; no journey has one yet. A line starts a new window when the text changes and lapses when the rate falls.
-   An in-house agent has no record unless the team builds a second product to produce one; a model vendor publishes
-   its own benchmarks, not your journeys. This is the claim only an operator product can make.
+3. **It cannot regress silently.** Every night, the exact text that shipped runs 159 cases on the same seeded fleet,
+   three times each, and any forbidden action fails the run. Be precise about what that measures today: the defects
+   are planted and mostly simple, so the record is a regression tripwire and an authority proof, not yet a measure of
+   competence on hard problems (section 17 is that). A tripwire does not need hard cases; it needs the same cases every
+   night, so a model update, a text edit or a GKE change that breaks a journey shows as a red the next morning instead
+   of in a customer's fleet. The line a customer reads is per journey and per model ("version-control on Claude Opus
+   5.5: 42 of 42 since 10-25" is the one that exists), it starts a new window when the text changes, and it lapses when
+   the rate falls. An in-house agent has no tripwire unless the team builds a second product; a model vendor's
+   benchmark does not re-run your journeys when the model changes. The competence claim is earned later, by the hard
+   tier and the bare-model arm; the no-silent-regression claim is the one the record supports now, and the last three
+   nights (22, 0 and 26 cases recorded) show it only holds when the record is whole.
 4. **It carries GKE know-how as rules, catalogues and collectors, not as prose.** 15 governance SOPs, 10 with 117
    numbered checks; 24 upgrade-readiness rule modules, 33 known GKE issues and 52 removed APIs in the readiness skill;
    collectors that read a whole fleet in one deterministic pass; 26 of the 31 mirrored Google skills patched for
