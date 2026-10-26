@@ -10,18 +10,61 @@ The questions this document answers: which core metrics we track (unattended jou
 roadmap that delivers them, how many journeys can run with no human and which, how many we add a week and how the loop
 scales, how a journey or skill is certified, what testing in the loop means here, and what customers want.
 
-## 1. Summary
+## 1. The end state, and the steps to it
 
-**The two counters.** _Unattended journeys_ (HOOTL): a schedule or an event starts the journey, no person acts before
-the outcome, and a deterministic check reads the ledger, the pull request or the chat post the product exports.
-_Certified capabilities and skills_: the newest 60 nightly runs on one model and one exact text pass at a 95% lower
-bound of 0.85; the word "certified" is reserved for the top step of a four-step ladder with evidence from outside the
-team.
+### 1.1 The end state
 
-**Where we stand.** 47 journeys claimed or tested; 17 can run with no human; 0 are graded as scheduled outcomes; one
-skill is at the eval-tested bar on Claude Opus 5.5 (version-control, 42 of 42 since 2026-10-25); 20 documented promises
-have no test. The nightly that feeds every counter is past its ceiling and recorded 22, 0 and 26 cases on the last
-three nights; the fix is in flight.
+**What a customer sees.** On their own install, a page with one line per journey and per model: the promise kind
+(guaranteed, measured, attested), the rate and its bound, the window dates, the exact text digest the pod loaded, the
+difficulty tier, the typical run in minutes and tokens, the skills the runs read, and the last lapse. Every clause links
+to the record that proves it. The authority line reads "guaranteed to propose, never apply", enforced by IAM and the
+proxy and observed as zero forbidden actions in the window.
+
+**What the product does.** The unattended journeys run on their schedule and reach their outcome with nobody typing: a
+ledger rewritten in place, a pull request whose diff fixes the defect and passes CI, a paced chat line. Each journey
+has a route envelope the record has seen. A model update, a text edit or a GKE change that breaks a journey shows as a
+red the next morning and files an issue to the journey's owner. A customer can switch models and read the same line.
+
+**What the measurement system is.** A nightly that records every registered case every night, across its lanes,
+including one install where the clock is not paused and a chat platform receives posts. Every case carries its skills,
+its journey and its difficulty tier. The scorecard is computed in CI from the nightly record, per journey, capability
+and skill, per model, with tokens and latency beside the rate. A bare-model arm runs per release on the hard tier. A
+private set the authors never see, and a named reviewer outside the team, back every attested line. A second model runs
+the same cases as a standing control for check defects.
+
+**What the content is.** Every audit check carries its source: a Google guide, a release note or a named incident.
+Every shipped skill has a case or is retired; skills are rules and scripts, with prose only where a supported model is
+shown to need it. The unattended journeys cover the customer epic's problems at tiers 2 and 3, not only planted
+defects. A capability set in the shape of the CKA tasks, filtered to GKE, runs against the same two arms.
+
+**What the team does.** Every change to agent behaviour lands with its red and three greens. Lapses are reviewed
+weekly with their owners. Three counters are reported weekly: journeys graded and attested, capabilities measured,
+pull requests accepted.
+
+### 1.2 The steps, in order
+
+| #   | Step                                                                                                                                                    | Done when                                                                              | Depends on                | Owner                      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------- | -------------------------- |
+| 0   | The decisions: the word and its definition, the unattended-journey unit, the window key, the default install's model line, Claude on one dev project    | Each is answered in [#3978](https://github.com/gke-labs/kube-agents/issues/3978)       | nothing                   | project lead               |
+| 1   | A whole nightly record: the second half scheduled, cases recorded per repetition, the slow tail found                                                   | Three nights in a row record every registered case                                     | in flight                 | eval crew                  |
+| 2   | Measurement on `main`: the `skills:` key, the journey entity, the tier label, tokens in the record, the rating calculation in CI, a generated scorecard | CI produces the scorecard each morning without a laptop                                | 0                         | the author                 |
+| 3   | Scheduled outcomes graded: the lookup field and five outcome checks on the existing first-run case                                                      | Five audits report an outcome every night                                              | 1, 2                      | the author                 |
+| 4   | The twelve measurement defects: one case fix of ours, nine reports to owners                                                                            | Each low case has an owner's answer; the two display-line cases read the typed command | 0                         | the author, owners         |
+| 5   | An install where the clock runs and chat is read                                                                                                        | The stall watch and the event triage report outcomes nightly                           | 0 (question 3), eval crew | eval crew, the author      |
+| 6   | The two behaviour fixes on a Claude-served install: the forge-CLI miss, the dismissal                                                                   | Red on `main`, three greens, registered                                                | 0 (the enable)            | skill owners               |
+| 7   | The hard tier: ten to fifteen tier 2 and 3 cases from the customer epic, with their fixtures                                                            | Graded nightly with tier labels; the fleet sized against the budget                    | 1, 2                      | case authors               |
+| 8   | The bare-model arm, per release: the product's disable setting for skills, and the capability set's second arm                                          | Headroom per tier published beside the rate                                            | 6 (the install), 7        | the author, operator owner |
+| 9   | Provenance: a source line on every audit check                                                                                                          | Every check cites a guide, a release note or an incident, or is labelled and reviewed  | nothing                   | skill owners               |
+| 10  | Skills triage: tag or retire the untagged thirty; shrink to rules and scripts where the arm shows no prose value                                        | Every shipped skill has a case or is gone                                              | 2, 8                      | skill owners               |
+| 11  | The customer's own view: the pod reports its loaded digests; the scorecard page on the install                                                          | A customer reads the line on their install and the digest matches                      | 2                         | operator owner             |
+| 12  | The attested step: the private set, the reviewer, the audit-log sweep across the window                                                                 | One journey carries an attested line                                                   | 1, 7, 11                  | eval crew                  |
+| 13  | The weekly cadence: lapse review, three counters                                                                                                        | Four weeks of reports                                                                  | 2                         | the author                 |
+
+Steps 0 to 4 are this month. Steps 5 to 8 are November. Steps 9 to 11 run beside them and finish by mid-December.
+Step 12 is the first line after 12-14. Section 13 carries the dates and the counter targets; section 14 the open
+decisions; the sections between hold the evidence for each step.
+
+### 1.3 Today against the first milestone
 
 | Counter                                                 | Today | 2026-12-14 target | What it depends on                                                                    |
 | ------------------------------------------------------- | ----- | ----------------- | ------------------------------------------------------------------------------------- |
@@ -29,10 +72,6 @@ three nights; the fix is in flight.
 | Journeys graded as scheduled outcomes                   | 0     | 5 to 12           | five checks on an existing case (about 11-09); a chat-capable install for the rest    |
 | Journeys at the eval-tested bar                         | 0     | 0 to 2            | the audits pass 0.21 to 0.65 today; the rated text changes 22 of 30 days (decision 5) |
 | Certified lines                                         | 0     | 0                 | the private set is not built in this window                                           |
-
-**The five open decisions** (section 14): what "certified" requires; how an unattended journey is counted; how chat
-evidence and the paused audits are graded; what the line says for a default install's model; the window key when the
-text changes almost daily.
 
 ## 2. The story: why a customer runs kube-agents instead of their own agent or a generic LLM
 
