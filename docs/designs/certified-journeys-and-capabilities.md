@@ -98,6 +98,23 @@ Scope, one sentence: **journeys and capabilities (a bench case each) can be cert
 a skill is a file, and its rating is derived from the tasks that use it. The independent reviewer of step 3d is a named
 member of the eval crew who did not write the skill or the case, and the name goes on the line.
 
+**A capability or journey is certified with or without a skill.** The claim is about the agent as deployed on a named
+model: the identity and its limits, the tools, the schedule, the record, and whatever skill text the run chose to read.
+A strong model passes many cases without opening any skill (on Claude, 9 of 11 Cluster Agent cases never open theirs
+and pass), and that pass is as real to the customer as one that read a skill. So the skill is not a condition of the
+word; it is one component, and the line says what the run used: "skills read: none" or "skills read: fleet-audit". What
+kube-agents adds in the no-skill case is still what the customer pays for: the authority limit, the unattended schedule,
+the fleet collectors, the nightly measurement and the lapse. What it does not add there is the skill text, and the line
+must not imply otherwise.
+
+Three consequences. (1) The skill rating is a repair and cost signal, not the customer's word: it tells us where a skill
+is needed on a model and where it is dead weight. (2) The no-skill arm (C5) decides per model and per skill whether the
+text is necessary; where it is not, the skill shrinks to its scripts and rules or goes, because unread text still costs
+tokens, maintenance and window restarts. (3) A capability the model carries on its own can leave with the next model
+update; the window and the lapse exist for exactly that, and for a weaker model the same skill may be the difference
+(the Gemini record shows both directions). Skills are therefore the per-model adaptation layer, kept where a supported
+model needs them, measured rather than assumed.
+
 What step 3 costs, beyond step 2: a private private line (a repository, a runner identity, a bucket and a seeded fleet
 the authors cannot read: one pool project; the gap plan, H, option b), its cases (the panel's estimate is that a private-set
 set roughly doubles the nightly's runs, against a nightly that cannot finish the 159 cases it has today, so its size is
