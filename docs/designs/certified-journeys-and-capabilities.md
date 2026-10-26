@@ -102,6 +102,16 @@ points below can be built in-house; the product is that they exist, work togethe
 
 It runs in your project, on your model and your billing, with telemetry in your project and prompts going only to
 your provider (`reference/security-and-iam.md`, "What leaves for the model provider"); that is table stakes against an
+
+**The reputational reason, stated plainly.** Part of why a customer wants the vendor's guidance for the vendor's
+product is cover, not insight: a platform lead who followed Google's published GKE guidance, executed by a tool from a
+Google team, has an answer when something goes wrong that a home-grown checklist does not give; the posture is one
+Google support will recognise, and a security review accepts a known name faster than an internal script. That reason
+is real for the person who carries the risk, and it cuts both ways. It exists only if the checks trace to published
+guidance and meet the brand's quality bar: a check labelled "recommended" that is wrong costs the brand more than a
+missing check, which is why provenance (section 16, step 8) and the certified ladder matter more here than for a
+neutral tool. And it is weaker while the product carries a "labs" name: the cover a customer gets is the cover the name
+gives. The design treats this as a reason to earn the brand's bar, not as a value to claim before it is met.
 in-house build and is stated here so nobody has to ask.
 
 What is true today, and what is a promise with a date: one skill is at the bar on Claude (version-control, 42 of 42);
