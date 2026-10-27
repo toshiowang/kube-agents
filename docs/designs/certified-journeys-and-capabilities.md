@@ -60,7 +60,8 @@ Claude. _Owner:_ project lead. _First result:_ none; these unblock steps 2, 4 an
 hold-back on [#3384](https://github.com/gke-labs/kube-agents/issues/3384), the slow tail diagnosed
 ([#3940](https://github.com/gke-labs/kube-agents/issues/3940)). _Owner:_ eval crew; our part is one observation
 comment if the lead allows a post, otherwise none. _Starts:_ in flight. _Done:_ three consecutive nights record every
-registered case. _First result:_ cases recorded per night, from 22, 0, 26 to the full roster. _Week:_ W44 to W45.
+registered case. _First result:_ cases recorded per night, from 22, 0, 26 to the full roster. On 2026-10-27 the split ran for the first time and the two halves recorded 79 and 79 of the 159
+scheduled cases, both inside the deadline. _Week:_ W44 to W45.
 
 **Step 2. Measurement on `main`.** Seven pull requests, each one purpose, in this order:
 2a the `skills:` key and its validator (126 lines, exists as a local commit; needs a rebase; no agent file); 2b
