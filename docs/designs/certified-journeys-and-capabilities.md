@@ -41,29 +41,141 @@ defects. A capability set in the shape of the CKA tasks, filtered to GKE, runs a
 weekly with their owners. Three counters are reported weekly: journeys graded and attested, capabilities measured,
 pull requests accepted.
 
-### 1.2 The steps, in order
+### 1.2 The steps, fleshed out
 
-| #   | Step                                                                                                                                                    | Done when                                                                                | Depends on                               | Owner                          |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------ |
-| 0   | The decisions: the word and its definition, the unattended-journey unit, the window key, the default install's model line, Claude on one dev project    | Each is answered in [#3978](https://github.com/gke-labs/kube-agents/issues/3978)         | nothing                                  | project lead                   |
-| 1   | A whole nightly record: the second half scheduled, cases recorded per repetition, the slow tail found                                                   | Three nights in a row record every registered case                                       | in flight                                | eval crew                      |
-| 2   | Measurement on `main`: the `skills:` key, the journey entity, the tier label, tokens in the record, the rating calculation in CI, a generated scorecard | CI produces the scorecard each morning without a laptop                                  | 0                                        | the author                     |
-| 3   | Scheduled outcomes graded: the lookup field and five outcome checks on the existing first-run case                                                      | Five audits report an outcome every night                                                | 1, 2                                     | the author                     |
-| 4   | The twelve measurement defects: one case fix of ours, nine reports to owners                                                                            | Each low case has an owner's answer; the two display-line cases read the typed command   | 0                                        | the author, owners             |
-| 5   | An install where the clock runs and chat is read                                                                                                        | The stall watch and the event triage report outcomes nightly                             | 0 (question 3), eval crew                | eval crew, the author          |
-| 6   | The two behaviour fixes on a Claude-served install: the forge-CLI miss, the dismissal                                                                   | Red on `main`, three greens, registered                                                  | 0 (the enable)                           | skill owners                   |
-| 7   | The hard tier: ten to fifteen tier 2 and 3 cases from the customer epic, with their fixtures                                                            | Graded nightly with tier labels; the fleet sized against the budget                      | 1, 2                                     | case authors                   |
-| 8   | The bare-model arm, per release: the product's disable setting for skills, and the capability set's second arm                                          | Headroom per tier published beside the rate                                              | 6 (the install), 7                       | the author, operator owner     |
-| 9   | Provenance: a source line on every audit check                                                                                                          | Every check cites a guide, a release note or an incident, or is labelled and reviewed    | nothing                                  | skill owners                   |
-| 10  | Skills triage: tag or retire the untagged thirty; shrink to rules and scripts where the arm shows no prose value                                        | Every shipped skill has a case or is gone                                                | 2, 8                                     | skill owners                   |
-| 11  | The customer's own view: the pod reports its loaded digests; the scorecard page on the install                                                          | A customer reads the line on their install and the digest matches                        | 2                                        | operator owner                 |
-| 12  | The attested step: the private set, the reviewer, the audit-log sweep across the window                                                                 | One journey carries an attested line                                                     | 1, 7, 11                                 | eval crew                      |
-| 13  | The weekly cadence: lapse review, three counters                                                                                                        | Four weeks of reports                                                                    | 2                                        | the author                     |
-| 14  | The intake loop: support patterns of the trailing 60 days triaged monthly into journeys, cases and catalogue entries (section 18)                       | The first monthly report shows the share of support patterns covered by a graded journey | a data agreement for support cases; 2, 7 | an intake owner, domain owners |
+Each step names what is built, who builds it, the condition that lets it start, what "done" means, the first number
+that moves, and the week. Sizes are the plan's budget: a pull request that grows past twice its size stops and asks.
+Three gates belong to the project lead and are listed as such; everything else can be queued now. Weeks are ISO weeks
+of 2026: W44 is 10-26 to 11-01, W50 is 12-07 to 12-13.
 
-Steps 0 to 4 are this month. Steps 5 to 8 are November. Steps 9 to 11 run beside them and finish by mid-December.
-Step 12 is the first line after 12-14. Section 13 carries the dates and the counter targets; section 14 the open
-decisions; the sections between hold the evidence for each step.
+**Step 0. Gates.** The five design decisions of section 14 are parked, by decision, until this plan is fleshed out;
+every step below is written so that it proceeds under the recommended option and changes shape, not direction, if a
+decision goes the other way. Three gates remain live because they start work: the go on the `skills:` key pull
+request; the go on the display-line case fix and the nine owner reports; and a Claude-served install for the behaviour
+fixes, either Anthropic enabled in Model Garden on one dev project or a leased CI pool project, which already serves
+Claude. _Owner:_ project lead. _First result:_ none; these unblock steps 2, 4 and 6.
+
+**Step 1. A whole nightly record.** _Built:_ the second nightly half scheduled in Prow (kube-agents side merged as
+[#3934](https://github.com/gke-labs/kube-agents/pull/3934), Prow side open), per-repetition recording or the launch
+hold-back on [#3384](https://github.com/gke-labs/kube-agents/issues/3384), the slow tail diagnosed
+([#3940](https://github.com/gke-labs/kube-agents/issues/3940)). _Owner:_ eval crew; our part is one observation
+comment if the lead allows a post, otherwise none. _Starts:_ in flight. _Done:_ three consecutive nights record every
+registered case. _First result:_ cases recorded per night, from 22, 0, 26 to the full roster. _Week:_ W44 to W45.
+
+**Step 2. Measurement on `main`.** Seven pull requests, each one purpose, in this order:
+2a the `skills:` key and its validator (126 lines, exists as a local commit; needs a rebase; no agent file); 2b
+`docs/designs/journeys.yaml`, one entry per journey with its id, trigger, outcome, owner, tier and the case ids that
+grade it, plus a validator that every case id exists (about 100 lines; no teammate's case is edited); 2c token counts
+written into the record beside the timing the gate already records (about 30 lines in `bench/kube_agents_bench/gate.py`
+and the dashboard schema, additive); 2d `scripts/eval_dashboard/ratings.py`: the window per journey, capability and
+skill, per model and digest, under the one rating rule, with tokens and latency columns and the lapse state (about
+300 lines plus tests, reading the dashboard's data file); 2e a generated region in the eval dashboard that prints the
+scorecard (about 100 lines); 2f the lapse filer: `nightly_bugs.py` opens an issue to the owner when a journey or skill
+sits below 0.70 on two checks (about 60 lines); 2g the morning run retired: the laptop script stops when 2d produces
+the same numbers two mornings running. _Owner:_ the author, under the one-lifecycle rule (preflight by the review
+session, minding by the pull-request minder). _Starts:_ 2a on its gate; 2b to 2f need no gate but are new work, so each
+is queued for a go. _Done:_ CI produces the scorecard each morning and the laptop script is deleted. _First result:_
+the first scorecard produced by CI, expected the morning after 2d merges. _Week:_ 2a W44; 2b to 2d W45; 2e to 2g W46.
+
+**Step 3. Scheduled outcomes graded, zero extra runs.** _Built:_ a `lookup:` field on `ledger_issue_contains` that
+finds an audit's ledger by label and a since-time (40 to 60 lines in `verifiers.py` plus tests), and five outcome
+checks added to `oobe-first-run-audits`, one per first-run audit, each with its silence half (about 40 lines of case
+YAML); the retrospective's outcome asserted as silence; a GitHub 429 on the lookup classed as infrastructure, not a
+fail. _Owner:_ the author; the case's owner by report. _Starts:_ after 2b, so the five audits are journeys the
+scorecard knows. _Done:_ the five checks pass on the cached record where the ledger exists, fail where it does not, and
+the case is unchanged in the roster. _First result:_ five audit outcomes reported from the first nightly after the
+merge, about 11-09. _Week:_ W45 to W46.
+
+**Step 4. The twelve measurement defects.** _Built:_ one case edit of ours, `after_result_pattern` on
+`obtainability-design-quota-vs-capacity` (12 lines, the shape the lead chose on 10-22, under
+[#3128](https://github.com/gke-labs/kube-agents/issues/3128)); a question to the owner of
+[#2344](https://github.com/gke-labs/kube-agents/issues/2344) for the observability case his issue rewrites; nine
+comments on the owners' issues with the run id, the cause and the smallest fix (drafted, hill-climb plan section 7).
+_Owner:_ the author; the owners for the fixes. _Starts:_ on its gate. _Done:_ the case reads the typed command and
+each of the nine issues has an owner's answer. _First result:_ that case from 1 of 9 to 9 of 9 on the first nightly
+after the merge; the capacity-obtainability row from 1 of 12 to about 9 of 12. _Week:_ W44 to W45.
+
+**Step 5. An install where the clock runs and chat is read.** _Built:_ a decision memo first (one pool project with
+a chat app and its secret, audits unpaused, no GitHub-writing cases beside them, a Prow periodic of its own; against
+"the five first-run audits only"); then the job, the stall-watch and event-triage outcome checks (chat post plus pull
+request diff), and the five paused audits' outcome checks. _Owner:_ eval crew for the project, the app and the job;
+the author for the checks. _Starts:_ after the memo is approved; the memo needs no install. _Done:_ the stall watch
+and the event triage report outcomes nightly. _First result:_ journeys graded from 5 to 10 or more. _Week:_ memo W46;
+job W47 to W48.
+
+**Step 6. The two behaviour fixes on a Claude-served install.** _Built:_ a persona line for the forge-CLI miss and
+one for the dismissal, each red on `main` for its reason and green three times on the branch build. _Owner:_ the skill
+owners; the author can run the loops. _Starts:_ on the Claude gate; a leased CI pool project is the path that needs no
+console step. _Done:_ three greens, registered. _First result:_ `vcs-forge-cli-request-uses-the-verbs` from 7 of 9 to
+9 of 9 and `findings-decision-covers-item` from 0 of 9 to 9 of 9. _Week:_ W46 to W47.
+
+**Step 7. The hard tier.** _Built:_ the tier label on every journey in `journeys.yaml` (2b) and, from the customer epic
+([#2597](https://github.com/gke-labs/kube-agents/issues/2597)) and the drafts, ten to fifteen tier 2 and 3 cases:
+the silent controller deadlock among a hundred healthy workloads (the existing draft `cluster-agent-stalled-controller-
+diagnosis` with its fixture built); a rollout stall whose cause is a fail-closed webhook two hops away; an IaC repository
+where Config Connector and a live change disagree; a declared posture beside a real over-grant; a ten-cluster readiness
+grade inside the nightly's time limit, which needs a larger seeded fleet sized against the budget. _Owner:_ the domain
+owners as case authors; the author writes the tier proposal and the first two fixtures. _Starts:_ after 2b; the fleet
+change after step 1. _Done:_ the cases graded nightly with their tier. _First result:_ the first pass rate by tier,
+which is the first number that can say whether the harness matters where the model struggles. _Week:_ W46 to W49.
+
+**Step 8. The bare-model arm, per release.** _Built:_ the product's skill-disable setting (one `PlatformAgent` field
+over the runtime's own switch, about 150 lines, operator owner); then the arm itself: the same cases on the same
+install with the skill disabled, one lease per skill version, version-control and the thirteen passing fleet-audit
+cases first, then the tier 2 and 3 set; the capability set in the CKA task shape, filtered to GKE, with the bare model
+and the GKE MCP server as its second arm, parked until its yes. _Owner:_ operator owner for the setting; the author for
+the runs. _Starts:_ the setting after step 2; the runs after step 6's install. _Done:_ headroom per tier published
+beside the rate. _First result:_ "helps", "equal" or "hurts" for version-control on Claude. _Week:_ setting W47; runs
+W48 to W49.
+
+**Step 9. Provenance.** _Built:_ a `source:` line on every check in the fifteen SOPs and the readiness rule modules,
+citing a Google guide, a release note or a named incident, and a coverage map per audit against its benchmark (the
+compliance audit against the CIS GKE Benchmark first, appendix D is the template); a check with no source is labelled
+and reviewed; a small checker fails a new check that arrives without a source. _Owner:_ the domain owners; the author
+writes the template and the checker. _Starts:_ now; no gate. _Done:_ every check cites or is labelled; the map lists
+the benchmark items checked as posture, as drift, or missing with a reason. _First result:_ the compliance audit's map,
+17 checks and the named gaps. _Week:_ W45 to W49.
+
+**Step 10. Skills triage.** _Built:_ the two-reader tags (PR 2, about 450 lines across the tagged cases, the reader
+output in the pull request body); then one decision per untagged skill, thirty of them: a case, or out of the shipped
+set; and for the skills the arm has measured, the shrink to rules and scripts where prose adds nothing. _Owner:_ the
+skills-content owner decides; the author prepares the table. _Starts:_ PR 2 after 2a; the decisions after 8. _Done:_
+every shipped skill has a case or is gone. _First result:_ the count of shipped skills with no case, from 23 of 53 to
+zero. _Week:_ PR 2 W46; decisions W49 to W50.
+
+**Step 11. The customer's own view.** _Built:_ the pod reports the digests it loaded (the operator's status field,
+about 300 lines); the scorecard page on the install reads the published record and matches it to those digests.
+_Owner:_ operator owner; the author for the page. _Starts:_ after 2d. _Done:_ a customer reads the line on their
+install and the digest matches the pod's. _First result:_ the first install that shows its own line. _Week:_ W48 to
+W50.
+
+**Step 12. The attested step.** _Built:_ the private set (a pool project, a private repository and bucket the authors
+cannot read, a seeded fleet, sized against the budget), the named reviewer and the re-derivation procedure, the
+audit-log sweep across the window (about 250 lines). _Owner:_ eval crew. _Starts:_ after steps 1, 7 and 11. _Done:_
+one journey carries an attested line. _First result:_ that line. _Week:_ after W50.
+
+**Step 13. The weekly cadence.** _Built:_ the three counters from 2d (journeys graded and attested, capabilities
+measured, pull requests accepted), one script and a weekly note; a lapse review with owners. _Owner:_ the author.
+_Starts:_ after 2d. _Done:_ four weeks of reports. _Week:_ W46 on.
+
+**Step 14. The intake loop.** _Built:_ the data agreement for support cases (an organisational step), then the monthly
+triage note into the drafts backlog with gap types (section 18); until the agreement, the loop runs on the public
+known-issues page, the release notes and the customer epic. _Owner:_ an intake owner and the domain owners. _Starts:_
+the proxy run now; the real run on the agreement. _Done:_ the first monthly report shows the share of support patterns
+covered by a graded journey. _Week:_ proxy run W47; monthly from the agreement.
+
+**The weeks, at a glance:**
+
+| Week                 | Active steps                           | What exists at the end of the week                                                                                                        |
+| -------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| W44 (10-26 to 11-01) | 0, 1, 2a, 4                            | the gates answered; the `skills:` key and the case fix open as pull requests; the nine reports posted                                     |
+| W45 (11-02 to 11-08) | 1, 2b to 2d, 3, 4, 9                   | the journey entity and tokens in the record; the lookup field and five outcome checks open; the compliance coverage map                   |
+| W46 (11-09 to 11-15) | 2e to 2g, 3, 5 memo, 6, 7, 10 PR 2, 13 | the scorecard produced by CI; five audit outcomes reported nightly; the install memo; the behaviour loops started; the first tier 2 cases |
+| W47 (11-16 to 11-22) | 5, 6, 7, 8 setting, 9, 14 proxy        | the install job; the two persona fixes green; the skill-disable setting open                                                              |
+| W48 (11-23 to 11-29) | 5, 7, 8 runs, 11                       | chat-evidenced journeys graded; the first bare-model result on version-control; loaded digests open                                       |
+| W49 (11-30 to 12-06) | 7, 8, 9, 10                            | headroom per tier; the source lines done; the skills triage table                                                                         |
+| W50 (12-07 to 12-13) | 10, 11, 13                             | the customer's own view on one install; the triage decisions; four weeks of counters                                                      |
+| after W50            | 12                                     | the first attested line                                                                                                                   |
 
 ### 1.3 Today against the first milestone
 
@@ -624,7 +736,7 @@ Today versus 12-14, the one table: Rated (skills) 1 to 2-4; HOOTL-graded 0 to 5-
 phase 2 about two worker-weeks plus the eval crew's install; phase 3 the skill owners' loops at about 1.5 h of install
 time each, plus 11a and 11b for the operator owner.
 
-## 14. Open decisions, under [#3978](https://github.com/gke-labs/kube-agents/issues/3978)
+## 14. Open decisions, under [#3978](https://github.com/gke-labs/kube-agents/issues/3978) (parked on 2026-10-26 until the plan in section 1 is fleshed out; unchanged)
 
 1. **Which claim may use the word "certified"?** a) Eval-tested, plus a private set we did not write, plus no forbidden
    action in any run, plus the model named, plus a named reviewer outside the authoring team who re-derives the number.
