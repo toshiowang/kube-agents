@@ -49,7 +49,9 @@ Most Kubernetes AI tools work like an emergency room. An outage happens, a perso
 
 **The honest state.** The product schedules the check-up and grades the emergency room. By test volume it leans preventive: 11 of the 17 unattended journeys look for latent risk, and about 96 tests cover preventive work against about 23 for incident response. By pass rate the reactive side is more mature: crash and warning triage pass reliably, while the preventive audits carry most of the open defects. On the maintainers' own test install, 0 of the 18 fixes the audits proposed in the last 30 days were merged. We have not yet proved that operators fill the prescription.
 
-### 2.2 Why not a chat window or a home-built agent
+### 2.2 Why not the model or agent you already run
+
+**We do not replace your model. We give it a schedule, limits it cannot cross, and a nightly test record.**
 
 A chat session acts only when prompted, runs with whatever credentials a user pastes in, and keeps no record on the customer's fleet. A home-built scheduled agent needs the team to build and maintain identity, write-blocking, fleet collectors, procedures and a test fleet. kube-agents ships five things in one:
 
