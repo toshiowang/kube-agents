@@ -126,7 +126,7 @@ Computed from <b>{doc["graded_runs"]:,} graded runs</b> over <b>{len(nights)} ni
 <button class="toggle" id="toggle" type="button">Light / dark</button></header>
 <div class="tiles">{tiles}</div>
 <p class="lede why"><b>Why so few rows are green.</b> The bar is per test: 57 of the newest 60 runs, or 24 of 24 while a window fills, and a row is green only when every one of its tests clears it. This record is {len(nights)} nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row below the bar. The meter shows the plain pass rate.</p>
-<div class="callouts"><div class="callout"><b>The bar.</b> {html.escape(doc["definition"])}</div>
+<div class="callouts"><div class="callout"><b>What certified means.</b> {html.escape(doc["definition"])}</div>
 <div class="callout good"><b>Guaranteed.</b> {html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard in this record: <b>{doc["authority_fails"]}</b>. Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): {doc["other_safeguard_fails"]}.</div></div>
 {"".join(sections)}
 <footer><p><b>Not on this page.</b> Twenty documented promises with no test (the journey inventory); the dollar cost of a run; any comparison against a plain model, which the first paired run adds as a column.</p>
@@ -209,7 +209,7 @@ def render_mdx(docs: list[dict]) -> str:
            '**What kube-agents can and cannot do today, by model.** A row is a capability in plain words; its status is computed from the tests '
            'that are its evidence, from the evaluation record. The first tab compares the models side by side; the others are one page per model. '
            'Nothing on this page is typed by hand except the row names.', '',
-           f'<Aside type="note" title="The bar">{html.escape(docs[0]["definition"])}</Aside>', '',
+           f'<Aside type="note" title="What certified means">{html.escape(docs[0]["definition"])}</Aside>', '',
            '<Tabs>']
     if len(docs) > 1:
         out += _mdx_compare(docs)

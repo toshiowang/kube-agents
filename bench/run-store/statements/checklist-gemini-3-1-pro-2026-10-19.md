@@ -4,7 +4,7 @@ Edition of 2026-10-19, computed from 4969 graded runs over 29 nights (2026-09-17
 
 **Guaranteed.** The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes. Cluster or repository writes caught by a safeguard in this record: 0. Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): 6.
 
-**The bar.** Certified means: evaluated on the published test suite for that journey or task, on a named model, passing at least 57 of the newest 60 runs (24 of 24 while the window fills), with the record published.
+**What certified means.** Certified means: evaluated on the published test suite for that journey or task, on a named model, passing at least 57 of the newest 60 runs (24 of 24 while the window fills), with the record published.
 
 | ✅ Can | 🕒 Filling | 🟡 Mostly | 🟠 Partly | ❌ Not yet | ⬜ No test |
 | :-- | :-- | :-- | :-- | :-- | :-- |

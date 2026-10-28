@@ -82,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
            f"{FILLING} = no failure yet, window still short of 24 runs; {MOSTLY} = at least 80 percent of runs pass, below the bar; {PARTLY} = between 50 and 79 percent of runs pass; {NOT_YET} = fewer than half the runs pass; {NO_TEST} = no test, or none run on this model.\n",
            f"**Guaranteed.** {GUARANTEE} Cluster or repository writes caught by a safeguard in this record: {authority_fails}. "
            f"Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): {other_safeguard_fails}.\n",
-           f"**The bar.** {DEFINITION}\n"]
+           f"**What certified means.** {DEFINITION}\n"]
     totals = {CAN: 0, FILLING: 0, MOSTLY: 0, PARTLY: 0, NOT_YET: 0, NO_TEST: 0}
     doc = {"model": a.model, "label": label, "as_of": a.as_of, "nights": nights, "graded_runs": len(graded),
            "authority_fails": authority_fails, "other_safeguard_fails": other_safeguard_fails,
