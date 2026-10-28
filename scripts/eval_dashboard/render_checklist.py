@@ -156,7 +156,7 @@ def render_mdx(docs: list[dict]) -> str:
     out = ['---', 'title: Certification checklist',
            'description: What kube-agents can and cannot do today, per model, computed from the nightly evaluation record.',
            '---', '',
-           'import { Aside, Badge, Card, CardGrid, Tabs, TabItem } from "@astrojs/starlight/components";', '',
+           'import { Aside, Badge, Tabs, TabItem } from "@astrojs/starlight/components";', '',
            'One page per model, regenerated from the evaluation record. A row is a capability in plain words; its status is computed '
            'from the tests that are its evidence. Nothing on this page is typed by hand except the row names.', '',
            f'<Aside type="note" title="The bar">{html.escape(docs[0]["definition"])}</Aside>', '',
@@ -166,11 +166,11 @@ def render_mdx(docs: list[dict]) -> str:
         span = f'{nights[0]} to {nights[-1]}' if nights else "–"
         out.append(f'<TabItem label="{html.escape(doc["label"])}">')
         out.append(f'\nEdition {doc["as_of"]}: {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
-        out.append('<CardGrid>')
+        out += ["| Status | Rows | Meaning |", "| :-- | --: | :-- |"]
         for st, v in doc["totals"].items():
             key, icon, label = STATUS_STYLE[st]
-            out.append(f'  <Card title="{label}: {v}">{STATUS_HELP[key]}.</Card>')
-        out.append('</CardGrid>\n')
+            out.append(f'| <Badge text="{icon} {label}" variant="{MDX_BADGE[key]}" /> | {v} | {STATUS_HELP[key]} |')
+        out.append("")
         out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard '
                    f'in this record: **{doc["authority_fails"]}**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, '
                    f'a sandbox tree check): {doc["other_safeguard_fails"]}.</Aside>\n')
@@ -179,18 +179,13 @@ def render_mdx(docs: list[dict]) -> str:
                    f'below the bar. The percentage is the plain pass rate.</Aside>\n')
         for g in doc["groups"]:
             sched = g["scheduled"]
-            out.append(f'### {html.escape(g["name"])}\n')
-            out.append(("These run on a schedule with no person in the loop. Their scheduled results are not graded yet; the evidence comes from the same work requested by a test.\n"
+            out.append(f'#### {html.escape(g["name"])}\n')
+            out.append(("These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.\n"
                         if sched else "A person asks for these in chat.\n"))
-            head = "| Capability | Status | Evidence on this model |" + (" Graded on its schedule |" if sched else "") + " Note |"
-            sep = "| :-- | :-- | :-- |" + (" :-- |" if sched else "") + " :-- |"
-            out += [head, sep]
+            out += ["| Capability | Status | Evidence on this model |", "| :-- | :-- | :-- |"]
             for r in g["rows"]:
-                cells = [html.escape(r["capability"]), _mdx_badge(r["status"]), _mdx_evidence(r)]
-                if sched:
-                    cells.append("Not yet · graded on request only")
-                cells.append(html.escape(r.get("note") or ""))
-                out.append("| " + " | ".join(cells) + " |")
+                cap = html.escape(r["capability"]) + (f' <br/><small>{html.escape(r["note"])}</small>' if r.get("note") else "")
+                out.append("| " + " | ".join([cap, _mdx_badge(r["status"]), _mdx_evidence(r)]) + " |")
             out.append("")
         out.append('</TabItem>')
     out += ['</Tabs>', '',
