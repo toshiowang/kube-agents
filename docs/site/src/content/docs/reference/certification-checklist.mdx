@@ -1,0 +1,143 @@
+---
+title: Certification checklist
+description: What kube-agents can and cannot do today, per model, computed from the nightly evaluation record.
+---
+
+import { Aside, Badge, Card, CardGrid, Tabs, TabItem } from "@astrojs/starlight/components";
+
+One page per model, regenerated from the evaluation record. A row is a capability in plain words; its status is computed from the tests that are its evidence. Nothing on this page is typed by hand except the row names.
+
+<Aside type="note" title="The bar">Certified means: evaluated on the published test suite for that journey or task, on a named model, passing at least 57 of the newest 60 runs (24 of 24 while the window fills), with the record published.</Aside>
+
+<Tabs>
+<TabItem label="Claude Opus 5.5">
+
+Edition 2026-10-28: 2,792 graded runs over 9 nights, 2026-10-20 to 2026-10-28.
+
+<CardGrid>
+  <Card title="Can: 2">Every evidence test is at the bar.</Card>
+  <Card title="Filling: 2">No failure yet; the window is short of 24 runs.</Card>
+  <Card title="Mostly: 12">At least 80 percent of runs pass; below the certification bar.</Card>
+  <Card title="Partly: 5">Between 50 and 79 percent of runs pass.</Card>
+  <Card title="Not yet: 4">Fewer than half the runs pass.</Card>
+  <Card title="No test: 4">No test exists, or none has run on this model.</Card>
+</CardGrid>
+
+<Aside type="tip" title="Guaranteed">The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes. Cluster or repository writes caught by a safeguard in this record: **0**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): 11.</Aside>
+
+<Aside type="caution" title="Why so few rows are green">The bar is per test, and a row is green only when every one of its tests clears it. This record is 9 nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row below the bar. The percentage is the plain pass rate.</Aside>
+
+### Scheduled journeys (run with no person in the loop)
+
+These run on a schedule with no person in the loop. Their scheduled results are not graded yet; the evidence comes from the same work requested by a test.
+
+| Capability | Status | Evidence on this model | Graded on its schedule | Note |
+| :-- | :-- | :-- | :-- | :-- |
+| Compliance audit finds risky access and respects declared exceptions | <Badge text="◕ Mostly" variant="caution" /> | **91%** · 71 of 78 runs · 1 of 4 tests at the bar | Not yet · graded on request only |  |
+| Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones | <Badge text="◕ Mostly" variant="caution" /> | **96%** · 86 of 90 runs · 1 of 5 tests at the bar | Not yet · graded on request only |  |
+| Patch readiness names the clusters behind on their version | <Badge text="✕ Not yet" variant="danger" /> | **11%** · 4 of 35 runs · 0 of 2 tests at the bar | Not yet · graded on request only |  |
+| Cost audit finds idle resources and respects declared exceptions | <Badge text="◕ Mostly" variant="caution" /> | **92%** · 60 of 65 runs · 0 of 4 tests at the bar | Not yet · graded on request only |  |
+| Consistency audit spots the cluster configured unlike its peers | <Badge text="◕ Mostly" variant="caution" /> | **81%** · 50 of 62 runs · 0 of 3 tests at the bar | Not yet · graded on request only |  |
+| AI security audit finds exposed model-serving workloads | <Badge text="◑ Partly" variant="tip" /> | **62%** · 40 of 65 runs · 1 of 3 tests at the bar | Not yet · graded on request only |  |
+| Stockout prevention names node pools at risk | <Badge text="◑ Partly" variant="tip" /> | **60%** · 36 of 60 runs · 0 of 3 tests at the bar | Not yet · graded on request only | the collector misses the planted pool |
+| Networking fabric audit | <Badge text="– No test" variant="default" /> | no test exists | Not yet · graded on request only |  |
+| Compute fleet audit | <Badge text="– No test" variant="default" /> | no test exists | Not yet · graded on request only |  |
+| Upgrade retrospective explains a failed upgrade, stays quiet after a clean week | <Badge text="◑ Partly" variant="tip" /> | **51%** · 41 of 81 runs · 0 of 9 tests at the bar | Not yet · graded on request only |  |
+| Stall watch notices a controller that stopped, stays quiet on a healthy fleet | <Badge text="◔ Filling" variant="note" /> | **100%** · 15 of 15 runs · window at 15 of 24 runs | Not yet · graded on request only | only the silence side has a fixture |
+| Upgrade readiness grades each cluster and names every blocker | <Badge text="◕ Mostly" variant="caution" /> | **90%** · 270 of 299 runs · 0 of 26 tests at the bar | Not yet · graded on request only |  |
+| Weekly readiness brief names the decisions a person owes | <Badge text="◑ Partly" variant="tip" /> | **71%** · 17 of 24 runs · 0 of 2 tests at the bar | Not yet · graded on request only |  |
+| Repository watcher triages new issues | <Badge text="✓ Can" variant="success" /> | **100%** · 27 of 27 runs · 1 of 1 tests at the bar | Not yet · graded on request only |  |
+| Warning event becomes a root cause, fix options and a pull request on &quot;apply&quot; | <Badge text="◕ Mostly" variant="caution" /> | **84%** · 78 of 93 runs · 1 of 5 tests at the bar | Not yet · graded on request only |  |
+| GitOps drift alert is triaged against the declared source | <Badge text="◕ Mostly" variant="caution" /> | **88%** · 100 of 113 runs · 0 of 6 tests at the bar | Not yet · graded on request only |  |
+| Autoscaler stockout investigator | <Badge text="– No test" variant="default" /> | no test exists | Not yet · graded on request only | off by default |
+| Critical findings get a pull request, re-runs open no duplicate | <Badge text="◔ Filling" variant="note" /> | **100%** · 81 of 81 runs · window at 15 of 24 runs | Not yet · graded on request only | the pull request is graded on request; the audit-opened one is not |
+| Chat posts (audit report, findings nudge, daily recap, fallback to the home channel) | <Badge text="– No test" variant="default" /> | no test exists | Not yet · graded on request only | no evaluation install has a chat platform |
+
+### On-demand tasks (a person asks in chat)
+
+A person asks for these in chat.
+
+| Capability | Status | Evidence on this model | Note |
+| :-- | :-- | :-- | :-- |
+| Diagnose a broken workload without changing it | <Badge text="◕ Mostly" variant="caution" /> | **85%** · 89 of 105 runs · 0 of 6 tests at the bar |  |
+| Run an audit now, or answer a fleet question from the collectors | <Badge text="◕ Mostly" variant="caution" /> | **91%** · 159 of 175 runs · 1 of 10 tests at the bar |  |
+| Propose a change as a pull request, never apply it | <Badge text="◕ Mostly" variant="caution" /> | **81%** · 131 of 162 runs · 2 of 6 tests at the bar |  |
+| Refuse an unsafe or direct change and name the safe path | <Badge text="◑ Partly" variant="tip" /> | **69%** · 106 of 153 runs · 0 of 8 tests at the bar |  |
+| Repository work (review replies, branch reuse, issue triage, forge commands) | <Badge text="◕ Mostly" variant="caution" /> | **97%** · 151 of 156 runs · 3 of 5 tests at the bar |  |
+| Answer GKE knowledge questions with sources | <Badge text="◕ Mostly" variant="caution" /> | **81%** · 90 of 111 runs · 0 of 7 tests at the bar |  |
+| Check observability wiring (metrics, traces, alerts) | <Badge text="✕ Not yet" variant="danger" /> | **46%** · 22 of 48 runs · 0 of 3 tests at the bar |  |
+| Converse well (answer first, say the next step, back claims with evidence) | <Badge text="✕ Not yet" variant="danger" /> | **46%** · 29 of 63 runs · 0 of 5 tests at the bar |  |
+| Record a person&#x27;s decision on a finding (dismiss, snooze, accept) | <Badge text="✕ Not yet" variant="danger" /> | **27%** · 9 of 33 runs · 0 of 3 tests at the bar |  |
+| First-run audits start at onboarding | <Badge text="✓ Can" variant="success" /> | **100%** · 27 of 27 runs · 1 of 1 tests at the bar |  |
+
+</TabItem>
+<TabItem label="Gemini 3.1 Pro">
+
+Edition 2026-10-19: 4,969 graded runs over 29 nights, 2026-09-17 to 2026-10-19.
+
+<CardGrid>
+  <Card title="Can: 1">Every evidence test is at the bar.</Card>
+  <Card title="Filling: 1">No failure yet; the window is short of 24 runs.</Card>
+  <Card title="Mostly: 6">At least 80 percent of runs pass; below the certification bar.</Card>
+  <Card title="Partly: 10">Between 50 and 79 percent of runs pass.</Card>
+  <Card title="Not yet: 5">Fewer than half the runs pass.</Card>
+  <Card title="No test: 6">No test exists, or none has run on this model.</Card>
+</CardGrid>
+
+<Aside type="tip" title="Guaranteed">The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes. Cluster or repository writes caught by a safeguard in this record: **0**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): 6.</Aside>
+
+<Aside type="caution" title="Why so few rows are green">The bar is per test, and a row is green only when every one of its tests clears it. This record is 29 nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row below the bar. The percentage is the plain pass rate.</Aside>
+
+### Scheduled journeys (run with no person in the loop)
+
+These run on a schedule with no person in the loop. Their scheduled results are not graded yet; the evidence comes from the same work requested by a test.
+
+| Capability | Status | Evidence on this model | Graded on its schedule | Note |
+| :-- | :-- | :-- | :-- | :-- |
+| Compliance audit finds risky access and respects declared exceptions | <Badge text="◑ Partly" variant="tip" /> | **51%** · 69 of 136 runs · 0 of 4 tests at the bar | Not yet · graded on request only |  |
+| Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones | <Badge text="✕ Not yet" variant="danger" /> | **44%** · 109 of 246 runs · 0 of 5 tests at the bar | Not yet · graded on request only |  |
+| Patch readiness names the clusters behind on their version | <Badge text="✕ Not yet" variant="danger" /> | **41%** · 39 of 96 runs · 0 of 2 tests at the bar | Not yet · graded on request only |  |
+| Cost audit finds idle resources and respects declared exceptions | <Badge text="✕ Not yet" variant="danger" /> | **31%** · 30 of 98 runs · 0 of 3 tests at the bar | Not yet · graded on request only |  |
+| Consistency audit spots the cluster configured unlike its peers | <Badge text="◑ Partly" variant="tip" /> | **75%** · 94 of 126 runs · 0 of 3 tests at the bar | Not yet · graded on request only |  |
+| AI security audit finds exposed model-serving workloads | <Badge text="✕ Not yet" variant="danger" /> | **8%** · 5 of 66 runs · 0 of 2 tests at the bar | Not yet · graded on request only |  |
+| Stockout prevention names node pools at risk | <Badge text="◑ Partly" variant="tip" /> | **50%** · 63 of 126 runs · 0 of 3 tests at the bar | Not yet · graded on request only | the collector misses the planted pool |
+| Networking fabric audit | <Badge text="– No test" variant="default" /> | no test exists | Not yet · graded on request only |  |
+| Compute fleet audit | <Badge text="– No test" variant="default" /> | no test exists | Not yet · graded on request only |  |
+| Upgrade retrospective explains a failed upgrade, stays quiet after a clean week | <Badge text="– No test" variant="default" /> | no graded run on this model | Not yet · graded on request only |  |
+| Stall watch notices a controller that stopped, stays quiet on a healthy fleet | <Badge text="✓ Can" variant="success" /> | **95%** · 57 of 60 runs · 1 of 1 tests at the bar | Not yet · graded on request only | only the silence side has a fixture |
+| Upgrade readiness grades each cluster and names every blocker | <Badge text="◑ Partly" variant="tip" /> | **56%** · 141 of 252 runs · 1 of 6 tests at the bar | Not yet · graded on request only |  |
+| Weekly readiness brief names the decisions a person owes | <Badge text="– No test" variant="default" /> | no graded run on this model | Not yet · graded on request only |  |
+| Repository watcher triages new issues | <Badge text="◑ Partly" variant="tip" /> | **75%** · 45 of 60 runs · 0 of 1 tests at the bar | Not yet · graded on request only |  |
+| Warning event becomes a root cause, fix options and a pull request on &quot;apply&quot; | <Badge text="◕ Mostly" variant="caution" /> | **83%** · 200 of 240 runs · 1 of 4 tests at the bar | Not yet · graded on request only |  |
+| GitOps drift alert is triaged against the declared source | <Badge text="◑ Partly" variant="tip" /> | **79%** · 63 of 80 runs · 0 of 3 tests at the bar | Not yet · graded on request only |  |
+| Autoscaler stockout investigator | <Badge text="– No test" variant="default" /> | no test exists | Not yet · graded on request only | off by default |
+| Critical findings get a pull request, re-runs open no duplicate | <Badge text="◕ Mostly" variant="caution" /> | **92%** · 165 of 180 runs · 2 of 3 tests at the bar | Not yet · graded on request only | the pull request is graded on request; the audit-opened one is not |
+| Chat posts (audit report, findings nudge, daily recap, fallback to the home channel) | <Badge text="– No test" variant="default" /> | no test exists | Not yet · graded on request only | no evaluation install has a chat platform |
+
+### On-demand tasks (a person asks in chat)
+
+A person asks for these in chat.
+
+| Capability | Status | Evidence on this model | Note |
+| :-- | :-- | :-- | :-- |
+| Diagnose a broken workload without changing it | <Badge text="◑ Partly" variant="tip" /> | **73%** · 218 of 300 runs · 2 of 5 tests at the bar |  |
+| Run an audit now, or answer a fleet question from the collectors | <Badge text="◕ Mostly" variant="caution" /> | **83%** · 104 of 126 runs · 1 of 9 tests at the bar |  |
+| Propose a change as a pull request, never apply it | <Badge text="◕ Mostly" variant="caution" /> | **82%** · 198 of 240 runs · 2 of 4 tests at the bar |  |
+| Refuse an unsafe or direct change and name the safe path | <Badge text="◑ Partly" variant="tip" /> | **75%** · 88 of 117 runs · 0 of 3 tests at the bar |  |
+| Repository work (review replies, branch reuse, issue triage, forge commands) | <Badge text="◑ Partly" variant="tip" /> | **72%** · 205 of 285 runs · 1 of 5 tests at the bar |  |
+| Answer GKE knowledge questions with sources | <Badge text="◑ Partly" variant="tip" /> | **66%** · 159 of 240 runs · 1 of 7 tests at the bar |  |
+| Check observability wiring (metrics, traces, alerts) | <Badge text="✕ Not yet" variant="danger" /> | **36%** · 12 of 33 runs · 0 of 3 tests at the bar |  |
+| Converse well (answer first, say the next step, back claims with evidence) | <Badge text="◕ Mostly" variant="caution" /> | **89%** · 8 of 9 runs · 0 of 1 tests at the bar |  |
+| Record a person&#x27;s decision on a finding (dismiss, snooze, accept) | <Badge text="◕ Mostly" variant="caution" /> | **97%** · 61 of 63 runs · 0 of 2 tests at the bar |  |
+| First-run audits start at onboarding | <Badge text="◔ Filling" variant="note" /> | **100%** · 12 of 12 runs · window at 12 of 24 runs |  |
+
+</TabItem>
+</Tabs>
+
+## Not on this page
+
+Twenty documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; any comparison against a plain model, which the first paired run adds as a column.
+
+## Method
+
+Rows: `bench/run-store/capabilities.yaml`. Numbers: `bench/run-store/runs/`, the newest 60 graded runs per test on the model; runs marked not applicable are left out; the lower bound is the 95 percent Wilson bound. Generators: `scripts/eval_dashboard/capability_checklist.py` and `render_checklist.py --mdx`.

@@ -134,12 +134,84 @@ Computed from <b>{doc["graded_runs"]:,} graded runs</b> over <b>{len(nights)} ni
 </main><script>{JS}</script></body></html>"""
 
 
+MDX_BADGE = {"can": "success", "filling": "note", "mostly": "caution", "partly": "tip", "notyet": "danger", "notest": "default"}
+
+
+def _mdx_badge(status: str) -> str:
+    key, icon, label = STATUS_STYLE[status]
+    return f'<Badge text="{icon} {label}" variant="{MDX_BADGE[key]}" />'
+
+
+def _mdx_evidence(row: dict) -> str:
+    if row["n"] == 0:
+        return html.escape(row["detail"])
+    pct = 100.0 * row["passes"] / row["n"]
+    key = STATUS_STYLE[row["status"]][0]
+    tail = f'window at {row["min_window"]} of 24 runs' if key == "filling" else f'{row["certified"]} of {row["tests_with_runs"]} tests at the bar'
+    return f'**{pct:.0f}%** · {row["passes"]} of {row["n"]} runs · {tail}'
+
+
+def render_mdx(docs: list[dict]) -> str:
+    """One Starlight page, one tab per model, in the site's own components."""
+    out = ['---', 'title: Certification checklist',
+           'description: What kube-agents can and cannot do today, per model, computed from the nightly evaluation record.',
+           '---', '',
+           'import { Aside, Badge, Card, CardGrid, Tabs, TabItem } from "@astrojs/starlight/components";', '',
+           'One page per model, regenerated from the evaluation record. A row is a capability in plain words; its status is computed '
+           'from the tests that are its evidence. Nothing on this page is typed by hand except the row names.', '',
+           f'<Aside type="note" title="The bar">{html.escape(docs[0]["definition"])}</Aside>', '',
+           '<Tabs>']
+    for doc in docs:
+        nights = doc["nights"]
+        span = f'{nights[0]} to {nights[-1]}' if nights else "–"
+        out.append(f'<TabItem label="{html.escape(doc["label"])}">')
+        out.append(f'\nEdition {doc["as_of"]}: {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
+        out.append('<CardGrid>')
+        for st, v in doc["totals"].items():
+            key, icon, label = STATUS_STYLE[st]
+            out.append(f'  <Card title="{label}: {v}">{STATUS_HELP[key]}.</Card>')
+        out.append('</CardGrid>\n')
+        out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard '
+                   f'in this record: **{doc["authority_fails"]}**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, '
+                   f'a sandbox tree check): {doc["other_safeguard_fails"]}.</Aside>\n')
+        out.append(f'<Aside type="caution" title="Why so few rows are green">The bar is per test, and a row is green only when every one of its tests '
+                   f'clears it. This record is {len(nights)} nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row '
+                   f'below the bar. The percentage is the plain pass rate.</Aside>\n')
+        for g in doc["groups"]:
+            sched = g["scheduled"]
+            out.append(f'### {html.escape(g["name"])}\n')
+            out.append(("These run on a schedule with no person in the loop. Their scheduled results are not graded yet; the evidence comes from the same work requested by a test.\n"
+                        if sched else "A person asks for these in chat.\n"))
+            head = "| Capability | Status | Evidence on this model |" + (" Graded on its schedule |" if sched else "") + " Note |"
+            sep = "| :-- | :-- | :-- |" + (" :-- |" if sched else "") + " :-- |"
+            out += [head, sep]
+            for r in g["rows"]:
+                cells = [html.escape(r["capability"]), _mdx_badge(r["status"]), _mdx_evidence(r)]
+                if sched:
+                    cells.append("Not yet · graded on request only")
+                cells.append(html.escape(r.get("note") or ""))
+                out.append("| " + " | ".join(cells) + " |")
+            out.append("")
+        out.append('</TabItem>')
+    out += ['</Tabs>', '',
+            '## Not on this page', '',
+            'Twenty documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; '
+            'any comparison against a plain model, which the first paired run adds as a column.', '',
+            '## Method', '',
+            'Rows: `bench/run-store/capabilities.yaml`. Numbers: `bench/run-store/runs/`, the newest 60 graded runs per test on the model; '
+            'runs marked not applicable are left out; the lower bound is the 95 percent Wilson bound. '
+            'Generators: `scripts/eval_dashboard/capability_checklist.py` and `render_checklist.py --mdx`.', '']
+    return "\n".join(out)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--in", dest="src", required=True, type=pathlib.Path)
+    ap.add_argument("--in", dest="src", required=True, type=pathlib.Path, nargs="+", help="one JSON per model; the HTML mode renders the first, the MDX mode one tab each")
     ap.add_argument("--out", required=True, type=pathlib.Path)
+    ap.add_argument("--mdx", action="store_true", help="write a Starlight MDX page for docs/site instead of standalone HTML")
     a = ap.parse_args(argv)
-    a.out.write_text(render(json.loads(a.src.read_text())))
+    docs = [json.loads(p.read_text()) for p in a.src]
+    a.out.write_text(render_mdx(docs) if a.mdx else render(docs[0]))
     print(f"wrote {a.out}")
     return 0
 
