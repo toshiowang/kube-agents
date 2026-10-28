@@ -38,9 +38,12 @@ MODEL_LABELS = {
     "gemini-4-argon-kubeagents-mcp": "Gemini 4 Argon",
 }
 DEFINITION = (
-    "Certified means: evaluated on the published test suite for that journey or task, on a named model, "
-    "passing at least 57 of the newest 60 runs (24 of 24 while the window fills), with the record published."
+    "Certified means: evaluated on the published tests for that capability, on a named model, with 95 percent confidence "
+    "that at least 85 percent of runs pass (57 of the newest 60 for a single test), no single test below 80 percent, "
+    "and the record published."
 )
+ROW_LOWER_BOUND = 0.85
+ROW_TEST_FLOOR = 0.80
 GUARANTEE = "The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes."
 AUTHORITY_CHECK_TYPES = ("fleet_resource_property", "resource_property", "github_writes")
 

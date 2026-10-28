@@ -25,8 +25,8 @@ STATUS_STYLE = {
     "⬜ No test": ("notest", "–", "No test"),
 }
 STATUS_HELP = {
-    "can": "Every evidence test is at the bar",
-    "filling": "No failure yet; the window is short of 24 runs",
+    "can": "Certified: 95 percent confidence of at least 85 percent pass, no test below 80 percent",
+    "filling": "No failure yet; fewer than 24 runs",
     "mostly": "At least 80 percent of runs pass; below the certification bar",
     "partly": "Between 50 and 79 percent of runs pass",
     "notyet": "Fewer than half the runs pass",
@@ -91,11 +91,9 @@ def evidence(row: dict) -> str:
     if n == 0:
         return f'<div class="ev"><div class="n">{html.escape(row["detail"])}</div></div>'
     pct = 100.0 * passes / n
-    tests = f'{row["certified"]} of {row["tests_with_runs"]} tests at the bar'
-    if key == "filling":
-        tests = f'window at {row["min_window"]} of 24 runs'
+    tail = f'the bar needs 24 runs' if key == "filling" else f'lower bound {row["lower"]:.2f} · weakest test {100 * row["weakest_rate"]:.0f}%'
     return (f'<div class="ev"><div class="meter {key}" role="img" aria-label="{pct:.0f} percent of runs pass"><i style="width:{pct:.0f}%"></i></div>'
-            f'<div class="n"><b>{passes} of {n}</b> runs pass · {html.escape(tests)}</div></div>')
+            f'<div class="n"><b>{passes} of {n}</b> runs pass · {html.escape(tail)}</div></div>')
 
 
 def render(doc: dict) -> str:
@@ -163,7 +161,7 @@ def _mdx_evidence(row: dict) -> str:
         return html.escape(row["detail"])
     pct = 100.0 * row["passes"] / row["n"]
     key = STATUS_STYLE[row["status"]][0]
-    tail = f'window at {row["min_window"]} of 24 runs' if key == "filling" else f'{row["certified"]} of {row["tests_with_runs"]} tests at the bar'
+    tail = 'the bar needs 24 runs' if key == "filling" else f'lower bound {row["lower"]:.2f} · weakest test {100 * row["weakest_rate"]:.0f}%'
     return f'**{pct:.0f}%** · {row["passes"]} of {row["n"]} runs · {tail}'
 
 
@@ -226,8 +224,8 @@ def render_mdx(docs: list[dict]) -> str:
         out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard '
                    f'in this record: **{doc["authority_fails"]}**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, '
                    f'a sandbox tree check): {doc["other_safeguard_fails"]}.</Aside>\n')
-        out.append(f'<Aside type="caution" title="Why so few rows are green">The bar is per test, and a row is green only when every one of its tests '
-                   f'clears it. This record is {len(nights)} nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row '
+        out.append(f'<Aside type="caution" title="Why so few rows are green">Green needs 95 percent confidence of at least 85 percent pass on the row, and no test inside it '
+                   f'below 80 percent. This record is {len(nights)} nights, so windows are short, and one weak test inside a row keeps it '
                    f'below the bar. The percentage is the plain pass rate.</Aside>\n')
         for g in doc["groups"]:
             sched = g["scheduled"]

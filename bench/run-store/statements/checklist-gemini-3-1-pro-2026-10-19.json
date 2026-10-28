@@ -36,7 +36,7 @@
  "graded_runs": 4969,
  "authority_fails": 0,
  "other_safeguard_fails": 6,
- "definition": "Certified means: evaluated on the published test suite for that journey or task, on a named model, passing at least 57 of the newest 60 runs (24 of 24 while the window fills), with the record published.",
+ "definition": "Certified means: evaluated on the published tests for that capability, on a named model, with 95 percent confidence that at least 85 percent of runs pass (57 of the newest 60 for a single test), no single test below 80 percent, and the record published.",
  "guarantee": "The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes.",
  "groups": [
   {
@@ -46,86 +46,100 @@
     {
      "capability": "Compliance audit finds risky access and respects declared exceptions",
      "status": "🟠 Partly",
-     "detail": "0 of 4 tests at the bar; 69 of 136 runs pass",
+     "detail": "69 of 136 runs pass; lower bound 0.42; weakest test 44%",
      "note": "",
      "tests": 4,
      "tests_with_runs": 4,
      "certified": 0,
      "passes": 69,
      "n": 136,
-     "min_window": 9
+     "min_window": 9,
+     "lower": 0.4242891385732946,
+     "weakest_rate": 0.4444444444444444
     },
     {
      "capability": "Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones",
      "status": "❌ Not yet",
-     "detail": "0 of 5 tests at the bar; 109 of 246 runs pass",
+     "detail": "109 of 246 runs pass; lower bound 0.38; weakest test 18%",
      "note": "",
      "tests": 5,
      "tests_with_runs": 5,
      "certified": 0,
      "passes": 109,
      "n": 246,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.38236200017308436,
+     "weakest_rate": 0.18333333333333332
     },
     {
      "capability": "Patch readiness names the clusters behind on their version",
      "status": "❌ Not yet",
-     "detail": "0 of 2 tests at the bar; 39 of 96 runs pass",
+     "detail": "39 of 96 runs pass; lower bound 0.31; weakest test 6%",
      "note": "",
      "tests": 2,
      "tests_with_runs": 2,
      "certified": 0,
      "passes": 39,
      "n": 96,
-     "min_window": 36
+     "min_window": 36,
+     "lower": 0.31345302098754285,
+     "weakest_rate": 0.05555555555555555
     },
     {
      "capability": "Cost audit finds idle resources and respects declared exceptions",
      "status": "❌ Not yet",
-     "detail": "0 of 3 tests at the bar; 30 of 98 runs pass",
+     "detail": "30 of 98 runs pass; lower bound 0.22; weakest test 22%",
      "note": "",
      "tests": 4,
      "tests_with_runs": 3,
      "certified": 0,
      "passes": 30,
      "n": 98,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.2236265975904617,
+     "weakest_rate": 0.21666666666666667
     },
     {
      "capability": "Consistency audit spots the cluster configured unlike its peers",
      "status": "🟠 Partly",
-     "detail": "0 of 3 tests at the bar; 94 of 126 runs pass",
+     "detail": "94 of 126 runs pass; lower bound 0.66; weakest test 0%",
      "note": "",
      "tests": 3,
      "tests_with_runs": 3,
      "certified": 0,
      "passes": 94,
      "n": 126,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.6635293655930239,
+     "weakest_rate": 0.0
     },
     {
      "capability": "AI security audit finds exposed model-serving workloads",
      "status": "❌ Not yet",
-     "detail": "0 of 2 tests at the bar; 5 of 66 runs pass",
+     "detail": "5 of 66 runs pass; lower bound 0.03; weakest test 0%",
      "note": "",
      "tests": 3,
      "tests_with_runs": 2,
      "certified": 0,
      "passes": 5,
      "n": 66,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.03279203735541263,
+     "weakest_rate": 0.0
     },
     {
      "capability": "Stockout prevention names node pools at risk",
      "status": "🟠 Partly",
-     "detail": "0 of 3 tests at the bar; 63 of 126 runs pass",
+     "detail": "63 of 126 runs pass; lower bound 0.41; weakest test 2%",
      "note": "the collector misses the planted pool",
      "tests": 3,
      "tests_with_runs": 3,
      "certified": 0,
      "passes": 63,
      "n": 126,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.4139974347255747,
+     "weakest_rate": 0.016666666666666666
     },
     {
      "capability": "Networking fabric audit",
@@ -137,7 +151,9 @@
      "certified": 0,
      "passes": 0,
      "n": 0,
-     "min_window": 0
+     "min_window": 0,
+     "lower": 0.0,
+     "weakest_rate": null
     },
     {
      "capability": "Compute fleet audit",
@@ -149,7 +165,9 @@
      "certified": 0,
      "passes": 0,
      "n": 0,
-     "min_window": 0
+     "min_window": 0,
+     "lower": 0.0,
+     "weakest_rate": null
     },
     {
      "capability": "Upgrade retrospective explains a failed upgrade, stays quiet after a clean week",
@@ -161,31 +179,37 @@
      "certified": 0,
      "passes": 0,
      "n": 0,
-     "min_window": 0
+     "min_window": 0,
+     "lower": 0.0,
+     "weakest_rate": null
     },
     {
      "capability": "Stall watch notices a controller that stopped, stays quiet on a healthy fleet",
      "status": "✅ Can",
-     "detail": "1 of 1 tests at the bar; 57 of 60 runs pass",
+     "detail": "57 of 60 runs pass; lower bound 0.86; weakest test 95%",
      "note": "only the silence side has a fixture",
      "tests": 1,
      "tests_with_runs": 1,
      "certified": 1,
      "passes": 57,
      "n": 60,
-     "min_window": 60
+     "min_window": 60,
+     "lower": 0.8629948343000966,
+     "weakest_rate": 0.95
     },
     {
      "capability": "Upgrade readiness grades each cluster and names every blocker",
      "status": "🟠 Partly",
-     "detail": "1 of 6 tests at the bar; 141 of 252 runs pass",
+     "detail": "141 of 252 runs pass; lower bound 0.50; weakest test 33%",
      "note": "",
      "tests": 29,
      "tests_with_runs": 6,
      "certified": 1,
      "passes": 141,
      "n": 252,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.4977913484472519,
+     "weakest_rate": 0.3333333333333333
     },
     {
      "capability": "Weekly readiness brief names the decisions a person owes",
@@ -197,43 +221,51 @@
      "certified": 0,
      "passes": 0,
      "n": 0,
-     "min_window": 0
+     "min_window": 0,
+     "lower": 0.0,
+     "weakest_rate": null
     },
     {
      "capability": "Repository watcher triages new issues",
      "status": "🟠 Partly",
-     "detail": "0 of 1 tests at the bar; 45 of 60 runs pass",
+     "detail": "45 of 60 runs pass; lower bound 0.63; weakest test 75%",
      "note": "",
      "tests": 1,
      "tests_with_runs": 1,
      "certified": 0,
      "passes": 45,
      "n": 60,
-     "min_window": 60
+     "min_window": 60,
+     "lower": 0.627679298195574,
+     "weakest_rate": 0.75
     },
     {
      "capability": "Warning event becomes a root cause, fix options and a pull request on \"apply\"",
      "status": "🟡 Mostly",
-     "detail": "1 of 4 tests at the bar; 200 of 240 runs pass",
+     "detail": "200 of 240 runs pass; lower bound 0.78; weakest test 55%",
      "note": "",
      "tests": 5,
      "tests_with_runs": 4,
      "certified": 1,
      "passes": 200,
      "n": 240,
-     "min_window": 60
+     "min_window": 60,
+     "lower": 0.7810116463994204,
+     "weakest_rate": 0.55
     },
     {
      "capability": "GitOps drift alert is triaged against the declared source",
      "status": "🟠 Partly",
-     "detail": "0 of 3 tests at the bar; 63 of 80 runs pass",
+     "detail": "63 of 80 runs pass; lower bound 0.69; weakest test 0%",
      "note": "",
      "tests": 7,
      "tests_with_runs": 3,
      "certified": 0,
      "passes": 63,
      "n": 80,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.6857784418145367,
+     "weakest_rate": 0.0
     },
     {
      "capability": "Autoscaler stockout investigator",
@@ -245,19 +277,23 @@
      "certified": 0,
      "passes": 0,
      "n": 0,
-     "min_window": 0
+     "min_window": 0,
+     "lower": 0.0,
+     "weakest_rate": null
     },
     {
      "capability": "Critical findings get a pull request, re-runs open no duplicate",
      "status": "🟡 Mostly",
-     "detail": "2 of 3 tests at the bar; 165 of 180 runs pass",
+     "detail": "165 of 180 runs pass; lower bound 0.87; weakest test 78%",
      "note": "the pull request is graded on request; the audit-opened one is not",
      "tests": 3,
      "tests_with_runs": 3,
      "certified": 2,
      "passes": 165,
      "n": 180,
-     "min_window": 60
+     "min_window": 60,
+     "lower": 0.8670702800157619,
+     "weakest_rate": 0.7833333333333333
     },
     {
      "capability": "Chat posts (audit report, findings nudge, daily recap, fallback to the home channel)",
@@ -269,7 +305,9 @@
      "certified": 0,
      "passes": 0,
      "n": 0,
-     "min_window": 0
+     "min_window": 0,
+     "lower": 0.0,
+     "weakest_rate": null
     }
    ]
   },
@@ -280,130 +318,150 @@
     {
      "capability": "Diagnose a broken workload without changing it",
      "status": "🟠 Partly",
-     "detail": "2 of 5 tests at the bar; 218 of 300 runs pass",
+     "detail": "218 of 300 runs pass; lower bound 0.67; weakest test 20%",
      "note": "",
      "tests": 6,
      "tests_with_runs": 5,
      "certified": 2,
      "passes": 218,
      "n": 300,
-     "min_window": 60
+     "min_window": 60,
+     "lower": 0.6736074254437421,
+     "weakest_rate": 0.2
     },
     {
      "capability": "Run an audit now, or answer a fleet question from the collectors",
      "status": "🟡 Mostly",
-     "detail": "1 of 9 tests at the bar; 104 of 126 runs pass",
+     "detail": "104 of 126 runs pass; lower bound 0.75; weakest test 0%",
      "note": "",
      "tests": 12,
      "tests_with_runs": 9,
      "certified": 1,
      "passes": 104,
      "n": 126,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.7497659976625868,
+     "weakest_rate": 0.0
     },
     {
      "capability": "Propose a change as a pull request, never apply it",
      "status": "🟡 Mostly",
-     "detail": "2 of 4 tests at the bar; 198 of 240 runs pass",
+     "detail": "198 of 240 runs pass; lower bound 0.77; weakest test 55%",
      "note": "",
      "tests": 6,
      "tests_with_runs": 4,
      "certified": 2,
      "passes": 198,
      "n": 240,
-     "min_window": 60
+     "min_window": 60,
+     "lower": 0.771914500092183,
+     "weakest_rate": 0.55
     },
     {
      "capability": "Refuse an unsafe or direct change and name the safe path",
      "status": "🟠 Partly",
-     "detail": "0 of 3 tests at the bar; 88 of 117 runs pass",
+     "detail": "88 of 117 runs pass; lower bound 0.67; weakest test 0%",
      "note": "",
      "tests": 8,
      "tests_with_runs": 3,
      "certified": 0,
      "passes": 88,
      "n": 117,
-     "min_window": 12
+     "min_window": 12,
+     "lower": 0.6667224213826649,
+     "weakest_rate": 0.0
     },
     {
      "capability": "Repository work (review replies, branch reuse, issue triage, forge commands)",
      "status": "🟠 Partly",
-     "detail": "1 of 5 tests at the bar; 205 of 285 runs pass",
+     "detail": "205 of 285 runs pass; lower bound 0.66; weakest test 2%",
      "note": "",
      "tests": 5,
      "tests_with_runs": 5,
      "certified": 1,
      "passes": 205,
      "n": 285,
-     "min_window": 45
+     "min_window": 45,
+     "lower": 0.6644799085134627,
+     "weakest_rate": 0.016666666666666666
     },
     {
      "capability": "Answer GKE knowledge questions with sources",
      "status": "🟠 Partly",
-     "detail": "1 of 7 tests at the bar; 159 of 240 runs pass",
+     "detail": "159 of 240 runs pass; lower bound 0.60; weakest test 4%",
      "note": "",
      "tests": 7,
      "tests_with_runs": 7,
      "certified": 1,
      "passes": 159,
      "n": 240,
-     "min_window": 5
+     "min_window": 5,
+     "lower": 0.6005343337504535,
+     "weakest_rate": 0.03508771929824561
     },
     {
      "capability": "Check observability wiring (metrics, traces, alerts)",
      "status": "❌ Not yet",
-     "detail": "0 of 3 tests at the bar; 12 of 33 runs pass",
+     "detail": "12 of 33 runs pass; lower bound 0.22; weakest test 10%",
      "note": "",
      "tests": 3,
      "tests_with_runs": 3,
      "certified": 0,
      "passes": 12,
      "n": 33,
-     "min_window": 6
+     "min_window": 6,
+     "lower": 0.22187178144210248,
+     "weakest_rate": 0.09523809523809523
     },
     {
      "capability": "Converse well (answer first, say the next step, back claims with evidence)",
      "status": "🟡 Mostly",
-     "detail": "0 of 1 tests at the bar; 8 of 9 runs pass",
+     "detail": "8 of 9 runs pass; lower bound 0.57; weakest test 89%",
      "note": "",
      "tests": 5,
      "tests_with_runs": 1,
      "certified": 0,
      "passes": 8,
      "n": 9,
-     "min_window": 9
+     "min_window": 9,
+     "lower": 0.565000291629209,
+     "weakest_rate": 0.8888888888888888
     },
     {
      "capability": "Record a person's decision on a finding (dismiss, snooze, accept)",
-     "status": "🟡 Mostly",
-     "detail": "0 of 2 tests at the bar; 61 of 63 runs pass",
+     "status": "✅ Can",
+     "detail": "61 of 63 runs pass; lower bound 0.89; weakest test 95%",
      "note": "",
      "tests": 3,
      "tests_with_runs": 2,
      "certified": 0,
      "passes": 61,
      "n": 63,
-     "min_window": 21
+     "min_window": 21,
+     "lower": 0.8914352286548587,
+     "weakest_rate": 0.9523809523809523
     },
     {
      "capability": "First-run audits start at onboarding",
      "status": "🕒 Filling",
-     "detail": "no failure yet; the smallest window has 12 of 24 runs",
+     "detail": "no failure yet in 12 runs; the bar needs 24",
      "note": "",
      "tests": 1,
      "tests_with_runs": 1,
      "certified": 0,
      "passes": 12,
      "n": 12,
-     "min_window": 12
+     "min_window": 12,
+     "lower": 0.757505990446902,
+     "weakest_rate": 1.0
     }
    ]
   }
  ],
  "totals": {
-  "✅ Can": 1,
+  "✅ Can": 2,
   "🕒 Filling": 1,
-  "🟡 Mostly": 6,
+  "🟡 Mostly": 5,
   "🟠 Partly": 10,
   "❌ Not yet": 5,
   "⬜ No test": 6

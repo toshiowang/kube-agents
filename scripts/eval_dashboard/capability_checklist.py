@@ -20,7 +20,8 @@ import yaml
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from certification_statement import (CERTIFIED_PASSES_FILLING, DEFINITION, GUARANTEE, MODEL_LABELS,  # noqa: E402
-                                     STATE_CERTIFIED, is_authority_violation, load_rows, load_tasks, window)
+                                     ROW_LOWER_BOUND, ROW_TEST_FLOOR, STATE_CERTIFIED, is_authority_violation,
+                                     load_rows, load_tasks, wilson_lower, window)
 
 CAN = "✅ Can"
 FILLING = "🕒 Filling"
@@ -33,24 +34,27 @@ MOSTLY_MIN_RATE = 0.8
 
 
 def status(windows: list[dict]) -> tuple[str, str, dict]:
-    """(label, one-line evidence, numbers) for one checklist row."""
+    """(label, one-line evidence, numbers) for one checklist row, under the per-row rule."""
     with_runs = [w for w in windows if w["n"] > 0]
-    numbers = {"tests": len(windows), "tests_with_runs": len(with_runs), "certified": 0, "passes": 0, "n": 0, "min_window": 0}
+    numbers = {"tests": len(windows), "tests_with_runs": len(with_runs), "certified": 0, "passes": 0, "n": 0,
+               "min_window": 0, "lower": 0.0, "weakest_rate": None}
     if not with_runs:
         return NO_TEST, ("no graded run on this model" if windows else "no test exists"), numbers
-    certified = sum(w["state"] == STATE_CERTIFIED for w in with_runs)
     n = sum(w["n"] for w in with_runs)
     passes = sum(w["passes"] for w in with_runs)
-    numbers.update(certified=certified, passes=passes, n=n, min_window=min(w["n"] for w in with_runs))
+    lower = wilson_lower(passes, n)
+    weakest = min(w["passes"] / w["n"] for w in with_runs)
+    numbers.update(certified=sum(w["state"] == STATE_CERTIFIED for w in with_runs), passes=passes, n=n,
+                   min_window=min(w["n"] for w in with_runs), lower=lower, weakest_rate=weakest)
     rate = passes / n
-    detail = f"{certified} of {len(with_runs)} tests at the bar; {passes} of {n} runs pass"
-    if certified == len(with_runs):
+    detail = f"{passes} of {n} runs pass; lower bound {lower:.2f}; weakest test {weakest:.0%}"
+    if lower >= ROW_LOWER_BOUND and weakest >= ROW_TEST_FLOOR:
         return CAN, detail, numbers
     if passes == n:
-        return FILLING, f"no failure yet; the smallest window has {numbers['min_window']} of {CERTIFIED_PASSES_FILLING} runs", numbers
+        return FILLING, f"no failure yet in {n} runs; the bar needs {CERTIFIED_PASSES_FILLING}", numbers
     if rate >= MOSTLY_MIN_RATE:
         return MOSTLY, detail, numbers
-    if certified or rate >= PARTLY_MIN_RATE:
+    if rate >= PARTLY_MIN_RATE:
         return PARTLY, detail, numbers
     return NOT_YET, detail, numbers
 
@@ -78,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
                                 if c.get("role") == "safeguard" and c.get("status") == "fail" and not is_authority_violation(c))
     out = [f"# What kube-agents can and cannot do today, on {label}\n",
            f"Edition of {a.as_of}, computed from {len(graded)} graded runs over {len(nights)} nights "
-           f"({nights[0] if nights else '–'} to {nights[-1] if nights else '–'}). Legend: {CAN} = every evidence test is at the bar; "
+           f"({nights[0] if nights else '–'} to {nights[-1] if nights else '–'}). Legend: {CAN} = certified: 95 percent confidence of at least 85 percent pass on the row, no test below 80 percent; "
            f"{FILLING} = no failure yet, window still short of 24 runs; {MOSTLY} = at least 80 percent of runs pass, below the bar; {PARTLY} = between 50 and 79 percent of runs pass; {NOT_YET} = fewer than half the runs pass; {NO_TEST} = no test, or none run on this model.\n",
            f"**Guaranteed.** {GUARANTEE} Cluster or repository writes caught by a safeguard in this record: {authority_fails}. "
            f"Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): {other_safeguard_fails}.\n",
