@@ -171,7 +171,7 @@ def _mdx_cell(row: dict) -> str:
     if row["n"] == 0:
         return f'{_mdx_badge(row["status"])}'
     pct = 100.0 * row["passes"] / row["n"]
-    return f'{_mdx_badge(row["status"])} {_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small>'
+    return f'<span style={{{{whiteSpace: "nowrap"}}}}>{_mdx_badge(row["status"])} {_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small></span>'
 
 
 def _mdx_compare(docs: list[dict]) -> list[str]:
