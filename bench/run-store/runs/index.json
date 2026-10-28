@@ -289,6 +289,14 @@
    "runs": 237
   },
   {
+   "build": "2115232317600436224",
+   "cases": 86,
+   "commit": "f917a00c015d6daf8e3053a5a07ca4938bb6e55d",
+   "job": "ci-kube-agents-eval-nightly",
+   "night": "2026-10-28",
+   "runs": 258
+  },
+  {
    "build": "2110551280941273088",
    "cases": 3,
    "commit": "0ec08289b48000dd8c835511a87aead793d46fe4",
@@ -385,12 +393,28 @@
    "runs": 9
   },
   {
+   "build": "2115262516064948224",
+   "cases": 3,
+   "commit": "f917a00c015d6daf8e3053a5a07ca4938bb6e55d",
+   "job": "ci-kube-agents-eval-nightly-gitlab",
+   "night": "2026-10-28",
+   "runs": 9
+  },
+  {
    "build": "2114869926308089856",
    "cases": 79,
    "commit": "ba5add701becc4ee1b37df01849a397502d4600a",
    "job": "ci-kube-agents-eval-nightly-main-b",
    "night": "2026-10-27",
    "runs": 237
+  },
+  {
+   "build": "2115232317663350784",
+   "cases": 85,
+   "commit": "f917a00c015d6daf8e3053a5a07ca4938bb6e55d",
+   "job": "ci-kube-agents-eval-nightly-main-b",
+   "night": "2026-10-28",
+   "runs": 255
   },
   {
    "build": "2113873188608806912",
@@ -567,9 +591,17 @@
    "job": "ci-kube-agents-eval-nightly-writers",
    "night": "2026-10-27",
    "runs": 27
+  },
+  {
+   "build": "2115232317743042560",
+   "cases": 9,
+   "commit": "f917a00c015d6daf8e3053a5a07ca4938bb6e55d",
+   "job": "ci-kube-agents-eval-nightly-writers",
+   "night": "2026-10-28",
+   "runs": 27
   }
  ],
- "generated_at": "2026-10-27T21:07Z",
+ "generated_at": "2026-10-28T10:31Z",
  "nights": {
   "2026-09-17": {
    "ci-kube-agents-eval-nightly": {
@@ -1354,7 +1386,49 @@
     "pass": 24,
     "runs": 27
    }
+  },
+  "2026-10-28": {
+   "ci-kube-agents-eval-nightly": {
+    "cases": 86,
+    "fail": 28,
+    "models": [
+     "claude-opus-5-5-kubeagents-mcp"
+    ],
+    "other": 10,
+    "pass": 220,
+    "runs": 258
+   },
+   "ci-kube-agents-eval-nightly-gitlab": {
+    "cases": 3,
+    "fail": 0,
+    "models": [
+     "claude-opus-5-5-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 9,
+    "runs": 9
+   },
+   "ci-kube-agents-eval-nightly-main-b": {
+    "cases": 85,
+    "fail": 44,
+    "models": [
+     "claude-opus-5-5-kubeagents-mcp"
+    ],
+    "other": 6,
+    "pass": 205,
+    "runs": 255
+   },
+   "ci-kube-agents-eval-nightly-writers": {
+    "cases": 9,
+    "fail": 4,
+    "models": [
+     "claude-opus-5-5-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 23,
+    "runs": 27
+   }
   }
  },
- "rows": 7611
+ "rows": 8160
 }
