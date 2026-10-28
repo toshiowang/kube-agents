@@ -167,16 +167,51 @@ def _mdx_evidence(row: dict) -> str:
     return f'**{pct:.0f}%** · {row["passes"]} of {row["n"]} runs · {tail}'
 
 
+def _mdx_cell(row: dict) -> str:
+    if row["n"] == 0:
+        return f'{_mdx_badge(row["status"])}'
+    pct = 100.0 * row["passes"] / row["n"]
+    return f'{_mdx_badge(row["status"])} {_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small>'
+
+
+def _mdx_compare(docs: list[dict]) -> list[str]:
+    """One table per group: a column per model first, the capability last (the theme never wraps a first column)."""
+    labels = [d["label"] for d in docs]
+    out = [f'<TabItem label="Compare">', '',
+           'Side by side, the same rows on each model. The percentage is the plain pass rate on that model; the delta is the first model minus the second, in points.', '',
+           '| Status | ' + ' | '.join(labels) + ' |', '| :-- | ' + ' | '.join('--:' for _ in labels) + ' |']
+    for st in docs[0]["totals"]:
+        out.append(f'| {_mdx_badge(st)} | ' + ' | '.join(str(d["totals"].get(st, 0)) for d in docs) + ' |')
+    out.append('| Graded runs, nights | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} nights' for d in docs) + ' |')
+    out.append('')
+    for gi, g in enumerate(docs[0]["groups"]):
+        out.append(f'#### {html.escape(g["name"])}\n')
+        out.append('| ' + ' | '.join(labels) + ' | Delta | Capability |')
+        out.append('| ' + ' | '.join(':--' for _ in labels) + ' | --: | :-- |')
+        for ri, r in enumerate(g["rows"]):
+            rows = [d["groups"][gi]["rows"][ri] for d in docs]
+            assert all(x["capability"] == r["capability"] for x in rows), r["capability"]
+            cells = [_mdx_cell(x) for x in rows]
+            a, b = rows[0], rows[1]
+            delta = f'{(100.0 * a["passes"] / a["n"]) - (100.0 * b["passes"] / b["n"]):+.0f}' if a["n"] and b["n"] else '–'
+            out.append('| ' + ' | '.join(cells) + f' | {delta} | {html.escape(r["capability"])} |')
+        out.append('')
+    out.append('</TabItem>')
+    return out
+
+
 def render_mdx(docs: list[dict]) -> str:
     """One Starlight page, one tab per model, in the site's own components."""
     out = ['---', 'title: Certification checklist',
            'description: What kube-agents can and cannot do today, per model, computed from the nightly evaluation record.',
            '---', '',
            'import { Aside, Badge, Tabs, TabItem } from "@astrojs/starlight/components";', '',
-           'One page per model, regenerated from the evaluation record. A row is a capability in plain words; its status is computed '
-           'from the tests that are its evidence. Nothing on this page is typed by hand except the row names.', '',
+           'A row is a capability in plain words; its status is computed from the tests that are its evidence, per model, from the '
+           'evaluation record. The first tab compares the models side by side; the others are one page per model. Nothing on this page is typed by hand except the row names.', '',
            f'<Aside type="note" title="The bar">{html.escape(docs[0]["definition"])}</Aside>', '',
            '<Tabs>']
+    if len(docs) > 1:
+        out += _mdx_compare(docs)
     for doc in docs:
         nights = doc["nights"]
         span = f'{nights[0]} to {nights[-1]}' if nights else "–"
