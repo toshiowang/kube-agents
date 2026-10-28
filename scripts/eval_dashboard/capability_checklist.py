@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
+import json
 import pathlib
 import sys
 
@@ -23,28 +24,35 @@ from certification_statement import (CERTIFIED_PASSES_FILLING, DEFINITION, GUARA
 
 CAN = "✅ Can"
 FILLING = "🕒 Filling"
-PARTLY = "⚠️ Partly"
+MOSTLY = "🟡 Mostly"
+PARTLY = "🟠 Partly"
 NOT_YET = "❌ Not yet"
 NO_TEST = "⬜ No test"
 PARTLY_MIN_RATE = 0.5
+MOSTLY_MIN_RATE = 0.8
 
 
-def status(windows: list[dict]) -> tuple[str, str]:
+def status(windows: list[dict]) -> tuple[str, str, dict]:
+    """(label, one-line evidence, numbers) for one checklist row."""
     with_runs = [w for w in windows if w["n"] > 0]
+    numbers = {"tests": len(windows), "tests_with_runs": len(with_runs), "certified": 0, "passes": 0, "n": 0, "min_window": 0}
     if not with_runs:
-        return NO_TEST, "no graded run on this model" if windows else "no test exists"
+        return NO_TEST, ("no graded run on this model" if windows else "no test exists"), numbers
     certified = sum(w["state"] == STATE_CERTIFIED for w in with_runs)
     n = sum(w["n"] for w in with_runs)
     passes = sum(w["passes"] for w in with_runs)
+    numbers.update(certified=certified, passes=passes, n=n, min_window=min(w["n"] for w in with_runs))
     rate = passes / n
     detail = f"{certified} of {len(with_runs)} tests at the bar; {passes} of {n} runs pass"
     if certified == len(with_runs):
-        return CAN, detail
+        return CAN, detail, numbers
     if passes == n:
-        return FILLING, f"no failure yet; the smallest window has {min(w['n'] for w in with_runs)} of {CERTIFIED_PASSES_FILLING} runs"
+        return FILLING, f"no failure yet; the smallest window has {numbers['min_window']} of {CERTIFIED_PASSES_FILLING} runs", numbers
+    if rate >= MOSTLY_MIN_RATE:
+        return MOSTLY, detail, numbers
     if certified or rate >= PARTLY_MIN_RATE:
-        return PARTLY, detail
-    return NOT_YET, detail
+        return PARTLY, detail, numbers
+    return NOT_YET, detail, numbers
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -54,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--model", required=True)
     ap.add_argument("--as-of", required=True)
     ap.add_argument("--out", required=True, type=pathlib.Path)
+    ap.add_argument("--out-json", type=pathlib.Path, help="also write the rows and numbers as JSON for the HTML renderer")
     a = ap.parse_args(argv)
     label = MODEL_LABELS.get(a.model, a.model)
     rows = load_rows(a.store, a.model, a.as_of)
@@ -70,13 +79,18 @@ def main(argv: list[str] | None = None) -> int:
     out = [f"# What kube-agents can and cannot do today, on {label}\n",
            f"Edition of {a.as_of}, computed from {len(graded)} graded runs over {len(nights)} nights "
            f"({nights[0] if nights else '–'} to {nights[-1] if nights else '–'}). Legend: {CAN} = every evidence test is at the bar; "
-           f"{FILLING} = no failure yet, window still short of 24 runs; {PARTLY} = some tests at the bar, or at least half the runs pass; {NOT_YET} = fewer than half the runs pass; {NO_TEST} = no test, or none run on this model.\n",
+           f"{FILLING} = no failure yet, window still short of 24 runs; {MOSTLY} = at least 80 percent of runs pass, below the bar; {PARTLY} = between 50 and 79 percent of runs pass; {NOT_YET} = fewer than half the runs pass; {NO_TEST} = no test, or none run on this model.\n",
            f"**Guaranteed.** {GUARANTEE} Cluster or repository writes caught by a safeguard in this record: {authority_fails}. "
            f"Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): {other_safeguard_fails}.\n",
            f"**The bar.** {DEFINITION}\n"]
-    totals = {CAN: 0, FILLING: 0, PARTLY: 0, NOT_YET: 0, NO_TEST: 0}
+    totals = {CAN: 0, FILLING: 0, MOSTLY: 0, PARTLY: 0, NOT_YET: 0, NO_TEST: 0}
+    doc = {"model": a.model, "label": label, "as_of": a.as_of, "nights": nights, "graded_runs": len(graded),
+           "authority_fails": authority_fails, "other_safeguard_fails": other_safeguard_fails,
+           "definition": DEFINITION, "guarantee": GUARANTEE, "groups": []}
     for g in spec["groups"]:
         out.append(f"## {g['name']}\n")
+        doc_group = {"name": g["name"], "scheduled": bool(g.get("scheduled")), "rows": []}
+        doc["groups"].append(doc_group)
         sched = g.get("scheduled")
         head = "| Capability | Status | Evidence | Graded on its schedule? | Note |\n| :-- | :-- | :-- | :-- | :-- |\n" if sched \
             else "| Capability | Status | Evidence | Note |\n| :-- | :-- | :-- | :-- |\n"
@@ -84,15 +98,16 @@ def main(argv: list[str] | None = None) -> int:
         for row in g["rows"]:
             ids = sorted({t for pat in row.get("tests", []) for t in tasks if fnmatch.fnmatch(t, pat)})
             windows = [window(by_case.get(t, [])) for t in ids]
-            st, detail = status(windows)
+            st, detail, numbers = status(windows)
             totals[st] += 1
             note = row.get("note", "")
+            doc_group["rows"].append({"capability": row["capability"], "status": st, "detail": detail, "note": note, "tests": ids, **numbers})
             if sched:
                 body += f"| {row['capability']} | {st} | {detail} | ❌ not yet | {note} |\n"
             else:
                 body += f"| {row['capability']} | {st} | {detail} | {note} |\n"
         out.append(head + body)
-    out.insert(4, "| " + " | ".join(totals) + " |\n| :-- | :-- | :-- | :-- | :-- |\n| " + " | ".join(str(v) for v in totals.values()) + " |\n")
+    out.insert(4, "| " + " | ".join(totals) + " |\n| :-- | :-- | :-- | :-- | :-- | :-- |\n| " + " | ".join(str(v) for v in totals.values()) + " |\n")
     out.append("## Not in this checklist\n")
     out.append("Twenty documented promises with no test, listed in `docs/designs/certified-journeys-inventory.md`; the dollar cost of a run; "
                "any comparison against a plain model, which the first paired run will add as a column.\n")
@@ -101,6 +116,9 @@ def main(argv: list[str] | None = None) -> int:
                "95 percent Wilson lower bound, not-applicable runs left out. Generator: `scripts/eval_dashboard/capability_checklist.py`.\n")
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text("\n".join(out))
+    if a.out_json:
+        doc["totals"] = totals
+        a.out_json.write_text(json.dumps(doc, indent=1, ensure_ascii=False))
     print(f"wrote {a.out}: " + ", ".join(f"{k} {v}" for k, v in totals.items()) + f"; authority fails {authority_fails}, other safeguard fails {other_safeguard_fails}")
     return 0
 
