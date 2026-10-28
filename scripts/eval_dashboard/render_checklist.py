@@ -150,7 +150,7 @@ def _mdx_meter(row: dict) -> str:
         return ""
     key = STATUS_STYLE[row["status"]][0]
     pct = 100.0 * row["passes"] / row["n"]
-    track = ('display: "inline-block", width: "96px", height: "6px", borderRadius: "4px", background: "var(--sl-color-gray-5)", '
+    track = ('display: "inline-block", width: "72px", height: "6px", borderRadius: "4px", background: "var(--sl-color-gray-5)", '
              'verticalAlign: "middle", overflow: "hidden", margin: "0 6px 0 2px"')
     fill = f'display: "block", height: "100%", width: "{pct:.0f}%", background: "{MDX_METER_COLOR[key]}"'
     return f'<span style={{{{{track}}}}} role="img" aria-label="{pct:.0f} percent of runs pass"><span style={{{{{fill}}}}}></span></span>'
@@ -169,14 +169,16 @@ def _mdx_cell(row: dict) -> str:
     if row["n"] == 0:
         return f'{_mdx_badge(row["status"])}'
     pct = 100.0 * row["passes"] / row["n"]
-    return f'<span style={{{{whiteSpace: "nowrap"}}}}>{_mdx_badge(row["status"])} {_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small></span>'
+    why = (f'{row["passes"]} of {row["n"]} runs pass; lower bound {row["lower"]:.2f} against 0.85; weakest test {100 * row["weakest_rate"]:.0f}% against 80%')
+    return (f'<span style={{{{whiteSpace: "nowrap"}}}} title="{html.escape(why)}">{_mdx_badge(row["status"])}<br/>'
+            f'{_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small></span>')
 
 
 def _mdx_compare(docs: list[dict]) -> list[str]:
     """The single view: a column per model, the capability last (the theme never wraps a first column)."""
     labels = [d["label"] for d in docs]
-    nights_of = {d["label"]: d["nights"] for d in docs}
-    out = ['| | ' + ' | '.join(labels) + ' |', '| :-- | ' + ' | '.join('--:' for _ in labels) + ' |']
+    out = ['<style>{`.sl-markdown-content table:where(:not(.not-content *)) td:first-child { white-space: normal; min-width: 14rem; }`}</style>', '',
+           '| | ' + ' | '.join(labels) + ' |', '| :-- | ' + ' | '.join('--:' for _ in labels) + ' |']
     out.append('| Edition | ' + ' | '.join(d["as_of"] for d in docs) + ' |')
     out.append('| Record | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} nights' for d in docs) + ' |')
     out.append('| Writes caught by a safeguard | ' + ' | '.join(f'**{d["authority_fails"]}**' for d in docs) + ' |')
@@ -192,8 +194,8 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
         out.append(f'## {html.escape(g["name"])}\n')
         out.append(("These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.\n"
                     if g["scheduled"] else "A person asks for these in chat.\n"))
-        out.append('| ' + ' | '.join(labels) + ' | Delta | Capability |')
-        out.append('| ' + ' | '.join(':--' for _ in labels) + ' | --: | :-- |')
+        out.append('| Capability | ' + ' | '.join(labels) + ' | Delta |')
+        out.append('| :-- | ' + ' | '.join(':--' for _ in labels) + ' | --: |')
         for ri, r in enumerate(g["rows"]):
             rows = [d["groups"][gi]["rows"][ri] for d in docs]
             assert all(x["capability"] == r["capability"] for x in rows), r["capability"]
@@ -201,7 +203,7 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
             a, b = rows[0], rows[1]
             delta = f'{(100.0 * a["passes"] / a["n"]) - (100.0 * b["passes"] / b["n"]):+.0f}' if a["n"] and b["n"] else '–'
             note = f' <small>{html.escape(r["note"])}</small>' if r.get("note") else ""
-            out.append('| ' + ' | '.join(cells) + f' | {delta} | {html.escape(r["capability"])}{note} |')
+            out.append(f'| {html.escape(r["capability"])}{note} | ' + ' | '.join(cells) + f' | {delta} |')
         out.append('')
     return out
 
