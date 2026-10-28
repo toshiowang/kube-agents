@@ -142,6 +142,22 @@ def _mdx_badge(status: str) -> str:
     return f'<span style={{{{whiteSpace: "nowrap"}}}}><Badge text="{icon} {label}" variant="{MDX_BADGE[key]}" /></span>'
 
 
+MDX_METER_COLOR = {"can": "var(--sl-color-green)", "filling": "var(--sl-color-blue)", "mostly": "var(--sl-color-orange)",
+                   "partly": "var(--sl-color-purple)", "notyet": "var(--sl-color-red)", "notest": "var(--sl-color-gray-3)"}
+
+
+def _mdx_meter(row: dict) -> str:
+    """An inline pass-rate meter in the theme's own colors; empty for a row with no runs."""
+    if row["n"] == 0:
+        return ""
+    key = STATUS_STYLE[row["status"]][0]
+    pct = 100.0 * row["passes"] / row["n"]
+    track = ('display: "inline-block", width: "96px", height: "6px", borderRadius: "4px", background: "var(--sl-color-gray-5)", '
+             'verticalAlign: "middle", overflow: "hidden", margin: "0 6px 0 2px"')
+    fill = f'display: "block", height: "100%", width: "{pct:.0f}%", background: "{MDX_METER_COLOR[key]}"'
+    return f'<span style={{{{{track}}}}} role="img" aria-label="{pct:.0f} percent of runs pass"><span style={{{{{fill}}}}}></span></span>'
+
+
 def _mdx_evidence(row: dict) -> str:
     if row["n"] == 0:
         return html.escape(row["detail"])
@@ -184,7 +200,7 @@ def render_mdx(docs: list[dict]) -> str:
                         if sched else "A person asks for these in chat.\n"))
             for r in g["rows"]:
                 note = f' _{html.escape(r["note"])}._' if r.get("note") else ""
-                out.append(f'- {_mdx_badge(r["status"])} **{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
+                out.append(f'- {_mdx_badge(r["status"])} {_mdx_meter(r)}**{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
             out.append("")
         out.append('</TabItem>')
     out += ['</Tabs>', '',
