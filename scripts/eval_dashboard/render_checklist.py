@@ -139,7 +139,7 @@ MDX_BADGE = {"can": "success", "filling": "note", "mostly": "caution", "partly":
 
 def _mdx_badge(status: str) -> str:
     key, icon, label = STATUS_STYLE[status]
-    return f'<Badge text="{icon} {label}" variant="{MDX_BADGE[key]}" />'
+    return f'<span style={{{{whiteSpace: "nowrap"}}}}><Badge text="{icon} {label}" variant="{MDX_BADGE[key]}" /></span>'
 
 
 def _mdx_evidence(row: dict) -> str:
@@ -169,7 +169,7 @@ def render_mdx(docs: list[dict]) -> str:
         out += ["| Status | Rows | Meaning |", "| :-- | --: | :-- |"]
         for st, v in doc["totals"].items():
             key, icon, label = STATUS_STYLE[st]
-            out.append(f'| <Badge text="{icon} {label}" variant="{MDX_BADGE[key]}" /> | {v} | {STATUS_HELP[key]} |')
+            out.append(f'| {_mdx_badge(st)} | {v} | {STATUS_HELP[key]} |')
         out.append("")
         out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard '
                    f'in this record: **{doc["authority_fails"]}**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, '

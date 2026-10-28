@@ -16,12 +16,12 @@ Edition 2026-10-28: 2,792 graded runs over 9 nights, 2026-10-20 to 2026-10-28.
 
 | Status | Rows | Meaning |
 | :-- | --: | :-- |
-| <Badge text="✓ Can" variant="success" /> | 2 | Every evidence test is at the bar |
-| <Badge text="◔ Filling" variant="note" /> | 2 | No failure yet; the window is short of 24 runs |
-| <Badge text="◕ Mostly" variant="caution" /> | 12 | At least 80 percent of runs pass; below the certification bar |
-| <Badge text="◑ Partly" variant="tip" /> | 5 | Between 50 and 79 percent of runs pass |
-| <Badge text="✕ Not yet" variant="danger" /> | 4 | Fewer than half the runs pass |
-| <Badge text="– No test" variant="default" /> | 4 | No test exists, or none has run on this model |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="✓ Can" variant="success" /></span> | 2 | Every evidence test is at the bar |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="◔ Filling" variant="note" /></span> | 2 | No failure yet; the window is short of 24 runs |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> | 12 | At least 80 percent of runs pass; below the certification bar |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> | 5 | Between 50 and 79 percent of runs pass |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> | 4 | Fewer than half the runs pass |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> | 4 | No test exists, or none has run on this model |
 
 <Aside type="tip" title="Guaranteed">The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes. Cluster or repository writes caught by a safeguard in this record: **0**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): 11.</Aside>
 
@@ -31,40 +31,40 @@ Edition 2026-10-28: 2,792 graded runs over 9 nights, 2026-10-20 to 2026-10-28.
 
 These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.
 
-- <Badge text="◕ Mostly" variant="caution" /> **Compliance audit finds risky access and respects declared exceptions** — **91%** · 71 of 78 runs · 1 of 4 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones** — **96%** · 86 of 90 runs · 1 of 5 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **Patch readiness names the clusters behind on their version** — **11%** · 4 of 35 runs · 0 of 2 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Cost audit finds idle resources and respects declared exceptions** — **92%** · 60 of 65 runs · 0 of 4 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Consistency audit spots the cluster configured unlike its peers** — **81%** · 50 of 62 runs · 0 of 3 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **AI security audit finds exposed model-serving workloads** — **62%** · 40 of 65 runs · 1 of 3 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **Stockout prevention names node pools at risk** — **60%** · 36 of 60 runs · 0 of 3 tests at the bar. _the collector misses the planted pool._
-- <Badge text="– No test" variant="default" /> **Networking fabric audit** — no test exists.
-- <Badge text="– No test" variant="default" /> **Compute fleet audit** — no test exists.
-- <Badge text="◑ Partly" variant="tip" /> **Upgrade retrospective explains a failed upgrade, stays quiet after a clean week** — **51%** · 41 of 81 runs · 0 of 9 tests at the bar.
-- <Badge text="◔ Filling" variant="note" /> **Stall watch notices a controller that stopped, stays quiet on a healthy fleet** — **100%** · 15 of 15 runs · window at 15 of 24 runs. _only the silence side has a fixture._
-- <Badge text="◕ Mostly" variant="caution" /> **Upgrade readiness grades each cluster and names every blocker** — **90%** · 270 of 299 runs · 0 of 26 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **Weekly readiness brief names the decisions a person owes** — **71%** · 17 of 24 runs · 0 of 2 tests at the bar.
-- <Badge text="✓ Can" variant="success" /> **Repository watcher triages new issues** — **100%** · 27 of 27 runs · 1 of 1 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Warning event becomes a root cause, fix options and a pull request on &quot;apply&quot;** — **84%** · 78 of 93 runs · 1 of 5 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **GitOps drift alert is triaged against the declared source** — **88%** · 100 of 113 runs · 0 of 6 tests at the bar.
-- <Badge text="– No test" variant="default" /> **Autoscaler stockout investigator** — no test exists. _off by default._
-- <Badge text="◔ Filling" variant="note" /> **Critical findings get a pull request, re-runs open no duplicate** — **100%** · 81 of 81 runs · window at 15 of 24 runs. _the pull request is graded on request; the audit-opened one is not._
-- <Badge text="– No test" variant="default" /> **Chat posts (audit report, findings nudge, daily recap, fallback to the home channel)** — no test exists. _no evaluation install has a chat platform._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Compliance audit finds risky access and respects declared exceptions** — **91%** · 71 of 78 runs · 1 of 4 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones** — **96%** · 86 of 90 runs · 1 of 5 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **Patch readiness names the clusters behind on their version** — **11%** · 4 of 35 runs · 0 of 2 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Cost audit finds idle resources and respects declared exceptions** — **92%** · 60 of 65 runs · 0 of 4 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Consistency audit spots the cluster configured unlike its peers** — **81%** · 50 of 62 runs · 0 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **AI security audit finds exposed model-serving workloads** — **62%** · 40 of 65 runs · 1 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Stockout prevention names node pools at risk** — **60%** · 36 of 60 runs · 0 of 3 tests at the bar. _the collector misses the planted pool._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Networking fabric audit** — no test exists.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Compute fleet audit** — no test exists.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Upgrade retrospective explains a failed upgrade, stays quiet after a clean week** — **51%** · 41 of 81 runs · 0 of 9 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◔ Filling" variant="note" /></span> **Stall watch notices a controller that stopped, stays quiet on a healthy fleet** — **100%** · 15 of 15 runs · window at 15 of 24 runs. _only the silence side has a fixture._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Upgrade readiness grades each cluster and names every blocker** — **90%** · 270 of 299 runs · 0 of 26 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Weekly readiness brief names the decisions a person owes** — **71%** · 17 of 24 runs · 0 of 2 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✓ Can" variant="success" /></span> **Repository watcher triages new issues** — **100%** · 27 of 27 runs · 1 of 1 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Warning event becomes a root cause, fix options and a pull request on &quot;apply&quot;** — **84%** · 78 of 93 runs · 1 of 5 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **GitOps drift alert is triaged against the declared source** — **88%** · 100 of 113 runs · 0 of 6 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Autoscaler stockout investigator** — no test exists. _off by default._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◔ Filling" variant="note" /></span> **Critical findings get a pull request, re-runs open no duplicate** — **100%** · 81 of 81 runs · window at 15 of 24 runs. _the pull request is graded on request; the audit-opened one is not._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Chat posts (audit report, findings nudge, daily recap, fallback to the home channel)** — no test exists. _no evaluation install has a chat platform._
 
 #### On-demand tasks (a person asks in chat)
 
 A person asks for these in chat.
 
-- <Badge text="◕ Mostly" variant="caution" /> **Diagnose a broken workload without changing it** — **85%** · 89 of 105 runs · 0 of 6 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Run an audit now, or answer a fleet question from the collectors** — **91%** · 159 of 175 runs · 1 of 10 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Propose a change as a pull request, never apply it** — **81%** · 131 of 162 runs · 2 of 6 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **Refuse an unsafe or direct change and name the safe path** — **69%** · 106 of 153 runs · 0 of 8 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Repository work (review replies, branch reuse, issue triage, forge commands)** — **97%** · 151 of 156 runs · 3 of 5 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Answer GKE knowledge questions with sources** — **81%** · 90 of 111 runs · 0 of 7 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **Check observability wiring (metrics, traces, alerts)** — **46%** · 22 of 48 runs · 0 of 3 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **Converse well (answer first, say the next step, back claims with evidence)** — **46%** · 29 of 63 runs · 0 of 5 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **Record a person&#x27;s decision on a finding (dismiss, snooze, accept)** — **27%** · 9 of 33 runs · 0 of 3 tests at the bar.
-- <Badge text="✓ Can" variant="success" /> **First-run audits start at onboarding** — **100%** · 27 of 27 runs · 1 of 1 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Diagnose a broken workload without changing it** — **85%** · 89 of 105 runs · 0 of 6 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Run an audit now, or answer a fleet question from the collectors** — **91%** · 159 of 175 runs · 1 of 10 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Propose a change as a pull request, never apply it** — **81%** · 131 of 162 runs · 2 of 6 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Refuse an unsafe or direct change and name the safe path** — **69%** · 106 of 153 runs · 0 of 8 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Repository work (review replies, branch reuse, issue triage, forge commands)** — **97%** · 151 of 156 runs · 3 of 5 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Answer GKE knowledge questions with sources** — **81%** · 90 of 111 runs · 0 of 7 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **Check observability wiring (metrics, traces, alerts)** — **46%** · 22 of 48 runs · 0 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **Converse well (answer first, say the next step, back claims with evidence)** — **46%** · 29 of 63 runs · 0 of 5 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **Record a person&#x27;s decision on a finding (dismiss, snooze, accept)** — **27%** · 9 of 33 runs · 0 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✓ Can" variant="success" /></span> **First-run audits start at onboarding** — **100%** · 27 of 27 runs · 1 of 1 tests at the bar.
 
 </TabItem>
 <TabItem label="Gemini 3.1 Pro">
@@ -73,12 +73,12 @@ Edition 2026-10-19: 4,969 graded runs over 29 nights, 2026-09-17 to 2026-10-19.
 
 | Status | Rows | Meaning |
 | :-- | --: | :-- |
-| <Badge text="✓ Can" variant="success" /> | 1 | Every evidence test is at the bar |
-| <Badge text="◔ Filling" variant="note" /> | 1 | No failure yet; the window is short of 24 runs |
-| <Badge text="◕ Mostly" variant="caution" /> | 6 | At least 80 percent of runs pass; below the certification bar |
-| <Badge text="◑ Partly" variant="tip" /> | 10 | Between 50 and 79 percent of runs pass |
-| <Badge text="✕ Not yet" variant="danger" /> | 5 | Fewer than half the runs pass |
-| <Badge text="– No test" variant="default" /> | 6 | No test exists, or none has run on this model |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="✓ Can" variant="success" /></span> | 1 | Every evidence test is at the bar |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="◔ Filling" variant="note" /></span> | 1 | No failure yet; the window is short of 24 runs |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> | 6 | At least 80 percent of runs pass; below the certification bar |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> | 10 | Between 50 and 79 percent of runs pass |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> | 5 | Fewer than half the runs pass |
+| <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> | 6 | No test exists, or none has run on this model |
 
 <Aside type="tip" title="Guaranteed">The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes. Cluster or repository writes caught by a safeguard in this record: **0**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): 6.</Aside>
 
@@ -88,40 +88,40 @@ Edition 2026-10-19: 4,969 graded runs over 29 nights, 2026-09-17 to 2026-10-19.
 
 These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.
 
-- <Badge text="◑ Partly" variant="tip" /> **Compliance audit finds risky access and respects declared exceptions** — **51%** · 69 of 136 runs · 0 of 4 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones** — **44%** · 109 of 246 runs · 0 of 5 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **Patch readiness names the clusters behind on their version** — **41%** · 39 of 96 runs · 0 of 2 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **Cost audit finds idle resources and respects declared exceptions** — **31%** · 30 of 98 runs · 0 of 3 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **Consistency audit spots the cluster configured unlike its peers** — **75%** · 94 of 126 runs · 0 of 3 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **AI security audit finds exposed model-serving workloads** — **8%** · 5 of 66 runs · 0 of 2 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **Stockout prevention names node pools at risk** — **50%** · 63 of 126 runs · 0 of 3 tests at the bar. _the collector misses the planted pool._
-- <Badge text="– No test" variant="default" /> **Networking fabric audit** — no test exists.
-- <Badge text="– No test" variant="default" /> **Compute fleet audit** — no test exists.
-- <Badge text="– No test" variant="default" /> **Upgrade retrospective explains a failed upgrade, stays quiet after a clean week** — no graded run on this model.
-- <Badge text="✓ Can" variant="success" /> **Stall watch notices a controller that stopped, stays quiet on a healthy fleet** — **95%** · 57 of 60 runs · 1 of 1 tests at the bar. _only the silence side has a fixture._
-- <Badge text="◑ Partly" variant="tip" /> **Upgrade readiness grades each cluster and names every blocker** — **56%** · 141 of 252 runs · 1 of 6 tests at the bar.
-- <Badge text="– No test" variant="default" /> **Weekly readiness brief names the decisions a person owes** — no graded run on this model.
-- <Badge text="◑ Partly" variant="tip" /> **Repository watcher triages new issues** — **75%** · 45 of 60 runs · 0 of 1 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Warning event becomes a root cause, fix options and a pull request on &quot;apply&quot;** — **83%** · 200 of 240 runs · 1 of 4 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **GitOps drift alert is triaged against the declared source** — **79%** · 63 of 80 runs · 0 of 3 tests at the bar.
-- <Badge text="– No test" variant="default" /> **Autoscaler stockout investigator** — no test exists. _off by default._
-- <Badge text="◕ Mostly" variant="caution" /> **Critical findings get a pull request, re-runs open no duplicate** — **92%** · 165 of 180 runs · 2 of 3 tests at the bar. _the pull request is graded on request; the audit-opened one is not._
-- <Badge text="– No test" variant="default" /> **Chat posts (audit report, findings nudge, daily recap, fallback to the home channel)** — no test exists. _no evaluation install has a chat platform._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Compliance audit finds risky access and respects declared exceptions** — **51%** · 69 of 136 runs · 0 of 4 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones** — **44%** · 109 of 246 runs · 0 of 5 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **Patch readiness names the clusters behind on their version** — **41%** · 39 of 96 runs · 0 of 2 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **Cost audit finds idle resources and respects declared exceptions** — **31%** · 30 of 98 runs · 0 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Consistency audit spots the cluster configured unlike its peers** — **75%** · 94 of 126 runs · 0 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **AI security audit finds exposed model-serving workloads** — **8%** · 5 of 66 runs · 0 of 2 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Stockout prevention names node pools at risk** — **50%** · 63 of 126 runs · 0 of 3 tests at the bar. _the collector misses the planted pool._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Networking fabric audit** — no test exists.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Compute fleet audit** — no test exists.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Upgrade retrospective explains a failed upgrade, stays quiet after a clean week** — no graded run on this model.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✓ Can" variant="success" /></span> **Stall watch notices a controller that stopped, stays quiet on a healthy fleet** — **95%** · 57 of 60 runs · 1 of 1 tests at the bar. _only the silence side has a fixture._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Upgrade readiness grades each cluster and names every blocker** — **56%** · 141 of 252 runs · 1 of 6 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Weekly readiness brief names the decisions a person owes** — no graded run on this model.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Repository watcher triages new issues** — **75%** · 45 of 60 runs · 0 of 1 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Warning event becomes a root cause, fix options and a pull request on &quot;apply&quot;** — **83%** · 200 of 240 runs · 1 of 4 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **GitOps drift alert is triaged against the declared source** — **79%** · 63 of 80 runs · 0 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Autoscaler stockout investigator** — no test exists. _off by default._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Critical findings get a pull request, re-runs open no duplicate** — **92%** · 165 of 180 runs · 2 of 3 tests at the bar. _the pull request is graded on request; the audit-opened one is not._
+- <span style={{whiteSpace: "nowrap"}}><Badge text="– No test" variant="default" /></span> **Chat posts (audit report, findings nudge, daily recap, fallback to the home channel)** — no test exists. _no evaluation install has a chat platform._
 
 #### On-demand tasks (a person asks in chat)
 
 A person asks for these in chat.
 
-- <Badge text="◑ Partly" variant="tip" /> **Diagnose a broken workload without changing it** — **73%** · 218 of 300 runs · 2 of 5 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Run an audit now, or answer a fleet question from the collectors** — **83%** · 104 of 126 runs · 1 of 9 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Propose a change as a pull request, never apply it** — **82%** · 198 of 240 runs · 2 of 4 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **Refuse an unsafe or direct change and name the safe path** — **75%** · 88 of 117 runs · 0 of 3 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **Repository work (review replies, branch reuse, issue triage, forge commands)** — **72%** · 205 of 285 runs · 1 of 5 tests at the bar.
-- <Badge text="◑ Partly" variant="tip" /> **Answer GKE knowledge questions with sources** — **66%** · 159 of 240 runs · 1 of 7 tests at the bar.
-- <Badge text="✕ Not yet" variant="danger" /> **Check observability wiring (metrics, traces, alerts)** — **36%** · 12 of 33 runs · 0 of 3 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Converse well (answer first, say the next step, back claims with evidence)** — **89%** · 8 of 9 runs · 0 of 1 tests at the bar.
-- <Badge text="◕ Mostly" variant="caution" /> **Record a person&#x27;s decision on a finding (dismiss, snooze, accept)** — **97%** · 61 of 63 runs · 0 of 2 tests at the bar.
-- <Badge text="◔ Filling" variant="note" /> **First-run audits start at onboarding** — **100%** · 12 of 12 runs · window at 12 of 24 runs.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Diagnose a broken workload without changing it** — **73%** · 218 of 300 runs · 2 of 5 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Run an audit now, or answer a fleet question from the collectors** — **83%** · 104 of 126 runs · 1 of 9 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Propose a change as a pull request, never apply it** — **82%** · 198 of 240 runs · 2 of 4 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Refuse an unsafe or direct change and name the safe path** — **75%** · 88 of 117 runs · 0 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Repository work (review replies, branch reuse, issue triage, forge commands)** — **72%** · 205 of 285 runs · 1 of 5 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◑ Partly" variant="tip" /></span> **Answer GKE knowledge questions with sources** — **66%** · 159 of 240 runs · 1 of 7 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="✕ Not yet" variant="danger" /></span> **Check observability wiring (metrics, traces, alerts)** — **36%** · 12 of 33 runs · 0 of 3 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Converse well (answer first, say the next step, back claims with evidence)** — **89%** · 8 of 9 runs · 0 of 1 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◕ Mostly" variant="caution" /></span> **Record a person&#x27;s decision on a finding (dismiss, snooze, accept)** — **97%** · 61 of 63 runs · 0 of 2 tests at the bar.
+- <span style={{whiteSpace: "nowrap"}}><Badge text="◔ Filling" variant="note" /></span> **First-run audits start at onboarding** — **100%** · 12 of 12 runs · window at 12 of 24 runs.
 
 </TabItem>
 </Tabs>
