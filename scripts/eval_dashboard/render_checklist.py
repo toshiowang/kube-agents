@@ -119,8 +119,8 @@ def render(doc: dict) -> str:
                 if sched else "A person asks for these in chat.")
         sections.append(f'<h2>{html.escape(g["name"])}</h2><p class="lede">{lede}</p><table><thead>{head}</thead><tbody>{"".join(rows)}</tbody></table>')
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>What kube-agents can and cannot do today · {html.escape(doc["label"])}</title><style>{CSS}</style></head><body><main>
-<header><div><p class="eyebrow">kube-agents · certification checklist</p><h1>What kube-agents can and cannot do today</h1>
+<title>Capability scorecard · {html.escape(doc["label"])}</title><style>{CSS}</style></head><body><main>
+<header><div><p class="eyebrow">kube-agents · capability scorecard</p><h1>What kube-agents can and cannot do today</h1>
 <p class="sub"><span class="badge">{html.escape(doc["label"])}</span><span class="badge">Edition {html.escape(doc["as_of"])}</span>
 Computed from <b>{doc["graded_runs"]:,} graded runs</b> over <b>{len(nights)} nights</b>, {span}. Nothing on this page is typed by hand except the row names.</p></div>
 <button class="toggle" id="toggle" type="button">Light / dark</button></header>
@@ -202,12 +202,13 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
 
 def render_mdx(docs: list[dict]) -> str:
     """One Starlight page, one tab per model, in the site's own components."""
-    out = ['---', 'title: Certification checklist',
-           'description: What kube-agents can and cannot do today, per model, computed from the nightly evaluation record.',
+    out = ['---', 'title: Capability scorecard',
+           'description: What kube-agents can and cannot do today, by model, computed from the nightly evaluation record.',
            '---', '',
            'import { Aside, Badge, Tabs, TabItem } from "@astrojs/starlight/components";', '',
-           'A row is a capability in plain words; its status is computed from the tests that are its evidence, per model, from the '
-           'evaluation record. The first tab compares the models side by side; the others are one page per model. Nothing on this page is typed by hand except the row names.', '',
+           '**What kube-agents can and cannot do today, by model.** A row is a capability in plain words; its status is computed from the tests '
+           'that are its evidence, from the evaluation record. The first tab compares the models side by side; the others are one page per model. '
+           'Nothing on this page is typed by hand except the row names.', '',
            f'<Aside type="note" title="The bar">{html.escape(docs[0]["definition"])}</Aside>', '',
            '<Tabs>']
     if len(docs) > 1:
