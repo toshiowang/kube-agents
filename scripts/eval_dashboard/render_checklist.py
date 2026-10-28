@@ -182,10 +182,9 @@ def render_mdx(docs: list[dict]) -> str:
             out.append(f'#### {html.escape(g["name"])}\n')
             out.append(("These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.\n"
                         if sched else "A person asks for these in chat.\n"))
-            out += ["| Capability | Status | Evidence on this model |", "| :-- | :-- | :-- |"]
             for r in g["rows"]:
-                cap = html.escape(r["capability"]) + (f' <br/><small>{html.escape(r["note"])}</small>' if r.get("note") else "")
-                out.append("| " + " | ".join([cap, _mdx_badge(r["status"]), _mdx_evidence(r)]) + " |")
+                note = f' _{html.escape(r["note"])}._' if r.get("note") else ""
+                out.append(f'- {_mdx_badge(r["status"])} **{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
             out.append("")
         out.append('</TabItem>')
     out += ['</Tabs>', '',
