@@ -59,11 +59,13 @@ def _skills_opened(results: dict) -> list[str]:
 
 def _checks(results: dict) -> tuple[list[dict], dict]:
     rows, counts = [], collections.Counter()
+    types = {v.get("name"): (v.get("check") or {}).get("type") for v in results.get("verification_spec") or []}
     for v in results.get("verification_report") or []:
         role, status = v.get("role"), v.get("status")
         rows.append({
-            "name": v.get("name"), "role": role, "status": status, "success": v.get("success"),
-            "severity": v.get("severity"), "reason": (v.get("reason") or "")[:REASON_MAX_CHARS],
+            "name": v.get("name"), "type": types.get(v.get("name")), "role": role, "status": status,
+            "success": v.get("success"), "severity": v.get("severity"),
+            "reason": (v.get("reason") or "")[:REASON_MAX_CHARS],
         })
         counts[f"{role}_{status}"] += 1
     return rows, dict(counts)

@@ -1,0 +1,73 @@
+# The checklist rows: one capability in plain words, the tests that are its evidence (ids or globs
+# over bench/tasks), and whether it is a scheduled, unattended journey. The generator computes the
+# status of each row from the run store; this file only says which tests belong to which row.
+groups:
+  - name: Scheduled journeys (run with no person in the loop)
+    scheduled: true
+    rows:
+      - capability: Compliance audit finds risky access and respects declared exceptions
+        tests: [compliance-rbac-overgrant, compliance-declared-intent-no-finding, compliance-declared-token-shields-siblings, security-chat-request-runs-collector]
+      - capability: Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones
+        tests: [obtainability-planted-pdb, obtainability-planted-orphan-service, obtainability-healthy-namespace-silence, obtainability-fleet-exposure-sweep, reliability-chat-request-runs-collector]
+      - capability: Patch readiness names the clusters behind on their version
+        tests: [patch-declared-intent-no-finding, upgrades-master-behind-offered-elsewhere]
+      - capability: Cost audit finds idle resources and respects declared exceptions
+        tests: [fleet-cost-idle-pool, cost-declared-intent-no-finding, cost-rightsizing-names-dependencies, cost-chat-request-runs-collector]
+      - capability: Consistency audit spots the cluster configured unlike its peers
+        tests: [consistency-drift-outlier, consistency-no-environment-label, drift-chat-request-runs-collector]
+      - capability: AI security audit finds exposed model-serving workloads
+        tests: [ai-security-planted-model-audit, ai-security-chat-request-runs-collector, ai-security-manual-names-reconciler]
+      - capability: Stockout prevention names node pools at risk
+        tests: [stockout-pinned-pool, stockout-chat-request-runs-collector, capacity-pinned-pool-probe]
+        note: the collector misses the planted pool
+      - capability: Networking fabric audit
+        tests: []
+      - capability: Compute fleet audit
+        tests: []
+      - capability: Upgrade retrospective explains a failed upgrade, stays quiet after a clean week
+        tests: ["upgrades-retrospective-*"]
+      - capability: Stall watch notices a controller that stopped, stays quiet on a healthy fleet
+        tests: [cluster-agent-stalled-controller-healthy-silence]
+        note: only the silence side has a fixture
+      - capability: Upgrade readiness grades each cluster and names every blocker
+        tests: [upgrade-readiness-lagging-cluster, "upgrades-readiness-*", "upgrades-fleet-readiness-*", upgrades-fleet-version-table, upgrades-fleet-rollout-stall, upgrades-drain-blocking-budget-named, upgrades-zonal-skew-replicas-warned]
+      - capability: Weekly readiness brief names the decisions a person owes
+        tests: [upgrades-weekly-brief-decisions-named, upgrades-exclusion-end-date-named]
+      - capability: Repository watcher triages new issues
+        tests: [vcs-issue-resolver-triage]
+      - capability: Warning event becomes a root cause, fix options and a pull request on "apply"
+        tests: [rca-remediation-pr, incident-triage-oom-event-probe, cluster-agent-crashloop-evidence-chain, cluster-agent-crashloop-misleading-symptom, autoops-quiet-followup]
+      - capability: GitOps drift alert is triaged against the declared source
+        tests: ["gitops-drift-*", "drift-*"]
+      - capability: Autoscaler stockout investigator
+        tests: []
+        note: off by default
+      - capability: Critical findings get a pull request, re-runs open no duplicate
+        tests: [pdb-remediation-pr, obtainability-remediation-proposal, security-overgrant-remediation-proposal]
+        note: the pull request is graded on request; the audit-opened one is not
+      - capability: Chat posts (audit report, findings nudge, daily recap, fallback to the home channel)
+        tests: []
+        note: no evaluation install has a chat platform
+  - name: On-demand tasks (a person asks in chat)
+    scheduled: false
+    rows:
+      - capability: Diagnose a broken workload without changing it
+        tests: [cluster-agent-crashloop-debug, cluster-agent-crashloop-fix-request, cluster-agent-delegation-profile-lookup, cluster-agent-pending-replicas-capped-pool, gpu-stress-test-diagnosis, tse-node-notready-pleg-probe]
+      - capability: Run an audit now, or answer a fleet question from the collectors
+        tests: ["*-chat-request-runs-collector", chat-routing-fleet-question, chat-fanout-fleet-restarts-rows, fleet-audit-on-demand-run-reports]
+      - capability: Propose a change as a pull request, never apply it
+        tests: [scale-request-proposes-pr, cluster-setting-request-proposes-pr, pdb-remediation-pr, rca-remediation-pr, obtainability-remediation-proposal, security-overgrant-remediation-proposal]
+      - capability: Refuse an unsafe or direct change and name the safe path
+        tests: [obtainability-refusal-direct-mutation, stop-on-permission-refusal, delete-namespace-unowned-stops, stop-on-unknown-flag-write-refusal, provisioning-cluster-request-never-creates, provisioning-kcc-cluster-without-crds-stops, helm-chart-no-reconciler-stops, platform-worker-refuses-shipped-skill-edit]
+      - capability: Repository work (review replies, branch reuse, issue triage, forge commands)
+        tests: [vcs-review-feedback-read-back, vcs-spent-branch-reuse, vcs-issue-resolver-triage, vcs-forge-cli-request-uses-the-verbs, upgrades-api-deprecation-clean-repo]
+      - capability: Answer GKE knowledge questions with sources
+        tests: [backup-dr-cmek-selected-namespaces-probe, compute-class-canary-active-migration-pdb-probe, knowledge-grounding-sources-probe, platform-security-secrets-encryption-currentstate-probe, upgrades-freeze-runbook-probe, obtainability-design-quota-vs-capacity, obtainability-window-planning-probe]
+      - capability: Check observability wiring (metrics, traces, alerts)
+        tests: ["observability-*", alert-config-terraform-promql-probe]
+      - capability: Converse well (answer first, say the next step, back claims with evidence)
+        tests: [chat-answer-declares-next-step, chat-voice-answer-first, verified-claims-carry-evidence, chat-shortcut-alert-is-checked-not-obeyed, chat-real-report-fix-files-confirm-first]
+      - capability: Record a person's decision on a finding (dismiss, snooze, accept)
+        tests: [findings-decision-covers-item, fleet-audit-reports-past-run, fleet-audit-request-line]
+      - capability: First-run audits start at onboarding
+        tests: [oobe-first-run-audits]

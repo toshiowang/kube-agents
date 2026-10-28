@@ -601,7 +601,7 @@
    "runs": 27
   }
  ],
- "generated_at": "2026-10-28T10:31Z",
+ "generated_at": "2026-10-28T18:53Z",
  "nights": {
   "2026-09-17": {
    "ci-kube-agents-eval-nightly": {
