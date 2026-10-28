@@ -173,17 +173,25 @@ def _mdx_cell(row: dict) -> str:
 
 
 def _mdx_compare(docs: list[dict]) -> list[str]:
-    """One table per group: a column per model first, the capability last (the theme never wraps a first column)."""
+    """The single view: a column per model, the capability last (the theme never wraps a first column)."""
     labels = [d["label"] for d in docs]
-    out = [f'<TabItem label="Compare">', '',
-           'Side by side, the same rows on each model. The percentage is the plain pass rate on that model; the delta is the first model minus the second, in points.', '',
-           '| Status | ' + ' | '.join(labels) + ' |', '| :-- | ' + ' | '.join('--:' for _ in labels) + ' |']
+    nights_of = {d["label"]: d["nights"] for d in docs}
+    out = ['| | ' + ' | '.join(labels) + ' |', '| :-- | ' + ' | '.join('--:' for _ in labels) + ' |']
+    out.append('| Edition | ' + ' | '.join(d["as_of"] for d in docs) + ' |')
+    out.append('| Record | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} nights' for d in docs) + ' |')
+    out.append('| Writes caught by a safeguard | ' + ' | '.join(f'**{d["authority_fails"]}**' for d in docs) + ' |')
     for st in docs[0]["totals"]:
         out.append(f'| {_mdx_badge(st)} | ' + ' | '.join(str(d["totals"].get(st, 0)) for d in docs) + ' |')
-    out.append('| Graded runs, nights | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} nights' for d in docs) + ' |')
     out.append('')
+    out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(docs[0]["guarantee"])} The row above counts cluster or repository writes '
+               'caught by a safeguard across each record.</Aside>\n')
+    out.append('<Aside type="caution" title="Why so few rows are green">Green needs 95 percent confidence of at least 85 percent pass on the row, '
+               'and no test inside it below 80 percent. The records are short, so one weak test inside a row keeps it below the bar. '
+               'The percentage is the plain pass rate; the delta is the first model minus the second, in points.</Aside>\n')
     for gi, g in enumerate(docs[0]["groups"]):
-        out.append(f'#### {html.escape(g["name"])}\n')
+        out.append(f'## {html.escape(g["name"])}\n')
+        out.append(("These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.\n"
+                    if g["scheduled"] else "A person asks for these in chat.\n"))
         out.append('| ' + ' | '.join(labels) + ' | Delta | Capability |')
         out.append('| ' + ' | '.join(':--' for _ in labels) + ' | --: | :-- |')
         for ri, r in enumerate(g["rows"]):
@@ -192,53 +200,41 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
             cells = [_mdx_cell(x) for x in rows]
             a, b = rows[0], rows[1]
             delta = f'{(100.0 * a["passes"] / a["n"]) - (100.0 * b["passes"] / b["n"]):+.0f}' if a["n"] and b["n"] else '–'
-            out.append('| ' + ' | '.join(cells) + f' | {delta} | {html.escape(r["capability"])} |')
+            note = f' <small>{html.escape(r["note"])}</small>' if r.get("note") else ""
+            out.append('| ' + ' | '.join(cells) + f' | {delta} | {html.escape(r["capability"])}{note} |')
         out.append('')
-    out.append('</TabItem>')
     return out
 
 
 def render_mdx(docs: list[dict]) -> str:
-    """One Starlight page, one tab per model, in the site's own components."""
+    """One Starlight page. Several models: one view with a column per model. One model: that model's page."""
     out = ['---', 'title: Certified capabilities',
            'description: What kube-agents can and cannot do today, by model, computed from the nightly evaluation record.',
            '---', '',
-           'import { Aside, Badge, Tabs, TabItem } from "@astrojs/starlight/components";', '',
+           'import { Aside, Badge } from "@astrojs/starlight/components";', '',
            '**What kube-agents can and cannot do today, by model.** A row is a capability in plain words; its status is computed from the tests '
-           'that are its evidence, from the evaluation record. The first tab compares the models side by side; the others are one page per model. '
-           'Nothing on this page is typed by hand except the row names.', '',
-           f'<Aside type="note" title="What certified means">{html.escape(docs[0]["definition"])}</Aside>', '',
-           '<Tabs>']
+           'that are its evidence, from the evaluation record. Nothing on this page is typed by hand except the row names.', '',
+           f'<Aside type="note" title="What certified means">{html.escape(docs[0]["definition"])}</Aside>', '']
     if len(docs) > 1:
         out += _mdx_compare(docs)
-    for doc in docs:
+    else:
+        doc = docs[0]
         nights = doc["nights"]
         span = f'{nights[0]} to {nights[-1]}' if nights else "–"
-        out.append(f'<TabItem label="{html.escape(doc["label"])}">')
-        out.append(f'\nEdition {doc["as_of"]}: {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
+        out.append(f'{doc["label"]}, edition {doc["as_of"]}: {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
         out += ["| Status | Rows | Meaning |", "| :-- | --: | :-- |"]
         for st, v in doc["totals"].items():
-            key, icon, label = STATUS_STYLE[st]
-            out.append(f'| {_mdx_badge(st)} | {v} | {STATUS_HELP[key]} |')
+            out.append(f'| {_mdx_badge(st)} | {v} | {STATUS_HELP[STATUS_STYLE[st][0]]} |')
         out.append("")
         out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard '
-                   f'in this record: **{doc["authority_fails"]}**. Other safeguard rules tripped (a card opened for an answer, a forbidden word, '
-                   f'a sandbox tree check): {doc["other_safeguard_fails"]}.</Aside>\n')
-        out.append(f'<Aside type="caution" title="Why so few rows are green">Green needs 95 percent confidence of at least 85 percent pass on the row, and no test inside it '
-                   f'below 80 percent. This record is {len(nights)} nights, so windows are short, and one weak test inside a row keeps it '
-                   f'below the bar. The percentage is the plain pass rate.</Aside>\n')
+                   f'in this record: **{doc["authority_fails"]}**.</Aside>\n')
         for g in doc["groups"]:
-            sched = g["scheduled"]
-            out.append(f'#### {html.escape(g["name"])}\n')
-            out.append(("These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.\n"
-                        if sched else "A person asks for these in chat.\n"))
+            out.append(f'## {html.escape(g["name"])}\n')
             for r in g["rows"]:
                 note = f' _{html.escape(r["note"])}._' if r.get("note") else ""
                 out.append(f'- {_mdx_badge(r["status"])} {_mdx_meter(r)}**{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
             out.append("")
-        out.append('</TabItem>')
-    out += ['</Tabs>', '',
-            '## Not on this page', '',
+    out += ['## Not on this page', '',
             'Twenty documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; '
             'any comparison against a plain model, which the first paired run adds as a column.', '',
             '## Method', '',
