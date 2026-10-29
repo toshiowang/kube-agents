@@ -1,36 +1,38 @@
 # Certified journeys and capabilities: the concept and the plan
 
-Status: concept document, 2026-10-27. It states what we promise, what we measure, where the numbers stand, and the plan in phases. The detail sits in two companion documents: [`certified-journeys-technical-plan.md`](certified-journeys-technical-plan.md) (the fourteen steps, the measurement tables, the open decisions with their options, the review records) and [`certified-journeys-inventory.md`](certified-journeys-inventory.md) (the 47 journeys with evidence).
+Status: concept document, 2026-10-29. It states what we promise, what we measure, and the plan in three steps. The detail sits in two companion documents: [`certified-journeys-technical-plan.md`](certified-journeys-technical-plan.md) (the fourteen steps, the measurement tables, the open decisions with their options, the review records) and [`certified-journeys-inventory.md`](certified-journeys-inventory.md) (the 47 journeys with evidence).
 
 ## 1. Summary
 
-**The problem.** Customers ask for guarantees. An agent that runs on an AI model cannot promise the same outcome on every run. Today we publish neither a guarantee nor a measured rate. The product runs ten scheduled audits on every install, but no test grades what those scheduled runs produce, and only one skill has a proven pass record.
+**The problem.** Customers ask for guarantees. An agent that runs on an AI model cannot promise the same outcome on every run. Until now we published neither a guarantee nor a list of what the agent can do with evidence behind it. The product runs ten scheduled audits on every install, but no test grades what those scheduled runs produce.
 
 **The answer.** We publish a page of certified capabilities: for each model, what kube-agents can and cannot do today, computed from the nightly evaluation record. A capability is certified when it is evaluated on the published tests for it, on a named model, at the bar, with the record published. The same page states the one thing the product guarantees outside the model: the agent can only propose a change, never apply one.
 
 **The moat.** The tests are not only ours. Each month the set grows with the top cases from Google Cloud Support: the failures customers actually hit, turned into tests with a planted defect and a check. The page therefore measures the product against real incidents, and no plain model or home-built agent is evaluated against that set.
 
-**The two numbers we track.**
+**What the page shows.**
 
-| Number                 | Meaning                                                                                              | Today                                                   | Target for 2026-12-14                                            |
-| :--------------------- | :--------------------------------------------------------------------------------------------------- | :------------------------------------------------------ | :--------------------------------------------------------------- |
-| Unattended journeys    | Jobs the agent completes from a trigger to a result with no person in the loop, graded on the result | 17 can run this way; 0 are graded on their result       | 5 to 12 graded; 0 to 2 at the measured bar                       |
-| Certified capabilities | Operator tasks with a proven pass record on a named model                                            | 1 of 21 tracked skills at the measured bar; 0 certified | 2 to 4 at the measured bar; the first certified line after 12-14 |
+| Number                                           | Meaning                                                                                                                 | Today                                                                                           |
+| :----------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+| Certified capabilities, per model                | Rows of the page at the bar: 95 percent confidence of at least 85 percent pass, no test inside the row below 80 percent | Claude Opus 5.5: 4 of 29 rows; Gemini 3.1 Pro: 2 of 29; Gemini 4 Argon: 1 of 29 after one night |
+| Capabilities that run with no person in the loop | Rows started by a schedule or an event and completed without a human step                                               | 20 of 29 rows; none is graded on its scheduled result yet                                       |
+| Writes caught by a safeguard                     | Cluster or repository writes the agent attempted, across every graded run                                               | 0                                                                                               |
 
-**The end state.** A customer opens a page on their own install and reads one line per journey and per model: the kind of promise, the pass rate, the dates, the exact version of the text the agent loaded, the difficulty level, and the typical cost in minutes and tokens. When a model update or a text edit breaks a journey, the next morning's page turns red and the owner receives an issue.
+The page updates each night; these numbers are the edition of 2026-10-29.
 
-**What we need now.** Three decisions unblock the first phase: approval to tag each test with the skills it exercises, agreement to grade the five first-run audits on their real results inside the existing nightly, and a test project that can serve Claude.
+**The end state.** A customer opens the page on their own install and reads one line per capability and per model: the status, the pass rate, the dates, the exact version of the text the agent loaded, the difficulty level, and the typical cost in minutes and tokens, next to the same tests run on a plain model. When a model update or a text edit breaks a capability, the next morning's page shows it and the owner receives an issue.
+
+**What we need now.** Three things start the plan: a data agreement with Cloud Support for the monthly case feed; an owner for each of the three steps in section 5; and the paired runs against a plain model on an install we control, so the page gains its comparison column.
 
 **Words this document uses.**
 
-| Word       | Meaning here                                                                                                                                                           |
-| :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Journey    | A job the agent does for a customer, from a trigger to a result. Example: a critical access over-grant exists; by morning the agent has found it and proposed the fix. |
-| Capability | One operator task the agent can do, with a nightly test. Example: grade a cluster's readiness for an upgrade.                                                          |
-| Skill      | A package of rules and scripts the agent loads for one kind of task.                                                                                                   |
-| Unattended | Started by a schedule or an event, and completed with no human step before the result.                                                                                 |
-| Measured   | At least 57 of the newest 60 nightly runs passed, on one model and one exact version of the text.                                                                      |
-| Certified  | Measured, plus a private test set, zero forbidden actions, a named model, and an outside reviewer who repeats the measurement.                                         |
+| Word       | Meaning here                                                                                                                                                                                            |
+| :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Journey    | A job the agent does for a customer, from a trigger to a result. Example: a critical access over-grant exists; by morning the agent has found it and proposed the fix.                                  |
+| Capability | One operator task the agent can do, with a nightly test. Example: grade a cluster's readiness for an upgrade.                                                                                           |
+| Skill      | A package of rules and scripts the agent loads for one kind of task.                                                                                                                                    |
+| Unattended | Started by a schedule or an event, and completed with no human step before the result.                                                                                                                  |
+| Certified  | Evaluated on the published tests for the capability, on a named model, with 95 percent confidence that at least 85 percent of runs pass and no single test below 80 percent, with the record published. |
 
 ## 2. Why a customer wants this
 
@@ -76,33 +78,32 @@ From a retail platform team's requirements and the first-24-hour operating speci
 
 ### 3.1 The word problem
 
-The industry uses "certified" for four unrelated things: a person's exam (CKA), a distribution's conformance ("Certified Kubernetes"), an organisation's control audit (SOC 2), and a partner badge. Customers hear "guaranteed". A model-driven agent cannot guarantee an outcome on every run, so we separate three promises and use a different word for each.
+The industry uses "certified" for four unrelated things: a person's exam (CKA), a distribution's conformance ("Certified Kubernetes"), an organisation's control audit (SOC 2), and a partner badge. Customers hear "guaranteed". A model-driven agent cannot guarantee an outcome on every run, so we publish two words and define each where it appears.
 
-| Promise           | What it covers                                                                                                                                       | Strength of the claim                                               | Word we publish                                         |
-| :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------ | :------------------------------------------------------ |
-| Guarantee         | The agent can only propose, never apply: read-only access rights and a gateway that blocks writes                                                    | A hard rule enforced outside the model, checked on every run        | guaranteed                                              |
-| Measured rate     | How often a journey or task succeeds: the newest 60 nightly runs on a named model and exact text version, with an automatic drop when the rate falls | Statistical, like a service-level objective; never a single-run vow | measured                                                |
-| Independent check | How the rate was produced: a private test set, zero forbidden actions, a named model, and an outside reviewer who repeats the number                 | Compliance-grade                                                    | certified, with its definition printed beside every use |
+| Word       | What it covers                                                                                         | Strength of the claim                                                                               |
+| :--------- | :----------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------- |
+| Guaranteed | The agent can only propose, never apply: read-only access rights and a gateway that blocks writes      | A hard rule enforced outside the model, checked on every run                                        |
+| Certified  | A capability evaluated on its published tests, on a named model, at the bar, with the record published | Statistical, like a service-level objective: a rate with a confidence bound, never a single-run vow |
 
-### 3.2 The ladder
+Independent reproduction of a line by someone outside the team is a badge a line can earn, not a condition of the word.
 
-Each step adds one condition that a customer or a reviewer can check without trusting the author.
+### 3.2 The bar
 
-| Step | Label                        | Evidence required                                                                                                                                                                                              | Count today                          |
-| :--- | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------- |
-| 0    | Claimed                      | Written in the documentation                                                                                                                                                                                   | 20 promises with no test             |
-| 1    | Tested                       | At least one nightly test exists and has passed                                                                                                                                                                | Most journeys and skills             |
-| 2    | Measured                     | At least 57 of the newest 60 nightly runs pass, on one model and one exact version of the text (24 of 24 while the window fills). The line drops when the rate falls below 0.70 on two nightly checks in a row | 1 skill (version control, on Claude) |
-| 3    | Certified                    | Step 2, plus a private test set the authors never read, zero forbidden actions across the 60 runs, the named model and text version, and an outside reviewer who repeats the measurement                       | 0                                    |
-| 3+   | Certified with measured lift | Step 3, plus the same tests run with the skill switched off, to show whether the skill helps, matches or hurts                                                                                                 | 0                                    |
+A capability on the page is one of three things on a given model.
 
-The line a customer would read: "Certified: compliance audit on Claude Opus 5.5, since 2026-11-20, 60 of 60 on text version a1b2c3, private set 24 of 24, 0 forbidden actions in 60 runs, reviewed by <name>."
+| State     | Meaning                                                                                                                                    |
+| :-------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| Untested  | No test exists for it, or none has run on this model                                                                                       |
+| Tested    | At least one of its tests has run on this model, and the record is below the bar                                                           |
+| Certified | Its pooled runs on this model pass with 95 percent confidence of at least 85 percent, and no single test inside it passes below 80 percent |
+
+The bound is the 95 percent Wilson lower bound on the newest 60 graded runs per test; for one test that is 57 of 60. Runs marked not applicable or infrastructure are left out. A forbidden action fails its run whatever else happened. The page splits "tested" further for the reader, into filling, mostly, partly and not yet, by how far the record is from the bar.
+
+The line a customer reads: "Certified: reliability audit on Claude Opus 5.5, 86 of 90 runs, lower bound 0.89, weakest test 87 percent, record 2026-10-20 to 2026-10-28."
 
 ### 3.3 What gets certified
 
-Journeys and capabilities get certified. Skills get an internal rating from the tests that use them. A pass counts whether or not the agent opened a skill: on Claude Opus 5.5, 9 of 11 cluster-level tests pass without the agent reading the skill text. The published line records what ran. Even when no skill text is read, the customer still gets the authority limit, the schedule, the fleet collectors, the nightly window and the drop alert.
-
-Step 3 costs more than step 2: an isolated test project the authors cannot read, a private test suite (the review panel estimates it would double the nightly run volume), automated sweeps of the cloud and cluster audit logs, and a named outside reviewer. We adopt the definition now, at no cost, and fund the private project once the first journey reaches step 2.
+The rows of the page get certified: capabilities in plain words, each backed by the tests that are its evidence. Skills get an internal rating from the tests that use them and never appear on the page. A pass counts whether or not the agent opened a skill: on Claude Opus 5.5, 9 of 11 cluster-level tests pass without the agent reading the skill text. Even when no skill text is read, the customer still gets the authority limit, the schedule, the fleet collectors and the nightly record.
 
 ## 4. What we measure, and against what
 
@@ -116,7 +117,7 @@ Any write to a cluster, any read of a secret, and any blocked write to the code 
 
 ### 4.3 Reliability, cost and speed
 
-Reliability is the 60-run window above. Minutes per run and tokens per run are recorded today and will be reported as a median and a 90th percentile per journey. We report them and do not gate on them: a slow run that produces the right fix is an expense, not a failure. We never publish a dollar figure, because the bill depends on the customer's provider; we publish the token counts and a per-model formula. Whether the agent follows the same route each night is not yet compared across runs; the plan adds bounds on the spread of steps, on repeated commands and on the spread of cost.
+Reliability is the bar in section 3. Minutes per run and tokens per run are recorded today and will be reported as a median and a 90th percentile per journey. We report them and do not gate on them: a slow run that produces the right fix is an expense, not a failure. We never publish a dollar figure, because the bill depends on the customer's provider; we publish the token counts and a per-model formula. Whether the agent follows the same route each night is not yet compared across runs; the plan adds bounds on the spread of steps, on repeated commands and on the spread of cost.
 
 ### 4.4 Difficulty levels
 
