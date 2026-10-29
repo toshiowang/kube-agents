@@ -1,0 +1,59 @@
+# Scenario S04: Autoscaling, ComputeClass & Accelerators (stockout-prevention)
+id: ccc-untainted-node-pool-absorption
+name: "Untainted ComputeClass Node Pool Absorbing Untargeted Pods Until Exhausted"
+domain: capacity
+expected_fail: true
+audit_streams:
+  - stockout-prevention
+fixtures: []
+prompt: >-
+  Run the stockout-prevention audit across the fleet, following the stockout-prevention SOP.
+expected_output: >-
+  The ledger issue carries a finding for general-ccc-pool in namespace
+  seeded-capacity explaining: Node pool `general-ccc-pool` has label `cloud.google.com/compute-class: general-ccc` but was provisioned without the matching `cloud.google.com/compute-class=general-ccc:NoSchedule` taint. `kube-scheduler` places untargeted pods onto running nodes, masking the missing `nodeSelector` until scale-up is required and the CA pre-filter drops the pool. The closing response is the
+  SOP's one line with the ledger URL.
+infrastructure:
+  deployer: "tofu"
+  provider: "gcp"
+  stack: "prebuilt/ccc-untainted-node-pool-absorption"
+  teardown: true
+  variables:
+    namespace: "seeded-capacity"
+    target_resource_name: "general-ccc-pool"
+validated: false
+
+verification_spec:
+  - name: ledger-tracks-target-resource
+    role: objective
+    mode: assert
+    check:
+      type: ledger_issue_contains
+      audit: stockout-prevention
+      scope: finding_ids
+      required_phrases: ["general-ccc-pool"]
+  - name: ledger-uses-expected-check-slug
+    role: objective
+    mode: assert
+    check:
+      type: ledger_issue_contains
+      audit: stockout-prevention
+      scope: finding_ids
+      any_of_phrases:
+        ["ccc-untainted-pool", "untainted-compute-class-pool", "ccc-prefilter"]
+  - name: ledger-explains-root-cause-and-fix
+    role: objective
+    mode: assert
+    check:
+      type: ledger_issue_contains
+      audit: stockout-prevention
+      required_phrases: ["general-ccc-pool"]
+  - name: audit-remains-read-only-in-cluster
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: resource_property
+      kind: "computeclass"
+      resource_name: "general-ccc"
+      path: "spec.nodePoolAutoCreation.enabled"
+      op: eq
+      value: "true"
