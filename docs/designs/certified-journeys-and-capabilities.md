@@ -1,6 +1,6 @@
 # Certified journeys and capabilities: the concept and the plan
 
-Status: concept document, 2026-10-27. It states what we promise, what we measure, where the numbers stand, and the plan in phases. The detail sits in two companion documents: [`certified-journeys-technical-plan.md`](certified-journeys-technical-plan.md) (the fourteen steps, the measurement tables, the open decisions with their options, the review records) and [`certified-journeys-inventory.md`](certified-journeys-inventory.md) (the 47 journeys with evidence). Tracking issue: [#3978](https://github.com/gke-labs/kube-agents/issues/3978).
+Status: concept document, 2026-10-27. It states what we promise, what we measure, where the numbers stand, and the plan in phases. The detail sits in two companion documents: [`certified-journeys-technical-plan.md`](certified-journeys-technical-plan.md) (the fourteen steps, the measurement tables, the open decisions with their options, the review records) and [`certified-journeys-inventory.md`](certified-journeys-inventory.md) (the 47 journeys with evidence).
 
 ## 1. Summary
 
@@ -70,7 +70,7 @@ All execution stays in the customer's own cloud project, on their own model prov
 
 ### 2.3 What customers asked for
 
-From the retail customer epic [#2597](https://github.com/gke-labs/kube-agents/issues/2597) and the first-24-hour operating specification: pre-upgrade blockers and post-upgrade reviews first; detection of controllers that stop working without an error; audits that respect declared intent; a rating line for the exact model their install runs; proof that the agent never wrote to a cluster; tests the authors have not seen; a hard cap on noise; every fix as a proposed change they approve; and a warning from us before a regression reaches them.
+From a retail platform team's requirements and the first-24-hour operating specification: pre-upgrade blockers and post-upgrade reviews first; detection of controllers that stop working without an error; audits that respect declared intent; a rating line for the exact model their install runs; proof that the agent never wrote to a cluster; tests the authors have not seen; a hard cap on noise; every fix as a proposed change they approve; and a warning from us before a regression reaches them.
 
 ## 3. What "certified" means here
 
@@ -138,7 +138,7 @@ Today's record is almost all level 1, with a few level 2 tests and no active lev
 | How much does the product add over a bare model? | The same tests with the skill switched off; a pilot on public exam tasks against a bare model with the same cluster tools | Not measured end to end. Earlier work on Gemini found no lift from skill prose in 5 of 7 suites.           |
 | Do skills help a strong model?                   | Pass rates with the skill opened against unopened                                                                         | Equal on Claude for the prose; the rules and scripts carry the value. A control run per model will decide. |
 | Does it match a competent operator?              | A GKE engineer runs the same journey by hand once                                                                         | Not measured; proposed for the first four or five audits                                                   |
-| Does it catch real incidents?                    | Customer failures, starting with the retail epic, turned into tests                                                       | Planned                                                                                                    |
+| Does it catch real incidents?                    | Customer failures, starting with the retail team's requirements, turned into tests                                        | Planned                                                                                                    |
 
 ### 4.6 Effectiveness beyond the tests
 
@@ -292,7 +292,7 @@ The options and the recommended answers are in the technical plan, section 14.
 | How many of the 47 journeys work unattended end to end?                 | 17 are built to; 5 have their start graded; 0 have their result graded; 20 promises have no test.                                                                                                | Phases 1 and 2; unverified claims are tested or removed                                                                                |
 | What stops the agent from breaking production at 3 a.m.?                | Read-only access rights and a gateway that blocks writes; any forbidden action fails the run.                                                                                                    | Phase 4 adds audit-log sweeps across every run                                                                                         |
 | How is this different from a model vendor's benchmark page?             | Vendors score public prompts once per release. We grade fleet journeys every night on the shipped text and drop the rating when the model or the text drifts.                                    | Phase 0 page; phase 3 view on the install                                                                                              |
-| What if the customer's outage is not one you planted?                   | Today the tests are self-authored, apart from the retail epic.                                                                                                                                   | Level 2 and 3 tests from the epic; the monthly intake loop                                                                             |
+| What if the customer's outage is not one you planted?                   | Today the tests are self-authored, apart from the retail team's requirements.                                                                                                                    | Level 2 and 3 tests from the customer requirements; the monthly intake loop                                                            |
 | Does the agent follow the same route every night, or get lucky?         | Not compared across runs today; we check that the required scripts ran.                                                                                                                          | Phase 2 route-stability bounds                                                                                                         |
 | Does this survive the scheduler replacement?                            | Yes. Journeys are graded on external results (the tracking issue, the proposed change, the chat post), never on the scheduler's internal state.                                                  | The rule in section 4.1                                                                                                                |
 
