@@ -52,6 +52,12 @@ variable "compute_class_pool" {
   default     = "general-ccc-pool"
 }
 
+variable "cpu_request" {
+  type        = string
+  description = "CPU request per replica; set above the largest node's allocatable CPU so the pods stay Pending, as the scenario's do."
+  default     = "8"
+}
+
 variable "prow_build_id" {
   type        = string
   description = "Prow BUILD_ID of the run creating this infra"

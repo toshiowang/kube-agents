@@ -65,7 +65,7 @@ resource "null_resource" "untargeted_workload" {
     host_cluster  = var.host_cluster_name
     host_location = var.host_cluster_location
     host_project  = var.project_id
-    manifest      = sha256(join("|", [local.ns, local.workload, local.ccc, local.ccc_pool, var.host_cluster_name]))
+    manifest      = sha256(join("|", [local.ns, local.workload, local.ccc, local.ccc_pool, var.cpu_request, var.host_cluster_name]))
   }
 
   provisioner "local-exec" {
@@ -132,7 +132,7 @@ resource "null_resource" "untargeted_workload" {
                 image: registry.k8s.io/pause:3.10
                 resources:
                   requests:
-                    cpu: "8"
+                    cpu: "${var.cpu_request}"
                     memory: 64Mi
                   limits:
                     memory: 64Mi
