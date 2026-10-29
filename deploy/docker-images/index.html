@@ -1,0 +1,566 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-ae72s45h"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Docker images | kube-agents</title><link rel="canonical" href="https://gke-labs.github.io/kube-agents/deploy/docker-images/"/><link rel="sitemap" href="/kube-agents/sitemap-index.xml"/><script is:inline="true">document.documentElement.dataset.theme = 'dark';</script><script type="module" src="/kube-agents/mermaid-render.js"></script><link rel="shortcut icon" href="/kube-agents/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.3.8"/><meta name="generator" content="Starlight v0.42.6"/><meta property="og:title" content="Docker images"/><meta property="og:type" content="article"/><meta property="og:url" content="https://gke-labs.github.io/kube-agents/deploy/docker-images/"/><meta property="og:locale" content="en"/><meta property="og:description" content="The images shipped from this repo and how their tags are managed."/><meta property="og:site_name" content="kube-agents"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="The images shipped from this repo and how their tags are managed."/><script>
+  document.documentElement.dataset.theme = 'dark';
+</script><link rel="stylesheet" href="/kube-agents/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/kube-agents/_astro/common.CvG8RBkb.css"><style>@layer starlight.components{svg:where(.astro-havoivjf){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em;overflow:visible}}
+@layer starlight.components{:root{--sl-badge-default-border:var(--sl-color-accent);--sl-badge-default-bg:var(--sl-color-accent-low);--sl-badge-default-text:#fff;--sl-badge-note-border:var(--sl-color-blue);--sl-badge-note-bg:var(--sl-color-blue-low);--sl-badge-note-text:#fff;--sl-badge-danger-border:var(--sl-color-red);--sl-badge-danger-bg:var(--sl-color-red-low);--sl-badge-danger-text:#fff;--sl-badge-success-border:var(--sl-color-green);--sl-badge-success-bg:var(--sl-color-green-low);--sl-badge-success-text:#fff;--sl-badge-caution-border:var(--sl-color-orange);--sl-badge-caution-bg:var(--sl-color-orange-low);--sl-badge-caution-text:#fff;--sl-badge-tip-border:var(--sl-color-purple);--sl-badge-tip-bg:var(--sl-color-purple-low);--sl-badge-tip-text:#fff}[data-theme=light]:root{--sl-badge-default-bg:var(--sl-color-accent-high);--sl-badge-note-bg:var(--sl-color-blue-high);--sl-badge-danger-bg:var(--sl-color-red-high);--sl-badge-success-bg:var(--sl-color-green-high);--sl-badge-caution-bg:var(--sl-color-orange-high);--sl-badge-tip-bg:var(--sl-color-purple-high)}.sl-badge:where(.astro-6yf3h5sn){border:1px solid var(--sl-color-border-badge);font-family:var(--sl-font-system-mono);color:var(--sl-color-text-badge);background-color:var(--sl-color-bg-badge);overflow-wrap:anywhere;border-radius:.25rem;line-height:normal;display:inline-block}.sidebar-content .sl-badge:where(.astro-6yf3h5sn){line-height:1;font-size:var(--sl-text-xs);padding:.125rem .375rem}.sidebar-content a[aria-current=page]>.sl-badge:where(.astro-6yf3h5sn){--sl-color-bg-badge:transparent;--sl-color-border-badge:currentColor;color:inherit}.default:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-default-bg);--sl-color-border-badge:var(--sl-badge-default-border);--sl-color-text-badge:var(--sl-badge-default-text)}.note:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-note-bg);--sl-color-border-badge:var(--sl-badge-note-border);--sl-color-text-badge:var(--sl-badge-note-text)}.danger:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-danger-bg);--sl-color-border-badge:var(--sl-badge-danger-border);--sl-color-text-badge:var(--sl-badge-danger-text)}.success:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-success-bg);--sl-color-border-badge:var(--sl-badge-success-border);--sl-color-text-badge:var(--sl-badge-success-text)}.tip:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-tip-bg);--sl-color-border-badge:var(--sl-badge-tip-border);--sl-color-text-badge:var(--sl-badge-tip-text)}.caution:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-caution-bg);--sl-color-border-badge:var(--sl-badge-caution-border);--sl-color-text-badge:var(--sl-badge-caution-text)}.small:where(.astro-6yf3h5sn){font-size:var(--sl-text-xs);padding:.125rem .25rem}.medium:where(.astro-6yf3h5sn){font-size:var(--sl-text-sm);padding:.175rem .35rem}.large:where(.astro-6yf3h5sn){font-size:var(--sl-text-base);padding:.225rem .45rem}.sl-markdown-content :is(h1,h2,h3,h4,h5,h6) .sl-badge:where(.astro-6yf3h5sn){vertical-align:middle}}
+</style><script type="module" src="/kube-agents/_astro/page.cNngjUgL.js"></script></head><body class="astro-ae72s45h"><a class="sl-skip-link astro-t2grfou4" href="#_top">Skip to content</a><div class="page sl-flex astro-euo27uub"><header class="header astro-euo27uub"><div class="header astro-6k6kswk6"><div class="title-wrapper sl-flex astro-6k6kswk6"><a href="/kube-agents/" class="site-title sl-flex astro-iaj22pny"><span class="astro-iaj22pny" translate="no">kube-agents</span></a></div><div class="sl-flex print:hidden astro-6k6kswk6"><site-search class="astro-6k6kswk6 astro-ulwrr7k6" data-translations="{&quot;placeholder&quot;:&quot;Search&quot;}"><button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-ulwrr7k6"><svg aria-hidden="true" class="astro-ulwrr7k6 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-ulwrr7k6" aria-hidden="true">Search</span><kbd class="sl-hidden md:sl-flex astro-ulwrr7k6" style="display: none;"><kbd class="astro-ulwrr7k6">Ctrl</kbd><kbd class="astro-ulwrr7k6">K</kbd></kbd></button><dialog style="padding:0" aria-label="Search" class="astro-ulwrr7k6"><div class="dialog-frame sl-flex astro-ulwrr7k6"><button data-close-modal class="sl-flex md:sl-hidden astro-ulwrr7k6">Cancel</button><div class="search-container astro-ulwrr7k6"><div id="starlight__search" class="astro-ulwrr7k6"></div></div></div></dialog></site-search><script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script><script type="module" src="/kube-agents/_astro/Search.astro_astro_type_script_index_0_lang.DzR8jAgX.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-6k6kswk6"><div class="sl-flex social-icons astro-6k6kswk6"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></header><nav class="sidebar print:hidden astro-euo27uub" aria-label="Main"><button popovertarget="starlight__sidebar" class="sl-menu-button sl-flex md:sl-hidden print:hidden astro-5zlzgk4i"><svg aria-hidden="true" class="open-menu astro-5zlzgk4i astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-5zlzgk4i astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg><span class="sr-only astro-5zlzgk4i">Menu</span></button><script type="module">var e=class extends HTMLElement{constructor(){super();let e=matchMedia(`(min-width: 50em)`),t=()=>{this.popover=e.matches?null:`auto`};t(),e.addEventListener(`change`,()=>t()),this.addEventListener(`toggle`,({newState:e})=>this.trapFocus(e===`open`))}trapFocus(e){document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}};customElements.define(`sl-sidebar-pane`,e);</script><sl-sidebar-pane popover id="starlight__sidebar" class="sidebar-pane astro-euo27uub"><div class="sidebar-content sl-flex astro-euo27uub"><sl-sidebar-state-persist data-hash="11352sw" class="astro-vnnkyq4l"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><ul class="top-level astro-4c2piv4z"><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Overview</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Introduction</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/what-is-kube-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">What is kube-agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/proactive-autonomy/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Proactive autonomy</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/day-in-the-life/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">A day with kube-agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/architecture/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Architecture</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Install</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/install/prerequisites/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Prerequisites</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/quickstart-gke/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Quick start (GKE)</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/first-prompts/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">First prompts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/slack-app/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Slack app setup</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/manual/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Manual install</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/helm-and-kind/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Helm and Kind</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/gitlab/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">GitLab as the GitOps forge</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/gitea/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Gitea as the GitOps forge</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/upgrade/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Upgrade</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/uninstall/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Uninstall</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Concepts</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Concepts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/platform-agent/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Platform Agent</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/cluster-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Cluster Agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/chatops/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">ChatOps</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/skills/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Skills</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/governance-sops/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Governance SOPs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/autonomous-watchdogs/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Autonomous watchdogs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/declarative-workflow/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Declarative workflow</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/inference-gateway/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Inference gateway</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/observability/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Observability</span></a></li></ul></details></li><li class="astro-4c2piv4z"><a href="/kube-agents/skills/" class="large astro-4c2piv4z"><span class="astro-4c2piv4z">Skill catalog</span></a></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Operator</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/operator/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Operator overview</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/platformagent-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">PlatformAgent CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentplugin-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentPlugin CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentprofile-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentProfile CRD</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Deploy</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Deploy overview</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/kustomize/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Network policies and Service</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/docker-images/" aria-current="page" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Docker images</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/token-minter/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Token minter (Minty)</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/release-versioning/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Release lifecycle, versioning &amp; operations</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/telemetry/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Telemetry</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/gitops-argocd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">GitOps with ArgoCD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/rollback/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Rolling back a release</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/multi-project/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Multiple GCP projects</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Reference</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/reference/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Reference</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/config/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Config reference</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/cron-jobs/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Cron jobs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/examples/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Examples</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/glossary/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Glossary</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/attribution/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">User attribution</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/security-and-iam/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Security &amp; IAM</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/credential-isolation/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Credential isolation</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/resource-labels/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Resource labels</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/admin-console/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Admin console</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/certified-capabilities/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Certified capabilities</span></a></li></ul></details></li><li class="astro-4c2piv4z"><a href="/kube-agents/contributing/" class="large astro-4c2piv4z"><span class="astro-4c2piv4z">Contributing</span></a></li></ul><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-7it4zgwh"><div class="social-icons astro-7it4zgwh"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div></div></div></div></sl-sidebar-pane></nav><div class="main-frame astro-euo27uub"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-axz53cfb"><aside class="right-sidebar-container print:hidden astro-axz53cfb"><div class="right-sidebar astro-axz53cfb"><div class="lg:sl-hidden astro-gl637vfx"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-kwxnrgy4"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-kwxnrgy4"><details id="starlight__mobile-toc" class="astro-kwxnrgy4"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-kwxnrgy4"><span class="toggle sl-flex astro-kwxnrgy4">On this page<svg aria-hidden="true" class="caret astro-kwxnrgy4 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-kwxnrgy4"></span></summary><div class="dropdown astro-kwxnrgy4"><ul class="isMobile astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#image-inventory" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Image inventory</span></a><ul class="isMobile astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#built-and-published-by-this-repo" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Built and published by this repo</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#pulled-by-an-install-built-elsewhere" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Pulled by an install, built elsewhere</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#base-images" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Base images</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#published-images" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Published images</span></a><ul class="isMobile astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#platform-agent" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">platform-agent</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#credential-proxy" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">credential-proxy</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#replay-proxy" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">replay-proxy</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#k8s-operator" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">k8s-operator</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#container-entrypoint" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Container entrypoint</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#base-image-pin" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Base image pin</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#private--custom-registry" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Private / custom registry</span></a><ul class="isMobile astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#1-mirror-the-images" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">1. Mirror the images</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#2-point-the-install-at-it" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">2. Point the install at it</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#what-the-prefix-does-not-cover" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">What the prefix does not cover</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#rebuilding-rather-than-copying" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Rebuilding rather than copying</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#registry-authentication" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Registry authentication</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#local-builds" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Local builds</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module" src="/kube-agents/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C3fM4Kra.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-gl637vfx"><div class="sl-container astro-gl637vfx"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#image-inventory" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Image inventory</span></a><ul class="astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#built-and-published-by-this-repo" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Built and published by this repo</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#pulled-by-an-install-built-elsewhere" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Pulled by an install, built elsewhere</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#base-images" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Base images</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#published-images" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Published images</span></a><ul class="astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#platform-agent" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">platform-agent</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#credential-proxy" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">credential-proxy</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#replay-proxy" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">replay-proxy</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#k8s-operator" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">k8s-operator</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#container-entrypoint" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Container entrypoint</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#base-image-pin" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Base image pin</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#private--custom-registry" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Private / custom registry</span></a><ul class="astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#1-mirror-the-images" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">1. Mirror the images</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#2-point-the-install-at-it" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">2. Point the install at it</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#what-the-prefix-does-not-cover" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">What the prefix does not cover</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#rebuilding-rather-than-copying" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Rebuilding rather than copying</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#registry-authentication" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Registry authentication</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#local-builds" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Local builds</span></a></li></ul></nav></starlight-toc><script type="module" src="/kube-agents/_astro/TableOfContents.astro_astro_type_script_index_0_lang.BpJaGz7G.js"></script></div></div></div></aside><div class="main-pane astro-axz53cfb"><main data-pagefind-body class="astro-ae72s45h" lang="en" dir="ltr"><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><h1 id="_top" class="astro-dfqzrgu7">Docker images</h1></div></div><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><div class="sl-markdown-content"><p>Every image an install pulls or a rebuild needs, and how their tags are managed.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="image-inventory">Image inventory</h2><a class="sl-anchor-link" href="#image-inventory"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Image inventory”</span></a></div>
+<p><a href="https://github.com/gke-labs/kube-agents/blob/main/images.json"><code dir="auto">images.json</code></a> at the repository root is the source of truth for this list. It is what <code dir="auto">make mirror-images</code> copies from, what the chart and the dev tooling resolve their third-party pins from, and what the table below is generated from — so there is one pin per image, not one per install path.</p>
+<p>The A2A <code dir="auto">next</code> stack pulls NATS, nats-box, the gateway, the session worker, the auth callout,
+the capability verifier, the console server and the Hermes bridge sidecar, and each is in the
+tables below. The first-party ones (<code dir="auto">a2a-gateway</code>, <code dir="auto">a2a-worker</code>, <code dir="auto">a2a-authcallout</code>,
+<code dir="auto">a2a-verifier</code>, <code dir="auto">a2a-console</code>, <code dir="auto">hermes-bridge</code>) are built and tagged with the rest of the
+release. The operator derives the five it renders from its own image (<code dir="auto">OPERATOR_IMAGE</code>, which
+the chart sets beside <code dir="auto">PLATFORM_AGENT_IMAGE</code>) when it carries a tag, else from the agent image it
+resolves for itself:
+the same registry and tag, so an install at a release pulls them at that release and a mirrored
+install pulls them from the mirror. A <code dir="auto">PlatformAgent</code>’s own <code dir="auto">spec.deployment.image</code> does not move
+them;
+<code dir="auto">A2A_GATEWAY_IMAGE</code>, <code dir="auto">A2A_WORKER_IMAGE</code>, <code dir="auto">A2A_CALLOUT_IMAGE</code>, <code dir="auto">A2A_VERIFIER_IMAGE</code> and
+<code dir="auto">A2A_CONSOLE_IMAGE</code> on the operator override one at a time. The Hermes bridge sidecar the
+operator renders into the agent pod under <code dir="auto">next</code> is built from the <code dir="auto">platform-agent</code> image of the
+same commit, so the operator takes its registry and tag from the agent image instead, and
+<code dir="auto">A2A_BRIDGE_IMAGE</code> on the operator overrides it. A <code dir="auto">PlatformAgent</code> that declares its own
+<code dir="auto">hermes-bridge</code> sidecar keeps it, and that sidecar’s image is whatever the resource names. NATS and nats-box are ordinary third-party pins, in the
+table as <code dir="auto">nats</code> and <code dir="auto">nats-box</code>, so <code dir="auto">make mirror-images</code> copies them; the chart does not set their
+env vars, so a mirrored <code dir="auto">next</code> install still points <code dir="auto">A2A_NATS_IMAGE</code> and <code dir="auto">A2A_PROVISION_IMAGE</code> at
+the copies itself, through the operator’s environment
+(<a href="/kube-agents/install/quickstart-gke/#operator-settings">Operator settings</a> shows how).</p>
+<p>The bases those images are built from are inventory entries too. <code dir="auto">golang</code>, <code dir="auto">node</code> and
+<code dir="auto">distroless-static</code> in the build-time table below carry <code dir="auto">a2a/Dockerfile.authcallout</code>,
+<code dir="auto">a2a/Dockerfile.console</code>, <code dir="auto">a2a/Dockerfile.gateway</code>, <code dir="auto">a2a/Dockerfile.verifier</code>,
+<code dir="auto">a2a/Dockerfile.worker</code> and <code dir="auto">a2a/Dockerfile.hermes-bridge</code> alongside
+every other builder, so a build in a mirrored environment can resolve them like any other.</p>
+<p>Several images keep a second copy of their pin elsewhere in the tree — a chart value, a Dockerfile
+<code dir="auto">ARG</code> default, a compiled constant in the operator — and <code dir="auto">make images-check</code> holds them in step with
+this file. How to bump a pin is in
+<a href="https://github.com/gke-labs/kube-agents/blob/main/docs/pull-request-workflow.md#local-validation-before-committing"><code dir="auto">docs/pull-request-workflow.md</code></a>.</p>
+<!-- BEGIN GENERATED: container-images -->
+<!-- Regenerate with: make docs-generate -- do not edit by hand. -->
+<!-- prettier-ignore-start -->
+<div class="sl-heading-wrapper level-h3"><h3 id="built-and-published-by-this-repo">Built and published by this repo</h3><a class="sl-anchor-link" href="#built-and-published-by-this-repo"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Built and published by this repo”</span></a></div>
+<p>Tagged with the release version; <code dir="auto">:latest</code> on every push to <code dir="auto">main</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Image</th>
+<th>Upstream reference</th>
+<th>Pin</th>
+<th>Override</th>
+<th>Pulled by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">platform-agent</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/platform-agent</code></td>
+<td>release tag</td>
+<td><code dir="auto">PLATFORM_AGENT_IMAGE</code></td>
+<td>The agent Deployment the operator renders, and its sandbox init container.</td>
+</tr>
+<tr>
+<td><code dir="auto">credential-proxy</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/credential-proxy</code></td>
+<td>release tag</td>
+<td><code dir="auto">CREDENTIAL_PROXY_IMAGE</code></td>
+<td>The credential-proxy Deployment, and the agent-api-auth sidecar in the agent pod.</td>
+</tr>
+<tr>
+<td><code dir="auto">agent-sandbox</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/agent-sandbox</code></td>
+<td>release tag</td>
+<td><code dir="auto">AGENT_SANDBOX_IMAGE</code></td>
+<td>The shell sandbox StatefulSet the operator renders beside every agent pod.</td>
+</tr>
+<tr>
+<td><code dir="auto">k8s-operator</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/k8s-operator</code></td>
+<td>release tag</td>
+<td><code dir="auto">OPERATOR_IMAGE</code></td>
+<td>The controller-manager Deployment.</td>
+</tr>
+<tr>
+<td><code dir="auto">replay-proxy</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/replay-proxy</code></td>
+<td>release tag</td>
+<td><code dir="auto">REPLAY_IMAGE</code></td>
+<td>The optional inference-replay integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">pubsub-platform</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/pubsub-platform</code></td>
+<td>release tag</td>
+<td>—</td>
+<td>The pubsub-platform AgentPlugin.</td>
+</tr>
+<tr>
+<td><code dir="auto">gke-stockout-investigator</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/gke-stockout-investigator</code></td>
+<td>release tag</td>
+<td>—</td>
+<td>The gke-stockout-investigator AgentPlugin.</td>
+</tr>
+<tr>
+<td><code dir="auto">a2a-gateway</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/a2a-gateway</code></td>
+<td>release tag</td>
+<td><code dir="auto">A2A_GATEWAY_IMAGE</code></td>
+<td>The A2A gateway Deployment the operator renders under spec.mode: next, and nothing under spec.mode: today. The operator derives it from its own image, else from the agent image it resolves (registry and tag), unless the override is set; the worker, the callout and the console resolve the same way.</td>
+</tr>
+<tr>
+<td><code dir="auto">a2a-worker</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/a2a-worker</code></td>
+<td>release tag</td>
+<td><code dir="auto">A2A_WORKER_IMAGE</code></td>
+<td>The session pods the A2A gateway spawns under spec.mode: next; the operator passes its resolution to the gateway as A2A_WORKER_IMAGE. The image also carries the credential broker’s shim as <code dir="auto">kubectl</code> and <code dir="auto">gcloud</code>, used only when the operator’s A2A_SESSION_CLUSTER_VIEW flag gives a session pod its read-only cluster view.</td>
+</tr>
+<tr>
+<td><code dir="auto">a2a-authcallout</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/a2a-authcallout</code></td>
+<td>release tag</td>
+<td><code dir="auto">A2A_CALLOUT_IMAGE</code></td>
+<td>The auth callout Deployment the operator renders under spec.mode: next, and nothing under spec.mode: today.</td>
+</tr>
+<tr>
+<td><code dir="auto">a2a-console</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/a2a-console</code></td>
+<td>release tag</td>
+<td><code dir="auto">A2A_CONSOLE_IMAGE</code></td>
+<td>The console server Deployment the operator renders under spec.mode: next, and nothing under spec.mode: today.</td>
+</tr>
+<tr>
+<td><code dir="auto">a2a-verifier</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/a2a-verifier</code></td>
+<td>release tag</td>
+<td><code dir="auto">A2A_VERIFIER_IMAGE</code></td>
+<td>The capability verifier Deployment the operator renders under spec.mode: next, and nothing under spec.mode: today. It resolves the same way the gateway, the worker and the callout do.</td>
+</tr>
+<tr>
+<td><code dir="auto">hermes-bridge</code></td>
+<td><code dir="auto">ghcr.io/gke-labs/kube-agents/hermes-bridge</code></td>
+<td>release tag</td>
+<td><code dir="auto">A2A_BRIDGE_IMAGE</code></td>
+<td>The hermes-bridge sidecar the operator renders beside the agent container under spec.mode: next, and nothing under spec.mode: today. The operator derives it from the agent image (registry and tag) unless the override is set; a CR that declares its own hermes-bridge sidecar on spec.deployment.sidecars keeps it, and that sidecar’s image is the CR’s.</td>
+</tr>
+</tbody>
+</table>
+<div class="sl-heading-wrapper level-h3"><h3 id="pulled-by-an-install-built-elsewhere">Pulled by an install, built elsewhere</h3><a class="sl-anchor-link" href="#pulled-by-an-install-built-elsewhere"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Pulled by an install, built elsewhere”</span></a></div>
+<p>Pinned here so <code dir="auto">make mirror-images</code> and the install ask for the same version.</p>
+<table>
+<thead>
+<tr>
+<th>Image</th>
+<th>Upstream reference</th>
+<th>Pin</th>
+<th>Override</th>
+<th>Pulled by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">litellm</code></td>
+<td><code dir="auto">ghcr.io/berriai/litellm</code></td>
+<td><code dir="auto">v1.106.0</code></td>
+<td><code dir="auto">LITELLM_IMAGE</code></td>
+<td>The LiteLLM gateway, from either the chart or the kustomize integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">fluent-bit</code></td>
+<td><code dir="auto">docker.io/fluent/fluent-bit</code></td>
+<td><code dir="auto">5.1.2</code></td>
+<td><code dir="auto">FLUENT_BIT_IMAGE</code></td>
+<td>The logging sidecar the operator injects into every agent pod.</td>
+</tr>
+<tr>
+<td><code dir="auto">nats</code></td>
+<td><code dir="auto">docker.io/library/nats</code></td>
+<td><code dir="auto">2.10-alpine</code></td>
+<td><code dir="auto">A2A_NATS_IMAGE</code></td>
+<td>The NATS StatefulSet the operator renders under spec.mode: next, and nothing under spec.mode: today.</td>
+</tr>
+<tr>
+<td><code dir="auto">nats-box</code></td>
+<td><code dir="auto">docker.io/natsio/nats-box</code></td>
+<td><code dir="auto">0.14.5</code></td>
+<td><code dir="auto">A2A_PROVISION_IMAGE</code></td>
+<td>The provision Job the operator runs against that NATS under spec.mode: next, and nothing under spec.mode: today.</td>
+</tr>
+<tr>
+<td><code dir="auto">k8s</code></td>
+<td><code dir="auto">docker.io/alpine/k8s</code></td>
+<td><code dir="auto">1.36.5</code></td>
+<td>—</td>
+<td>The chart’s pre-delete cleanup hook Job.</td>
+</tr>
+<tr>
+<td><code dir="auto">github-token-minter-server</code></td>
+<td><code dir="auto">us-docker.pkg.dev/abcxyz-artifacts/docker-images/github-token-minter-server</code></td>
+<td><code dir="auto">v2.7.1-amd64</code></td>
+<td><code dir="auto">GITHUB_MINTER_IMAGE</code></td>
+<td>The optional GitHub integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">hindsight-api</code></td>
+<td><code dir="auto">ghcr.io/vectorize-io/hindsight-api</code></td>
+<td><code dir="auto">0.10.2@sha256:1ba631f950a04460feff6b1e212bad3cdf127b0cfb3d765bdcba12f512481d7b</code></td>
+<td><code dir="auto">HINDSIGHT_API_IMAGE</code></td>
+<td>The chart, when the memory provider uses Hindsight (make deploy-hindsight for the kustomize dev path).</td>
+</tr>
+<tr>
+<td><code dir="auto">hindsight-postgresql</code></td>
+<td><code dir="auto">docker.io/pgvector/pgvector</code></td>
+<td><code dir="auto">0.8.6-pg15@sha256:a947c45cdc5906a1bc951f20a8709e321256343ee0f251e4ae00b5e7def4e6da</code></td>
+<td><code dir="auto">HINDSIGHT_POSTGRES_IMAGE</code></td>
+<td>The chart, alongside the Hindsight API.</td>
+</tr>
+<tr>
+<td><code dir="auto">cert-manager-controller</code></td>
+<td><code dir="auto">quay.io/jetstack/cert-manager-controller</code></td>
+<td><code dir="auto">v1.21.2</code></td>
+<td>—</td>
+<td>cert-manager, installed by the full-install composition unless enable_cert_manager is false.</td>
+</tr>
+<tr>
+<td><code dir="auto">cert-manager-cainjector</code></td>
+<td><code dir="auto">quay.io/jetstack/cert-manager-cainjector</code></td>
+<td><code dir="auto">v1.21.2</code></td>
+<td>—</td>
+<td>cert-manager, installed by the full-install composition unless enable_cert_manager is false.</td>
+</tr>
+<tr>
+<td><code dir="auto">cert-manager-webhook</code></td>
+<td><code dir="auto">quay.io/jetstack/cert-manager-webhook</code></td>
+<td><code dir="auto">v1.21.2</code></td>
+<td>—</td>
+<td>cert-manager, installed by the full-install composition unless enable_cert_manager is false.</td>
+</tr>
+<tr>
+<td><code dir="auto">cert-manager-acmesolver</code></td>
+<td><code dir="auto">quay.io/jetstack/cert-manager-acmesolver</code></td>
+<td><code dir="auto">v1.21.2</code></td>
+<td>—</td>
+<td>cert-manager’s controller, via its –acme-http01-solver-image flag. Never pulled by kube-agents itself; the copy exists so a mirrored cert-manager install can point the flag at it.</td>
+</tr>
+<tr>
+<td><code dir="auto">cert-manager-startupapicheck</code></td>
+<td><code dir="auto">quay.io/jetstack/cert-manager-startupapicheck</code></td>
+<td><code dir="auto">v1.21.2</code></td>
+<td>—</td>
+<td>cert-manager, installed by the full-install composition unless enable_cert_manager is false. Runs once per install as a post-install hook Job.</td>
+</tr>
+</tbody>
+</table>
+<div class="sl-heading-wrapper level-h3"><h3 id="base-images">Base images</h3><a class="sl-anchor-link" href="#base-images"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Base images”</span></a></div>
+<p>Needed only to rebuild the images above from source, not to run an install. Each is a build arg on its Dockerfile, so a mirrored rebuild passes the copy’s reference.</p>
+<table>
+<thead>
+<tr>
+<th>Image</th>
+<th>Upstream reference</th>
+<th>Pin</th>
+<th>Override</th>
+<th>Pulled by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">hermes-agent</code></td>
+<td><code dir="auto">docker.io/nousresearch/hermes-agent</code></td>
+<td><code dir="auto">HERMES_AGENT_TAG</code> in <a href="https://github.com/gke-labs/kube-agents/blob/main/tags.env"><code dir="auto">tags.env</code></a></td>
+<td><code dir="auto">HERMES_AGENT_IMAGE</code></td>
+<td>deploy/docker/Dockerfile (agent-base stage).</td>
+</tr>
+<tr>
+<td><code dir="auto">envoy</code></td>
+<td><code dir="auto">docker.io/envoyproxy/envoy</code></td>
+<td><code dir="auto">v1.39.1</code></td>
+<td><code dir="auto">ENVOY_IMAGE</code></td>
+<td>deploy/docker/Dockerfile (envoy-bin stage).</td>
+</tr>
+<tr>
+<td><code dir="auto">golang</code></td>
+<td><code dir="auto">docker.io/library/golang</code></td>
+<td><code dir="auto">1.27-alpine</code></td>
+<td><code dir="auto">GOLANG_IMAGE</code></td>
+<td>deploy/docker/Dockerfile, k8s-operator/Dockerfile, a2a/Dockerfile.authcallout, a2a/Dockerfile.gateway, a2a/Dockerfile.hermes-bridge, a2a/Dockerfile.verifier, a2a/Dockerfile.worker and a2a/Dockerfile.console builder stages.</td>
+</tr>
+<tr>
+<td><code dir="auto">node</code></td>
+<td><code dir="auto">docker.io/library/node</code></td>
+<td><code dir="auto">22-slim</code></td>
+<td><code dir="auto">NODE_IMAGE</code></td>
+<td>a2a/Dockerfile.worker runtime stage and a2a/Dockerfile.console page build stage.</td>
+</tr>
+<tr>
+<td><code dir="auto">python</code></td>
+<td><code dir="auto">docker.io/library/python</code></td>
+<td><code dir="auto">3.14-slim</code></td>
+<td><code dir="auto">PYTHON_IMAGE</code></td>
+<td>examples/inference-replay/replay-proxy/Dockerfile and deploy/sandbox/Dockerfile.</td>
+</tr>
+<tr>
+<td><code dir="auto">distroless-static</code></td>
+<td><code dir="auto">gcr.io/distroless/static</code></td>
+<td><code dir="auto">nonroot</code></td>
+<td><code dir="auto">DISTROLESS_IMAGE</code></td>
+<td>k8s-operator/Dockerfile, a2a/Dockerfile.authcallout, a2a/Dockerfile.gateway, a2a/Dockerfile.verifier and a2a/Dockerfile.console runtime stages.</td>
+</tr>
+<tr>
+<td><code dir="auto">busybox</code></td>
+<td><code dir="auto">docker.io/library/busybox</code></td>
+<td><code dir="auto">musl@sha256:ea2b9914a16a4ac1981994af97b318f7c7d4db76b580c56177f08bf76f4a0be8</code></td>
+<td>—</td>
+<td>agentplugins/*/Dockerfile base images.</td>
+</tr>
+</tbody>
+</table>
+<!-- prettier-ignore-end -->
+<!-- END GENERATED: container-images -->
+<div class="sl-heading-wrapper level-h2"><h2 id="published-images">Published images</h2><a class="sl-anchor-link" href="#published-images"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Published images”</span></a></div>
+<p>Every image below is published to <code dir="auto">ghcr.io/gke-labs/kube-agents/&lt;image&gt;</code> on each push to <code dir="auto">main</code>, and when a merge lands on a <code dir="auto">release/&lt;X.Y&gt;</code> branch whose commit has no images yet, tagged with the pushed commit’s SHA; <code dir="auto">:latest</code> follows <code dir="auto">main</code> alone. A push to <code dir="auto">main</code> also publishes <code dir="auto">platform-agent</code>, <code dir="auto">credential-proxy</code>, <code dir="auto">replay-proxy</code>, <code dir="auto">agent-sandbox</code>, <code dir="auto">pubsub-platform</code> and <code dir="auto">gke-stockout-investigator</code> — not <code dir="auto">k8s-operator</code>, and not the four A2A <code dir="auto">next</code>-stack images, which are published to GHCR alone — to a Google Artifact Registry repository through <a href="https://github.com/gke-labs/kube-agents/blob/main/.github/workflows/docker-publish-gcp.yml"><code dir="auto">docker-publish-gcp.yml</code></a>, built there by Cloud Build. Production SemVer release tags (<code dir="auto">X.Y.Z</code>) are promoted from the GHCR commit images without rebuilding — see <a href="/kube-agents/deploy/release-versioning/">Release versioning</a>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="platform-agent"><code dir="auto">platform-agent</code></h3><a class="sl-anchor-link" href="#platform-agent"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “platform-agent”</span></a></div>
+<p>The agent Deployment image. Built from the <code dir="auto">platform</code> target of <a href="https://github.com/gke-labs/kube-agents/blob/main/deploy/docker/Dockerfile"><code dir="auto">deploy/docker/Dockerfile</code></a> on top of <code dir="auto">nousresearch/hermes-agent</code>. It lays down the Planning Agent workspace at <code dir="auto">/opt/defaults</code> (the <code dir="auto">default</code> profile) plus three specialist profile templates: the Platform Agent at <code dir="auto">/opt/platform-template</code>, scaffolded into the <code dir="auto">platform</code> profile at startup by the entrypoint; the Cluster Agent at <code dir="auto">/opt/cluster-template</code>, scaffolded into per-cluster <code dir="auto">cluster-*</code> profiles at runtime by <code dir="auto">cluster_agent_profile.py</code>; and the optional GKE Support Agent at <code dir="auto">/opt/tse-template</code>, scaffolded into the <code dir="auto">tse</code> profile at startup when <code dir="auto">KUBE_AGENTS_ENABLED_PROFILES</code> contains <code dir="auto">tse</code>.</p>
+<p>There is no cluster or forge tooling in this image, in any form, and a build guard fails if any reappears. The agent’s shell runs in the <code dir="auto">agent-sandbox</code> image. <code dir="auto">kubectl</code> and <code dir="auto">gcloud</code> there are credential-proxy shims — symlinks to a client that forwards a command to the broker holding the credential — and <code dir="auto">helm</code>, <code dir="auto">yq</code> and OpenTofu’s <code dir="auto">tofu</code> are native. The agent runs <code dir="auto">tofu</code> for one subcommand, <code dir="auto">fmt</code>: <code dir="auto">tofu fmt -check -diff</code> to check the syntax of Terraform it writes for a pull request, then <code dir="auto">tofu fmt</code> to apply the formatting. Its <code dir="auto">git</code> holds no credential and reaches no forge, and there is no <code dir="auto">gh</code>: repositories are fetched and changed through the version-control skill’s verbs, which the broker serves. Agent-pod code that needs one of them reaches the sandbox over SSH through <code dir="auto">agents/platform/scripts/sandbox_exec.py</code>, and the sandbox reaches the broker at the <code dir="auto">&lt;name&gt;-credential-proxy</code> Service.</p>
+<p>What is installed is the debugging set the agent’s own processes use: <code dir="auto">curl</code>, <code dir="auto">jq</code>, <code dir="auto">dnsutils</code>, <code dir="auto">iputils-ping</code>, <code dir="auto">patch</code>, <code dir="auto">wget</code>, <code dir="auto">nano</code>, <code dir="auto">vim</code>.</p>
+<p>It also builds two Go binaries in a builder stage and copies them into the image: the <code dir="auto">k8s-event-watcher</code> from <code dir="auto">k8s-operator/cmd/k8s-event-watcher/</code> and the <code dir="auto">drift-detector</code> from <code dir="auto">k8s-operator/cmd/drift-detector/</code>. Both land in the shared <code dir="auto">agent-base</code> stage, so the <code dir="auto">credential-proxy</code> image below carries them too — which is the image that actually runs them, in the gateway pod’s <code dir="auto">agent-api-auth</code> sidecar.</p>
+<p>A late build step precompiles the Python tree — <code dir="auto">/opt/hermes</code>, its venv, and the stdlib — to <code dir="auto">.pyc</code>. The base image ships almost none, sets <code dir="auto">PYTHONDONTWRITEBYTECODE=1</code>, and <code dir="auto">/opt/hermes</code> is read-only to the runtime user, so without this every short-lived process recompiled its imports from source and threw the result away. Each kanban worker is exactly such a process: a fresh <code dir="auto">hermes -p &lt;profile&gt; --cli chat -q</code>. Shipping the bytecode costs ~170MB of image and takes about 6s off a worker’s startup. It has to run after everything the Dockerfile writes into <code dir="auto">/opt/hermes</code> — its patches and its bundled plugins alike — because <code dir="auto">compileall</code> stamps each <code dir="auto">.pyc</code> with its source’s mtime and size, so bytecode written before the write would simply be discarded at import.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="credential-proxy"><code dir="auto">credential-proxy</code></h3><a class="sl-anchor-link" href="#credential-proxy"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “credential-proxy”</span></a></div>
+<p>The Envoy-based credential broker runtime, which runs as the <code dir="auto">envoy-credential-proxy</code> container in its own <code dir="auto">&lt;name&gt;-credential-proxy</code> Deployment. The same image also runs the gateway pod’s <code dir="auto">agent-api-auth</code> sidecar, with <code dir="auto">CREDENTIAL_PROXY_ROLE=api-proxy</code> starting neither Envoy nor the executor there. Built from the <code dir="auto">credential-proxy</code> target of the same <a href="https://github.com/gke-labs/kube-agents/blob/main/deploy/docker/Dockerfile"><code dir="auto">deploy/docker/Dockerfile</code></a>, on the shared <code dir="auto">agent-base</code> stage rather than on <code dir="auto">platform</code>: it adds the real <code dir="auto">gcloud</code>, <code dir="auto">kubectl</code>, <code dir="auto">gh</code> and <code dir="auto">git</code> that the sandbox image deliberately lacks, the <code dir="auto">envoy</code> binary and its config, and <code dir="auto">/opt/defaults/scripts</code>, which is where <code dir="auto">start-services.sh</code> finds <code dir="auto">credential_proxy.py</code>. It carries none of what the <code dir="auto">platform</code> stage adds on top — no kube-agents personas, skills, cron entries or profile templates — because nothing that runs from this image reads them.</p>
+<p>Building it from <code dir="auto">agent-base</code> rather than <code dir="auto">platform</code> is also what keeps a one-file agent change cheap. The stage copies <code dir="auto">agents/*/scripts/</code> itself, so an edit there still rebuilds that copy and the layers after it — but no longer the whole <code dir="auto">platform</code> chain, whose output the sidecar does not use.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="replay-proxy"><code dir="auto">replay-proxy</code></h3><a class="sl-anchor-link" href="#replay-proxy"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “replay-proxy”</span></a></div>
+<p>The inference replay proxy used for record/replay of model traffic. Built from <a href="https://github.com/gke-labs/kube-agents/blob/main/examples/inference-replay/replay-proxy/Dockerfile"><code dir="auto">examples/inference-replay/replay-proxy/Dockerfile</code></a>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="k8s-operator"><code dir="auto">k8s-operator</code></h3><a class="sl-anchor-link" href="#k8s-operator"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “k8s-operator”</span></a></div>
+<p>The Kubebuilder-generated operator manager image. Built from <code dir="auto">k8s-operator/Dockerfile</code> (<code dir="auto">make docker-build IMG=...</code>).</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="container-entrypoint">Container entrypoint</h2><a class="sl-anchor-link" href="#container-entrypoint"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Container entrypoint”</span></a></div>
+<p><code dir="auto">platform-agent</code> — and <code dir="auto">credential-proxy</code>, which inherits it from the shared <code dir="auto">agent-base</code> stage — run <a href="https://github.com/gke-labs/kube-agents/blob/main/deploy/shared/docker-entrypoint.sh"><code dir="auto">deploy/shared/docker-entrypoint.sh</code></a> as their <code dir="auto">ENTRYPOINT</code>, with <code dir="auto">CMD ["hermes", "gateway", "run"]</code>. Neither container built from that image reaches it under this operator: for both <code dir="auto">envoy-credential-proxy</code> and <code dir="auto">agent-api-auth</code> the operator sets <code dir="auto">command</code> to <code dir="auto">/usr/local/bin/start-services</code>, which replaces the image’s <code dir="auto">ENTRYPOINT</code> outright. Before it <code dir="auto">exec</code>s whatever command it was handed, the entrypoint converts Hermes’ SQLite databases out of WAL when the managed config pins <code dir="auto">database.journal_mode: delete</code> (see <code dir="auto">availability.runtimeClassName</code> on the <a href="/kube-agents/operator/platformagent-crd/#specdeployment">CRD reference</a>), seeds <code dir="auto">$HERMES_HOME</code> from <code dir="auto">/opt/defaults</code>, scaffolds the <code dir="auto">platform</code> profile, reconciles optional built-in profiles (<code dir="auto">KUBE_AGENTS_ENABLED_PROFILES</code>), links profile-targeted plugin volumes, merges the operator-rendered config overlays, copies the managed terminal settings into every profile’s <code dir="auto">.env</code>, and starts the Session KV server.</p>
+<p>Every one of those writes to the data volume, and a Pod runs this image in more than one container against a single copy of it. Exactly one container may do the setup. A second pass from a container that lacks the plugin volumes and the overlay ConfigMap does not merely duplicate the work — it reads the first container’s fresh plugin links as dangling and unlinks them, and reverts the overlay whose source it cannot see. <code dir="auto">AGENT_SHARED_STATE_SETUP</code> decides which container that is:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">owner</code> (or <code dir="auto">always</code>)</td>
+<td>Run the setup, then <code dir="auto">exec</code> the command.</td>
+</tr>
+<tr>
+<td><code dir="auto">skip</code> (or <code dir="auto">never</code>)</td>
+<td>Skip the setup and <code dir="auto">exec</code> the command directly.</td>
+</tr>
+<tr>
+<td><code dir="auto">auto</code>, or unset</td>
+<td>Infer from the command line: a bare <code dir="auto">gateway</code> argument owns the shared state, anything else does not.</td>
+</tr>
+</tbody>
+</table>
+<p>An unrecognised value falls back to <code dir="auto">auto</code> and logs a warning rather than guessing, because <code dir="auto">Owner</code>, <code dir="auto">true</code>, and <code dir="auto">1</code> are otherwise indistinguishable from having set nothing at all. Under the operator (<code dir="auto">HERMES_MANAGED_DIR</code> set) a container that skips the setup first waits, for up to <code dir="auto">AGENT_SHARED_STATE_WAIT_SECS</code> (default 120), for the owner to seed <code dir="auto">config.yaml</code> and to finish the WAL-to-DELETE conversion, then proceeds either way.</p>
+<p>The operator sets the variable explicitly on every container it builds — <code dir="auto">owner</code> on the gateway, <code dir="auto">skip</code> on the dashboard — so <code dir="auto">auto</code> never runs under a <code dir="auto">PlatformAgent</code>. Auto-detection exists for deployments with no operator to ask: Compose, plain manifests, <code dir="auto">docker run</code>. Set it by hand in those if the owning container’s own argv does not contain <code dir="auto">gateway</code>. Above one replica the operator’s gateway would itself be such a case, running <code dir="auto">leader_elect.py</code>, which starts <code dir="auto">hermes gateway run</code> as a child process, so the word never appears in the container’s own arguments. The operator runs the gateway as a single replica today, so it does not render that shape.</p>
+<p>A Dockerfile stage built on every pull request, <code dir="auto">entrypoint-gate-test</code>, verifies every case in that table against the real entrypoint (<code dir="auto">deploy/shared/entrypoint_gate_check.sh</code>): it runs the entrypoint once per case against a scratch <code dir="auto">$PLATFORM_AGENT_HOME</code> and checks the decision the gate announces against what it then writes to disk. A build that targets a runtime image does not run it. The script is not shipped in the runtime image, but it is safe to pipe into a running pod when diagnosing one:</p>
+<div class="expressive-code"><link rel="stylesheet" href="/kube-agents/_astro/ec.rw6j1.css"><script type="module" src="/kube-agents/_astro/ec.0vx5m.js"></script><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">exec</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-i</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/platform-agent-gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-c</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#ECC48D">sh</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-s</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">&lt;</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/shared/entrypoint_gate_check.sh</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl exec -i deploy/platform-agent-gateway -c platform-agent -- \  sh -s < deploy/shared/entrypoint_gate_check.sh"><div></div></button></div></figure></div>
+<p>Confining it takes more than a scratch <code dir="auto">$PLATFORM_AGENT_HOME</code>, because two of the setup’s effects are not derived from it. Step 4 points <code dir="auto">$HOME/.hermes/plugins/hermes_otel/config.yaml</code> at the config it generates — <code dir="auto">hermes-otel</code> resolves its config below <code dir="auto">~/.hermes</code> whatever <code dir="auto">HERMES_HOME</code> says — and <code dir="auto">$HOME</code> in the gateway is <code dir="auto">/opt/data/home</code>, on the data PVC. Step 5 starts the Session KV server on port 8699, which is pod-wide and scoped by nothing. So each case also gets a scratch <code dir="auto">$HOME</code>, and the server it spawns is killed by its scratch path as the case returns. The run ends by asserting both: that the pod’s real compat symlink is byte-for-byte what it was, and that no process from the run is still alive.</p>
+<p>Three things the entrypoint does can stop the container rather than warn: the skill manifest check, the terminal check (step 4b), and a failed move of the model’s files into the shell sandbox (step 5.7). The first: before the setup copies anything to the data volume — in the container that owns the shared state, since a <code dir="auto">skip</code> container has already <code dir="auto">exec</code>ed the command by this point — it checks each skill tree baked into the image (<code dir="auto">/opt/hermes/skills</code>, <code dir="auto">/opt/platform-template/skills</code>, <code dir="auto">/opt/cluster-template/skills</code>, <code dir="auto">/opt/tse-template/skills</code>, <code dir="auto">/opt/a2a-template/skills</code>) against the SHA-256 manifest the build wrote into it, and exits non-zero if a tree no longer matches — naming the offending file on stderr, with both digests when its content is what changed. Almost every other step here degrades with a <code dir="auto">WARN</code> — the exceptions are step 1, which runs upstream’s <code dir="auto">stage2-hook.sh</code> and inherits <code dir="auto">set -e</code> from the script, and the three named above. The manifest check is a deliberate exception, for the reason <a href="/kube-agents/reference/security-and-iam/#change-control--safety">Security &amp; IAM</a> gives. A pod crash-looping with <code dir="auto">does not match the manifest baked beside it at build time</code> is reporting a corrupted or altered image, not a misconfiguration: reinstate the image the manifest belongs to rather than looking for a setting to change.</p>
+<p>The manifest, not the checker, is what makes the check mandatory: a tree carrying one is verified or the container refuses to start. Both sides of that pairing are root-owned in the image — the manifest inside the tree it describes, the verifier in <code dir="auto">/opt/defaults/scripts</code> — so <code dir="auto">carries a build-time manifest but nothing here can check it</code> is not something the agent’s own uid can arrange, and it is read the same way as a mismatch: an altered or truncated image, not a setting. A tree with no manifest inside it is skipped, which is how the same entrypoint stays a no-op in images that never reached the stage where manifests are written.</p>
+<p>The second is the terminal check, step 4b. Hermes builds the terminal a scheduled run or a kanban wake turn uses from the profile’s own settings, not from the managed config the operator renders to <code dir="auto">/etc/hermes/config.yaml</code>, so the entrypoint copies every <code dir="auto">terminal:</code> setting Hermes maps to a <code dir="auto">TERMINAL_*</code> variable (all but <code dir="auto">workspace_root</code>) into the <code dir="auto">TERMINAL_*</code> lines of every profile’s <code dir="auto">.env</code> (<a href="https://github.com/gke-labs/kube-agents/blob/main/deploy/shared/terminal_env_pin.py"><code dir="auto">deploy/shared/terminal_env_pin.py</code></a>) and then asks Hermes what each profile resolves. If a profile would resolve any of those settings differently — a backend other than the <code dir="auto">ssh</code> sandbox, another host — the container exits non-zero naming the profile and the <code dir="auto">TERMINAL_*</code> variables Hermes resolves differently. A cluster profile scaffolded after start-up gets the same check from <code dir="auto">cluster_agent_profile.py</code>, which leaves a profile that fails it unfinished for the next reconcile to retry. In a pod crash-looping with <code dir="auto">would not use the managed ssh terminal</code>, the <code dir="auto">[TERMINAL-ENV-PIN] ERROR:</code> lines above it name the cause. A key in a profile’s own <code dir="auto">config.yaml</code> that sets one of those settings to another value, such as <code dir="auto">terminal.backend: local</code>, outranks <code dir="auto">.env</code>, so the step deletes it and leaves the rest of the file as it was, as Hermes’ own save does; if it cannot, the error names the keys to delete by hand. Any other error names the file or directory to fix, except <code dir="auto">this Hermes does not map terminal.backend</code>, which means the image ships a Hermes the copy does not support; the image build fails on that first. At start-up, a profile whose <code dir="auto">.env</code> took the copy but whose <code dir="auto">config.yaml</code> Hermes cannot read or parse gets a <code dir="auto">WARN</code> instead: Hermes refuses that profile’s terminal, so its scheduled runs fail until the file is fixed. Without <code dir="auto">HERMES_MANAGED_DIR</code>, which only the operator sets, the step copies a <code dir="auto">terminal:</code> block from <code dir="auto">/etc/hermes/config.yaml</code> if one is there, skipping with a <code dir="auto">WARN</code> any value <code dir="auto">.env</code> cannot hold as a plain line and ignoring, with a <code dir="auto">WARN</code>, a file it cannot read or parse, as Hermes does; with no block it does nothing. What it copies is still checked.</p>
+<p>The third, step 5.7, stops the container with <code dir="auto">the shell sandbox migration failed</code> when the model’s files could not be moved into the sandbox, followed by the last lines of <code dir="auto">logs/sandbox_mirror.log</code>.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="base-image-pin">Base image pin</h2><a class="sl-anchor-link" href="#base-image-pin"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Base image pin”</span></a></div>
+<p>The Hermes base image tag is pinned in <a href="https://github.com/gke-labs/kube-agents/blob/main/tags.env"><code dir="auto">tags.env</code></a> at the repo root, by tag and digest together:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#C5E478">HERMES_AGENT_TAG</span><span style="--0:#C792EA">=</span><span style="--0:#ECC48D">&lt;tag&gt;@sha256:&lt;digest&gt;</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="HERMES_AGENT_TAG=<tag>@sha256:<digest>"><div></div></button></div></figure></div>
+<p>That file holds the pin itself; this page does not repeat it, because a second copy of a digest is a second thing to forget.</p>
+<p>Docker builds source <code dir="auto">tags.env</code> via the <code dir="auto">HERMES_AGENT_TAG</code> build arg:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="dockerfile"><code><div class="ec-line"><div class="code"><span style="--0:#7FDBCA">ARG</span><span style="--0:#D6DEEB"> HERMES_AGENT_TAG</span></div></div><div class="ec-line"><div class="code"><span style="--0:#7FDBCA">ARG</span><span style="--0:#D6DEEB"> HERMES_AGENT_IMAGE=nousresearch/hermes-agent</span></div></div><div class="ec-line"><div class="code"><span style="--0:#7FDBCA">FROM</span><span style="--0:#D6DEEB"> ${HERMES_AGENT_IMAGE}:${HERMES_AGENT_TAG} </span><span style="--0:#7FDBCA">AS</span><span style="--0:#D6DEEB"> agent-base</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="ARG HERMES_AGENT_TAGARG HERMES_AGENT_IMAGE=nousresearch/hermes-agentFROM ${HERMES_AGENT_IMAGE}:${HERMES_AGENT_TAG} AS agent-base"><div></div></button></div></figure></div>
+<p>The <code dir="auto">ARG</code> has no default, so every build path has to pass it — the image-build workflows, <code dir="auto">make docker-build-agents</code> and <code dir="auto">make docker-build-credential-proxy</code>, and <code dir="auto">dev_rebuild_agent.sh</code> all read it from <code dir="auto">tags.env</code>. A build that omits it fails rather than falling back to <code dir="auto">latest</code>.</p>
+<p>Bumping Hermes means editing <code dir="auto">tags.env</code> and rebuilding both agent images: the pin is a build-time base, so nothing changes in a cluster until <code dir="auto">platform-agent</code> and <code dir="auto">credential-proxy</code> are rebuilt and rolled out.</p>
+<p>The tool-call audit trail does not depend on Hermes’ log line format: the <code dir="auto">tool_call_audit</code> plugin and the <code dir="auto">chat_message_audit</code> hook write their records to a file of their own that the <code dir="auto">fluent-bit</code> sidecar tails as JSON (<a href="/kube-agents/concepts/observability/#tool-call-audit">Concepts → Observability</a>). What a bump can still change is the plugin and hook interfaces the two emitters are loaded through. Once a bumped <code dir="auto">platform-agent</code> is running, has made a tool call and has answered a chat turn, query <code dir="auto">jsonPayload.audit_event:*</code> in Logs Explorer: a <code dir="auto">tool_call_start</code> record with a <code dir="auto">jsonPayload.file_path</code> ending in <code dir="auto">audit.jsonl</code> means the plugin still loads and writes, and a <code dir="auto">chat_message_start</code> record means the hook does; none means the plugin or the hook no longer registers, which the agent container’s startup output and <code dir="auto">agent.log</code> name.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="private--custom-registry">Private / custom registry</h2><a class="sl-anchor-link" href="#private--custom-registry"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Private / custom registry”</span></a></div>
+<p>Clusters that may only pull from an approved registry need two things: a copy of every image
+above in that registry, and each install layer pointed at the copy.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="1-mirror-the-images">1. Mirror the images</h3><a class="sl-anchor-link" href="#1-mirror-the-images"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “1. Mirror the images”</span></a></div>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">make</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">mirror-images</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">MIRROR_PREFIX=registry.example.com/kube-agents</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="make mirror-images MIRROR_PREFIX=registry.example.com/kube-agents"><div></div></button></div></figure></div>
+<p>The target reads <code dir="auto">images.json</code>, so an image added there is copied without editing the script. It
+prefers <code dir="auto">crane</code> (which copies a multi-arch manifest list byte-for-byte), falls back to <code dir="auto">skopeo</code>,
+then <code dir="auto">docker</code>, and exits non-zero listing anything that failed — an incomplete mirror must not
+look like success. <code dir="auto">./scripts/mirror_images.sh --help</code> documents the knobs; the ones that matter
+most:</p>
+<ul>
+<li><code dir="auto">MIRROR_THIRD_PARTY_PREFIX</code> — a separate destination for images this project does not build.
+Defaults to <code dir="auto">MIRROR_PREFIX</code>.</li>
+<li><code dir="auto">IMAGE_TAG</code> — which release tag of the first-party images to copy. Defaults to <code dir="auto">latest</code>.</li>
+<li><code dir="auto">INCLUDE</code> — which origins to copy. Defaults to <code dir="auto">first-party,third-party</code>, what a running
+install pulls; add <code dir="auto">build-time</code> only if you also rebuild from source.</li>
+<li><code dir="auto">--dry-run</code> — print the copy plan and copy nothing.</li>
+</ul>
+<p>Destinations are flat, named after the inventory entry’s <code dir="auto">name</code>, so
+<code dir="auto">quay.io/jetstack/cert-manager-webhook:v1.21.2</code> lands as
+<code dir="auto">&lt;prefix&gt;/cert-manager-webhook:v1.21.2</code>. The <code dir="auto">name</code>, not the repository’s trailing segment —
+they are the same word for almost every entry, but where they differ the name wins, and
+<code dir="auto">docker.io/pgvector/pgvector</code> lands as <code dir="auto">&lt;prefix&gt;/hindsight-postgresql</code>. Every consumer below
+assumes that flat layout.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="2-point-the-install-at-it">2. Point the install at it</h3><a class="sl-anchor-link" href="#2-point-the-install-at-it"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “2. Point the install at it”</span></a></div>
+<p>Pick the row for how you install. Each has two prefixes: one for the images this project builds,
+one for the images it does not.</p>
+<table>
+<thead>
+<tr>
+<th>Install path</th>
+<th>First-party</th>
+<th>Third party</th>
+<th>If the second is unset</th>
+<th>Reaches cert-manager</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">install.sh</code></td>
+<td><code dir="auto">--registry-prefix</code></td>
+<td><code dir="auto">--third-party-registry-prefix</code></td>
+<td>leaves upstream registries</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td>Helm chart</td>
+<td><code dir="auto">global.imageRegistry</code></td>
+<td><code dir="auto">global.thirdPartyImageRegistry</code></td>
+<td>leaves upstream registries</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>Terraform <code dir="auto">examples/full-install</code></td>
+<td><code dir="auto">image_registry</code></td>
+<td><code dir="auto">third_party_image_registry</code></td>
+<td>leaves upstream registries</td>
+<td><strong>yes</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The rows are one path in three coats: <code dir="auto">install.sh</code> generates the Terraform composition’s
+<code dir="auto">terraform.tfvars</code> from its flags, and the composition passes both values to the chart’s
+<code dir="auto">global.*</code> keys, so “third party” covers the same set everywhere — LiteLLM, fluent-bit, the
+GitHub token minter, and Hindsight. cert-manager is the chart row’s exception: the chart never
+renders it — it expects one to be present already. The composition installs it as a separate
+<code dir="auto">helm_release</code> of the upstream chart and passes the third-party prefix to that release’s image
+repositories, so a mirrored install pulls every image — cert-manager’s five included — from the
+mirror. On a cluster whose cert-manager comes from somewhere else, set
+<code dir="auto">enable_cert_manager = false</code> and install it yourself; <code dir="auto">images.json</code> carries all five of its
+images, so <code dir="auto">make mirror-images</code> has already copied them.
+The composition’s
+<a href="https://github.com/gke-labs/kube-agents/blob/main/terraform/examples/full-install/README.md">README</a>
+has the detail.</p>
+<p><code dir="auto">REGISTRY_PREFIX</code> and <code dir="auto">THIRD_PARTY_REGISTRY_PREFIX</code> live in the install configuration
+(<code dir="auto">install.env</code>) like every other knob, so re-runs reuse them; <code dir="auto">terraform.tfvars</code> is regenerated
+from it on every run. Changing the registry <em>after</em> a first run means editing <code dir="auto">install.env</code> and
+re-running <code dir="auto">install.sh</code>, or passing the flag again — a flag beats the file.</p>
+<p><code dir="auto">IMAGE_TAG</code> is per-run and is deliberately not recorded in <code dir="auto">install.env</code>: the installer passes it into
+<code dir="auto">terraform.tfvars</code> as <code dir="auto">image_tag</code>, which overrides both first-party image tags in the chart. The
+third-party images are excluded, because their tags come from <code dir="auto">images.json</code> and have nothing to
+do with <code dir="auto">IMAGE_TAG</code>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="what-the-prefix-does-not-cover">What the prefix does not cover</h3><a class="sl-anchor-link" href="#what-the-prefix-does-not-cover"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “What the prefix does not cover”</span></a></div>
+<p>Three images are resolved by the operator at reconcile time rather than rendered by any install
+manifest, so they need the operator’s own environment set — which the chart does automatically
+when a prefix is in effect:</p>
+<ul>
+<li><code dir="auto">PLATFORM_AGENT_IMAGE</code> — the agent image for a <code dir="auto">PlatformAgent</code> that omits
+<code dir="auto">spec.deployment.image</code>.</li>
+<li><code dir="auto">AGENT_SANDBOX_IMAGE</code> — the shell sandbox StatefulSet rendered beside every agent pod.</li>
+<li><code dir="auto">FLUENT_BIT_IMAGE</code> — the logging sidecar injected into every agent pod.</li>
+</ul>
+<p><code dir="auto">CREDENTIAL_PROXY_IMAGE</code> needs nothing: the operator derives the broker image from the agent image
+by swapping the trailing name (<code dir="auto">platform-agent</code> to <code dir="auto">credential-proxy</code>), which lands on the mirror
+on its own. The A2A <code dir="auto">next</code> images the operator renders (<code dir="auto">a2a-gateway</code>, <code dir="auto">a2a-worker</code>,
+<code dir="auto">a2a-authcallout</code>, <code dir="auto">a2a-verifier</code>, <code dir="auto">a2a-console</code>) follow <code dir="auto">OPERATOR_IMAGE</code>, else <code dir="auto">PLATFORM_AGENT_IMAGE</code>, the same way, so they need
+no env of their own on a mirror. The sandbox is a separate repository, so it gets no such derivation. Setting it explicitly still wins, which is why <code dir="auto">install.sh</code> leaves it unset — one
+explicit value pins the sidecar for every agent in the cluster, and the per-CR derivation is what
+otherwise keeps each sidecar in step with its own agent’s image.</p>
+<p>Per-agent, <code dir="auto">spec.deployment.image</code> / <code dir="auto">spec.deployment.tag</code> on a <code dir="auto">PlatformAgent</code> override all of
+the above for that agent’s containers — see the
+<a href="/kube-agents/operator/platformagent-crd/">PlatformAgent CRD reference</a>. The sandbox has
+<code dir="auto">spec.harness.experimental.shellSandbox.image</code>, which overrides <code dir="auto">AGENT_SANDBOX_IMAGE</code> for that
+agent. The fluent-bit sidecar has no CR-level equivalent; <code dir="auto">FLUENT_BIT_IMAGE</code> is its only override.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="rebuilding-rather-than-copying">Rebuilding rather than copying</h3><a class="sl-anchor-link" href="#rebuilding-rather-than-copying"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Rebuilding rather than copying”</span></a></div>
+<p>Every base image is a build arg, so the images can be rebuilt where the public registries are
+unreachable. Each takes a full reference rather than a shared prefix, because the flat mirror
+layout does not preserve the original paths:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">make</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">docker-build-agents</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#ECC48D">HERMES_AGENT_IMAGE=registry.example.com/mirror/hermes-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#ECC48D">GOLANG_IMAGE=registry.example.com/mirror/golang</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#ECC48D">ENVOY_IMAGE=registry.example.com/mirror/envoy</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="make docker-build-agents \  HERMES_AGENT_IMAGE=registry.example.com/mirror/hermes-agent \  GOLANG_IMAGE=registry.example.com/mirror/golang \  ENVOY_IMAGE=registry.example.com/mirror/envoy"><div></div></button></div></figure></div>
+<p>Unset args keep their upstream defaults, so an ordinary build is unchanged. Mirror the base
+images first with <code dir="auto">INCLUDE=build-time</code>, and use <code dir="auto">crane</code> or <code dir="auto">skopeo</code> rather than <code dir="auto">docker</code> — the
+Hermes pin is by digest, and a <code dir="auto">docker pull</code>/<code dir="auto">push</code> round trip changes it. A mirrored <code dir="auto">golang</code> copy
+is frozen at whichever patch it was copied at, and the builder stages run with <code dir="auto">GOTOOLCHAIN=local</code>,
+so a later bump of the <code dir="auto">go</code> directive in <code dir="auto">k8s-operator/go.mod</code> past that patch fails the rebuild
+instead of downloading a toolchain: re-mirror, or pass a patch-pinned <code dir="auto">GOLANG_VERSION</code>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="registry-authentication">Registry authentication</h3><a class="sl-anchor-link" href="#registry-authentication"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Registry authentication”</span></a></div>
+<p>A mirror the nodes can already read — an Artifact Registry in the same project, or a pull-through
+cache — needs nothing here. One that has to be authenticated to, Harbor or Artifactory with token
+auth, needs <code dir="auto">imagePullSecrets</code>, set in whichever of these matches how the install was made:</p>
+<ul>
+<li><code dir="auto">global.imagePullSecrets</code> in the Helm chart, a list of Secret names — or of <code dir="auto">{name: &lt;secret&gt;}</code>
+maps, the shape a <code dir="auto">PodSpec</code> takes; any other shape fails the render. It reaches every pod the
+chart renders — the operator, the LiteLLM gateway, the <code dir="auto">pre-delete</code> cleanup Job — and, through
+<code dir="auto">IMAGE_PULL_SECRETS</code> on the controller manager and <code dir="auto">spec.deployment.imagePullSecrets</code> on the
+<code dir="auto">PlatformAgent</code> it creates, the agent pods the operator renders as well.</li>
+<li><code dir="auto">image_pull_secrets</code> in <code dir="auto">terraform/examples/full-install</code>, which passes the same list to the
+chart.</li>
+<li><code dir="auto">spec.deployment.imagePullSecrets</code> on a <code dir="auto">PlatformAgent</code> written by hand, or
+<code dir="auto">IMAGE_PULL_SECRETS</code> (comma-separated Secret names) on the controller manager as the fleet-wide
+default for agents that do not set it. The CR <strong>replaces</strong> that default rather than adding to
+it, on the same terms as <code dir="auto">spec.deployment.image</code> against <code dir="auto">PLATFORM_AGENT_IMAGE</code>.</li>
+</ul>
+<p>The list is pod-scoped, so it covers every image in an agent pod: the agent, the credential-proxy
+and fluent-bit sidecars, anything in <code dir="auto">initContainers</code>/<code dir="auto">sidecars</code>, and the OCI image volumes
+<code dir="auto">AgentPlugin</code>s mount. Kubernetes has no per-container split.</p>
+<p>The Secrets are referenced, never created. Registry credentials would otherwise live in Helm
+release data and Terraform state, so each Secret has to exist in the agent’s namespace before the
+pod is scheduled:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">create</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">namespace</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">create</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">secret</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">docker-registry</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">regcred</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">--namespace</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">--docker-server=harbor.example.com</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">--docker-username=robot</span><span style="--0:#F78C6C">\$</span><span style="--0:#82AAFF">kube-agents</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">--docker-password=</span><span style="--0:#D9F5DD">"</span><span style="--0:#C5E478">$TOKEN</span><span style="--0:#D9F5DD">"</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl create namespace kubeagents-systemkubectl create secret docker-registry regcred \  --namespace kubeagents-system \  --docker-server=harbor.example.com \  --docker-username=robot\$kube-agents \  --docker-password=&quot;$TOKEN&quot;"><div></div></button></div></figure></div>
+<p>Two things this does not cover. The provisioning scripts have no flag for it, so <code dir="auto">install.sh</code>
+sets no pull identity for the operator, LiteLLM, and token-minter pods it applies — those need a
+mirror the nodes can read, or a hand-patched Deployment. Agent pods are reachable on that path:
+set <code dir="auto">IMAGE_PULL_SECRETS</code> on the controller manager yourself, the same way <code dir="auto">INSTALL.md</code> documents
+setting <code dir="auto">PLATFORM_AGENT_IMAGE</code>. And cert-manager is a separate Helm release of an upstream chart,
+unaffected by any of the above — on a cluster whose registry needs authenticating to, install it
+yourself from the mirror and set <code dir="auto">enable_cert_manager = false</code>.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="local-builds">Local builds</h2><a class="sl-anchor-link" href="#local-builds"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Local builds”</span></a></div>
+<p><code dir="auto">make docker-build</code> at the repository root builds the agent, credential-proxy and sandbox images; <code dir="auto">make docker-build-agents</code>, <code dir="auto">make docker-build-credential-proxy</code> and <code dir="auto">make docker-build-sandbox</code> build one. The operator image builds from <code dir="auto">k8s-operator/</code> (above) and <code dir="auto">replay-proxy</code> from its own Dockerfile. For iterating on the agent against a running cluster, <code dir="auto">make dev-rebuild-agent</code> builds, pushes to a dev Artifact Registry repository and patches the running <code dir="auto">PlatformAgent</code> — or a Deployment that pulls the image directly — to the new tag; <a href="https://github.com/gke-labs/kube-agents/blob/main/k8s-operator/README.md"><code dir="auto">k8s-operator/README.md</code></a> covers it.</p>
+</div><footer class="sl-flex astro-vcsylbkx"><div class="meta sl-flex astro-vcsylbkx"><a href="https://github.com/gke-labs/kube-agents/edit/main/docs/site/src/content/docs/deploy/docker-images.md" class="sl-flex print:hidden astro-7hm6odgq"><svg aria-hidden="true" class="astro-7hm6odgq astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a></div><div class="pagination-links print:hidden astro-bnkpfcrs" dir="ltr"><a href="/kube-agents/deploy/kustomize/" rel="prev" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-bnkpfcrs">Previous<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Network policies and Service</span></span></a><a href="/kube-agents/deploy/token-minter/" rel="next" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-bnkpfcrs">Next<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Token minter (Minty)</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>

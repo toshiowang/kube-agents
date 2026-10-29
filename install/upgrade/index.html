@@ -1,0 +1,1003 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-ae72s45h"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Upgrade | kube-agents</title><link rel="canonical" href="https://gke-labs.github.io/kube-agents/install/upgrade/"/><link rel="sitemap" href="/kube-agents/sitemap-index.xml"/><script is:inline="true">document.documentElement.dataset.theme = 'dark';</script><script type="module" src="/kube-agents/mermaid-render.js"></script><link rel="shortcut icon" href="/kube-agents/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.3.8"/><meta name="generator" content="Starlight v0.42.6"/><meta property="og:title" content="Upgrade"/><meta property="og:type" content="article"/><meta property="og:url" content="https://gke-labs.github.io/kube-agents/install/upgrade/"/><meta property="og:locale" content="en"/><meta property="og:description" content="Moving an existing install to a newer release with upgrade.sh — its modes, how the target version is resolved, and what a run refuses before any of the new release is applied."/><meta property="og:site_name" content="kube-agents"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Moving an existing install to a newer release with upgrade.sh — its modes, how the target version is resolved, and what a run refuses before any of the new release is applied."/><script>
+  document.documentElement.dataset.theme = 'dark';
+</script><link rel="stylesheet" href="/kube-agents/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/kube-agents/_astro/common.CvG8RBkb.css"><style>@layer starlight.components{svg:where(.astro-havoivjf){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em;overflow:visible}}
+@layer starlight.components{:root{--sl-badge-default-border:var(--sl-color-accent);--sl-badge-default-bg:var(--sl-color-accent-low);--sl-badge-default-text:#fff;--sl-badge-note-border:var(--sl-color-blue);--sl-badge-note-bg:var(--sl-color-blue-low);--sl-badge-note-text:#fff;--sl-badge-danger-border:var(--sl-color-red);--sl-badge-danger-bg:var(--sl-color-red-low);--sl-badge-danger-text:#fff;--sl-badge-success-border:var(--sl-color-green);--sl-badge-success-bg:var(--sl-color-green-low);--sl-badge-success-text:#fff;--sl-badge-caution-border:var(--sl-color-orange);--sl-badge-caution-bg:var(--sl-color-orange-low);--sl-badge-caution-text:#fff;--sl-badge-tip-border:var(--sl-color-purple);--sl-badge-tip-bg:var(--sl-color-purple-low);--sl-badge-tip-text:#fff}[data-theme=light]:root{--sl-badge-default-bg:var(--sl-color-accent-high);--sl-badge-note-bg:var(--sl-color-blue-high);--sl-badge-danger-bg:var(--sl-color-red-high);--sl-badge-success-bg:var(--sl-color-green-high);--sl-badge-caution-bg:var(--sl-color-orange-high);--sl-badge-tip-bg:var(--sl-color-purple-high)}.sl-badge:where(.astro-6yf3h5sn){border:1px solid var(--sl-color-border-badge);font-family:var(--sl-font-system-mono);color:var(--sl-color-text-badge);background-color:var(--sl-color-bg-badge);overflow-wrap:anywhere;border-radius:.25rem;line-height:normal;display:inline-block}.sidebar-content .sl-badge:where(.astro-6yf3h5sn){line-height:1;font-size:var(--sl-text-xs);padding:.125rem .375rem}.sidebar-content a[aria-current=page]>.sl-badge:where(.astro-6yf3h5sn){--sl-color-bg-badge:transparent;--sl-color-border-badge:currentColor;color:inherit}.default:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-default-bg);--sl-color-border-badge:var(--sl-badge-default-border);--sl-color-text-badge:var(--sl-badge-default-text)}.note:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-note-bg);--sl-color-border-badge:var(--sl-badge-note-border);--sl-color-text-badge:var(--sl-badge-note-text)}.danger:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-danger-bg);--sl-color-border-badge:var(--sl-badge-danger-border);--sl-color-text-badge:var(--sl-badge-danger-text)}.success:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-success-bg);--sl-color-border-badge:var(--sl-badge-success-border);--sl-color-text-badge:var(--sl-badge-success-text)}.tip:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-tip-bg);--sl-color-border-badge:var(--sl-badge-tip-border);--sl-color-text-badge:var(--sl-badge-tip-text)}.caution:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-caution-bg);--sl-color-border-badge:var(--sl-badge-caution-border);--sl-color-text-badge:var(--sl-badge-caution-text)}.small:where(.astro-6yf3h5sn){font-size:var(--sl-text-xs);padding:.125rem .25rem}.medium:where(.astro-6yf3h5sn){font-size:var(--sl-text-sm);padding:.175rem .35rem}.large:where(.astro-6yf3h5sn){font-size:var(--sl-text-base);padding:.225rem .45rem}.sl-markdown-content :is(h1,h2,h3,h4,h5,h6) .sl-badge:where(.astro-6yf3h5sn){vertical-align:middle}}
+</style><script type="module" src="/kube-agents/_astro/page.cNngjUgL.js"></script></head><body class="astro-ae72s45h"><a class="sl-skip-link astro-t2grfou4" href="#_top">Skip to content</a><div class="page sl-flex astro-euo27uub"><header class="header astro-euo27uub"><div class="header astro-6k6kswk6"><div class="title-wrapper sl-flex astro-6k6kswk6"><a href="/kube-agents/" class="site-title sl-flex astro-iaj22pny"><span class="astro-iaj22pny" translate="no">kube-agents</span></a></div><div class="sl-flex print:hidden astro-6k6kswk6"><site-search class="astro-6k6kswk6 astro-ulwrr7k6" data-translations="{&quot;placeholder&quot;:&quot;Search&quot;}"><button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-ulwrr7k6"><svg aria-hidden="true" class="astro-ulwrr7k6 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-ulwrr7k6" aria-hidden="true">Search</span><kbd class="sl-hidden md:sl-flex astro-ulwrr7k6" style="display: none;"><kbd class="astro-ulwrr7k6">Ctrl</kbd><kbd class="astro-ulwrr7k6">K</kbd></kbd></button><dialog style="padding:0" aria-label="Search" class="astro-ulwrr7k6"><div class="dialog-frame sl-flex astro-ulwrr7k6"><button data-close-modal class="sl-flex md:sl-hidden astro-ulwrr7k6">Cancel</button><div class="search-container astro-ulwrr7k6"><div id="starlight__search" class="astro-ulwrr7k6"></div></div></div></dialog></site-search><script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script><script type="module" src="/kube-agents/_astro/Search.astro_astro_type_script_index_0_lang.DzR8jAgX.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-6k6kswk6"><div class="sl-flex social-icons astro-6k6kswk6"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></header><nav class="sidebar print:hidden astro-euo27uub" aria-label="Main"><button popovertarget="starlight__sidebar" class="sl-menu-button sl-flex md:sl-hidden print:hidden astro-5zlzgk4i"><svg aria-hidden="true" class="open-menu astro-5zlzgk4i astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-5zlzgk4i astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg><span class="sr-only astro-5zlzgk4i">Menu</span></button><script type="module">var e=class extends HTMLElement{constructor(){super();let e=matchMedia(`(min-width: 50em)`),t=()=>{this.popover=e.matches?null:`auto`};t(),e.addEventListener(`change`,()=>t()),this.addEventListener(`toggle`,({newState:e})=>this.trapFocus(e===`open`))}trapFocus(e){document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}};customElements.define(`sl-sidebar-pane`,e);</script><sl-sidebar-pane popover id="starlight__sidebar" class="sidebar-pane astro-euo27uub"><div class="sidebar-content sl-flex astro-euo27uub"><sl-sidebar-state-persist data-hash="11352sw" class="astro-vnnkyq4l"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><ul class="top-level astro-4c2piv4z"><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Overview</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Introduction</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/what-is-kube-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">What is kube-agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/proactive-autonomy/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Proactive autonomy</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/day-in-the-life/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">A day with kube-agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/architecture/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Architecture</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Install</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/install/prerequisites/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Prerequisites</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/quickstart-gke/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Quick start (GKE)</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/first-prompts/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">First prompts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/slack-app/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Slack app setup</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/manual/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Manual install</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/helm-and-kind/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Helm and Kind</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/gitlab/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">GitLab as the GitOps forge</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/gitea/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Gitea as the GitOps forge</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/upgrade/" aria-current="page" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Upgrade</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/uninstall/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Uninstall</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Concepts</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Concepts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/platform-agent/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Platform Agent</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/cluster-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Cluster Agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/chatops/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">ChatOps</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/skills/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Skills</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/governance-sops/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Governance SOPs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/autonomous-watchdogs/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Autonomous watchdogs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/declarative-workflow/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Declarative workflow</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/inference-gateway/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Inference gateway</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/observability/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Observability</span></a></li></ul></details></li><li class="astro-4c2piv4z"><a href="/kube-agents/skills/" class="large astro-4c2piv4z"><span class="astro-4c2piv4z">Skill catalog</span></a></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Operator</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/operator/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Operator overview</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/platformagent-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">PlatformAgent CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentplugin-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentPlugin CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentprofile-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentProfile CRD</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Deploy</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Deploy overview</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/kustomize/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Network policies and Service</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/docker-images/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Docker images</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/token-minter/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Token minter (Minty)</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/release-versioning/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Release lifecycle, versioning &amp; operations</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/telemetry/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Telemetry</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/gitops-argocd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">GitOps with ArgoCD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/rollback/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Rolling back a release</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/multi-project/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Multiple GCP projects</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Reference</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/reference/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Reference</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/config/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Config reference</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/cron-jobs/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Cron jobs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/examples/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Examples</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/glossary/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Glossary</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/attribution/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">User attribution</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/security-and-iam/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Security &amp; IAM</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/credential-isolation/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Credential isolation</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/resource-labels/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Resource labels</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/admin-console/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Admin console</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/certified-capabilities/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Certified capabilities</span></a></li></ul></details></li><li class="astro-4c2piv4z"><a href="/kube-agents/contributing/" class="large astro-4c2piv4z"><span class="astro-4c2piv4z">Contributing</span></a></li></ul><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-7it4zgwh"><div class="social-icons astro-7it4zgwh"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div></div></div></div></sl-sidebar-pane></nav><div class="main-frame astro-euo27uub"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-axz53cfb"><aside class="right-sidebar-container print:hidden astro-axz53cfb"><div class="right-sidebar astro-axz53cfb"><div class="lg:sl-hidden astro-gl637vfx"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-kwxnrgy4"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-kwxnrgy4"><details id="starlight__mobile-toc" class="astro-kwxnrgy4"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-kwxnrgy4"><span class="toggle sl-flex astro-kwxnrgy4">On this page<svg aria-hidden="true" class="caret astro-kwxnrgy4 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-kwxnrgy4"></span></summary><div class="dropdown astro-kwxnrgy4"><ul class="isMobile astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#before-you-start" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Before you start</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#recovering-installenv" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Recovering install.env</span></a><ul class="isMobile astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#keys-in-the-values-record" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Keys in the values record</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#keys-outside-the-values-record" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Keys outside the values record</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#run-the-upgrade" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Run the upgrade</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#moving-across-more-than-one-release" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Moving across more than one release</span></a><ul class="isMobile astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#breaking-changes-in-recent-releases" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Breaking changes in recent releases</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#upgrade-modes" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Upgrade modes</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#choosing-what-the-run-targets" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Choosing what the run targets</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#previewing" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Previewing</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#naming-the-install" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Naming the install</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#checking-the-result" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Checking the result</span></a><ul class="isMobile astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#slack" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Slack</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#switching-specmode" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Switching spec.mode</span></a><ul class="isMobile astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#google-chat" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Google Chat</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#before-the-switch" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Before the switch</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#the-switch" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">The switch</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#during-the-switch" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">During the switch</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#what-carries-over" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">What carries over</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#after-the-switch-the-slack-app" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">After the switch: the Slack app</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#switching-back-to-today" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Switching back to today</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#the-gateways-own-serviceaccount" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">The gateway’s own ServiceAccount</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#when-an-upgrade-is-refused" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">When an upgrade is refused</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#what-stops-during-an-upgrade" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">What stops during an upgrade</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#where-to-go-next" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Where to go next</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module" src="/kube-agents/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C3fM4Kra.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-gl637vfx"><div class="sl-container astro-gl637vfx"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#before-you-start" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Before you start</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#recovering-installenv" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Recovering install.env</span></a><ul class="astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#keys-in-the-values-record" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Keys in the values record</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#keys-outside-the-values-record" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Keys outside the values record</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#run-the-upgrade" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Run the upgrade</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#moving-across-more-than-one-release" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Moving across more than one release</span></a><ul class="astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#breaking-changes-in-recent-releases" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Breaking changes in recent releases</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#upgrade-modes" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Upgrade modes</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#choosing-what-the-run-targets" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Choosing what the run targets</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#previewing" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Previewing</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#naming-the-install" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Naming the install</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#checking-the-result" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Checking the result</span></a><ul class="astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#slack" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Slack</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#switching-specmode" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Switching spec.mode</span></a><ul class="astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#google-chat" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Google Chat</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#before-the-switch" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Before the switch</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#the-switch" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">The switch</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#during-the-switch" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">During the switch</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#what-carries-over" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">What carries over</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#after-the-switch-the-slack-app" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">After the switch: the Slack app</span></a></li><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#switching-back-to-today" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">Switching back to today</span></a></li></ul></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#the-gateways-own-serviceaccount" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">The gateway’s own ServiceAccount</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#when-an-upgrade-is-refused" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">When an upgrade is refused</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#what-stops-during-an-upgrade" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">What stops during an upgrade</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#where-to-go-next" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Where to go next</span></a></li></ul></nav></starlight-toc><script type="module" src="/kube-agents/_astro/TableOfContents.astro_astro_type_script_index_0_lang.BpJaGz7G.js"></script></div></div></div></aside><div class="main-pane astro-axz53cfb"><main data-pagefind-body class="astro-ae72s45h" lang="en" dir="ltr"><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><h1 id="_top" class="astro-dfqzrgu7">Upgrade</h1></div></div><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><div class="sl-markdown-content"><p><code dir="auto">upgrade.sh</code> is the Day-2 engine for an install <code dir="auto">install.sh</code> created. It re-applies the same
+Terraform composition and the same Helm chart at a newer revision, re-rendering the install from
+the configuration it already has. A release copy of the script carries the version it upgrades to,
+so the ordinary upgrade names no version at all.</p>
+<p>An install whose GitHub forge is a GitHub Enterprise Server uses <code dir="auto">upgrade.sh</code> too: it renders the
+forge from <code dir="auto">GITOPS_FORGE=github</code>, <code dir="auto">GITOPS_HOST</code> and <code dir="auto">GITOPS_CA_SECRET</code> in <code dir="auto">install.env</code>. An install
+made with the Terraform + Helm method is upgraded with that method: see
+<a href="https://github.com/gke-labs/kube-agents/blob/main/INSTALL.md#upgrade-switch-and-teardown">GitHub Enterprise Server in INSTALL.md</a>.</p>
+<p>This site describes <code dir="auto">main</code>, not a release. It changes each time a docs change merges to <code dir="auto">main</code>. For
+the release you upgrade to, read the same pages at that release’s tag, for example
+<code dir="auto">https://github.com/gke-labs/kube-agents/tree/&lt;RELEASE_VERSION&gt;/docs/site/src/content/docs/install/upgrade.md</code>.
+If this site and the page at the tag do not agree, the page at the tag describes the release. On
+GitHub, the links between pages do not work: open each linked page at the same tag.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="before-you-start">Before you start</h2><a class="sl-anchor-link" href="#before-you-start"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Before you start”</span></a></div>
+<p>A GitLab install needs nothing extra for an upgrade: no token and no flag. See
+<a href="/kube-agents/install/gitlab/#upgrade-and-uninstall">Upgrade and uninstall</a>.</p>
+<p>Record what the install runs now, so you can tell afterwards what moved:</p>
+<div class="expressive-code"><link rel="stylesheet" href="/kube-agents/_astro/ec.rw6j1.css"><script type="module" src="/kube-agents/_astro/ec.0vx5m.js"></script><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deployment</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent-gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">jsonpath=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{.spec.template.spec.containers[?(@.name=="platform-agent")].image}{"\n"}</span><span style="--0:#D9F5DD">'</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deployment</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kube-agents-controller-manager</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">jsonpath=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{.spec.template.spec.containers[*].image}{"\n"}</span><span style="--0:#D9F5DD">'</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platformagent</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">jsonpath=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{.spec.mode}{"\n"}</span><span style="--0:#D9F5DD">'</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">helm</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">history</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kube-agents</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl get deployment platform-agent-gateway -n kubeagents-system \  -o jsonpath=&#x27;{.spec.template.spec.containers[?(@.name==&quot;platform-agent&quot;)].image}{&quot;\n&quot;}&#x27;kubectl get deployment kube-agents-controller-manager -n kubeagents-system \  -o jsonpath=&#x27;{.spec.template.spec.containers[*].image}{&quot;\n&quot;}&#x27;kubectl get platformagent platform-agent -n kubeagents-system \  -o jsonpath=&#x27;{.spec.mode}{&quot;\n&quot;}&#x27;helm history kube-agents -n kubeagents-system"><div></div></button></div></figure></div>
+<p>The third command prints the install’s <code dir="auto">spec.mode</code>; an empty line means <code dir="auto">today</code>.</p>
+<p>Read the release notes for every release between the one you run and the one you are moving to.</p>
+<p>The upgrade refuses to run without the install’s own configuration, because a full upgrade
+re-renders the <code dir="auto">PlatformAgent</code> resource from it: a file written from memory re-renders the install
+with whatever it forgets. <code dir="auto">KUBE_AGENTS_INSTALL_ENV</code> names the file outright, which is how an
+ephemeral CI runner supplies one. Otherwise the script looks for <code dir="auto">install.env</code> in the checkout it
+is running from, then in the directory you run it from, and — when run from outside a checkout,
+such as the piped release one-liner — last in the install checkout the installer left in
+<code dir="auto">$HOME/kube-agents</code>, so standing in one install’s directory upgrades that install, not whichever
+one the checkout in <code dir="auto">$HOME</code> belongs to.
+If the file is lost, rebuild it first: see <a href="#recovering-installenv">Recovering <code dir="auto">install.env</code></a>.</p>
+<p><code dir="auto">--upgrade-mode=full</code>, the default, additionally needs the <code dir="auto">terraform</code> CLI on <code dir="auto">PATH</code>.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="recovering-installenv">Recovering <code dir="auto">install.env</code></h2><a class="sl-anchor-link" href="#recovering-installenv"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Recovering install.env”</span></a></div>
+<p>If the machine that ran <code dir="auto">install.sh</code> is gone, rebuild <code dir="auto">install.env</code> from what the install recorded.
+No copy of the file exists on the cluster or in Google Cloud, and the generated
+<code dir="auto">terraform.tfvars</code> stayed on that machine too.</p>
+<p>The install records its settings in three places:</p>
+<ul>
+<li><strong>The Helm values record.</strong> Terraform rendered these values from <code dir="auto">install.env</code>, so most keys map
+to one value path. Read them with <code dir="auto">helm get values kube-agents -n &lt;NAMESPACE&gt; -o json</code>.</li>
+<li><strong>The Terraform state</strong>, at <code dir="auto">gs://&lt;PROJECT_ID&gt;-kube-agents-tfstate/kube-agents/&lt;CLUSTER_NAME&gt;/default.tfstate</code>
+unless the install moved it. It records the keys that the values do not hold.</li>
+<li><strong>The <code dir="auto">PlatformAgent</code> resource.</strong> Use it only as a cross-check. It also shows edits made with
+<code dir="auto">kubectl</code>, and a value copied from such an edit changes what the upgrade renders.</li>
+</ul>
+<p>The values record and the state both contain the install’s secrets. Do not print the whole state,
+and do not save either one to a shared disk.</p>
+<ol>
+<li>
+<p>Find the install. <code dir="auto">gcloud storage ls gs://&lt;PROJECT_ID&gt;-kube-agents-tfstate/kube-agents/</code> lists
+one folder for each cluster name. <code dir="auto">gcloud container clusters list --project &lt;PROJECT_ID&gt;</code> gives
+each cluster’s location, and <code dir="auto">helm list -A --filter '^kube-agents$'</code> gives the namespace. If the
+state is not at the default path, set <code dir="auto">KUBE_AGENTS_STATE_BUCKET</code> and <code dir="auto">KUBE_AGENTS_STATE_PREFIX</code>
+to where you found it.</p>
+</li>
+<li>
+<p>Save the values without the secrets, and read the state outputs:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">helm</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">values</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kube-agents</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">&lt;NAMESPACE&gt;</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">json</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">jq</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">del(.platformAgent.credentials)</span><span style="--0:#D9F5DD">'</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">&gt;</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">values.json</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">gcloud</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">storage</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">cat</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">&lt;STATE_PATH&gt;</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">jq</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">.outputs | map_values(.value)</span><span style="--0:#D9F5DD">'</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="helm get values kube-agents -n <NAMESPACE> -o json \  | jq &#x27;del(.platformAgent.credentials)&#x27; > values.jsongcloud storage cat <STATE_PATH> | jq &#x27;.outputs | map_values(.value)&#x27;"><div></div></button></div></figure></div>
+</li>
+<li>
+<p>Write each key from the tables below into a new file named <code dir="auto">install.env</code>. Write every value
+that is not empty, also when it equals a default: the upgrade does not apply every default that
+<code dir="auto">install.sh</code> applied. Leave a key out only when its value is empty, unless the table says
+otherwise.
+Write a list as comma-separated values, for example
+<code dir="auto">jq -r '.platformAgent.integration.slack.allowedUsers | join(",")' values.json</code>.</p>
+</li>
+<li>
+<p>Leave the secrets out. When the file holds no <code dir="auto">API_SERVER_KEY</code>, model provider API key, Slack
+token or Session KV key, the upgrade reads it from the <code dir="auto">platform-agent-secrets</code> Secret. Set
+<code dir="auto">PERSIST_SECRETS_ON_DISK=false</code> to keep them out of the regenerated <code dir="auto">terraform.tfvars</code> as well.</p>
+</li>
+<li>
+<p>Check the file before you upgrade. Use the <code dir="auto">upgrade.sh</code> of the release the install runs now, not
+the release you are moving to. Plan at the image tag in the state output <code dir="auto">image_tag</code>. If the
+output is <code dir="auto">null</code>, use <code dir="auto">.platformAgent.deployment.image.tag</code> from <code dir="auto">values.json</code>.</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">curl</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-fsSL</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">https://raw.githubusercontent.com/gke-labs/kube-agents/&lt;CURRENT_RELEASE&gt;/upgrade.sh</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#C5E478">KUBE_AGENTS_INSTALL_ENV</span><span style="--0:#C792EA">=</span><span style="--0:#D9F5DD">"</span><span style="--0:#C5E478">$PWD</span><span style="--0:#ECC48D">/install.env</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">bash</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-s</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--plan</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#82AAFF">--image-tag=</span><span style="--0:#D9F5DD">"</span><span style="--0:#ECC48D">$(</span><span style="--0:#82AAFF;--0fs:italic">gcloud</span><span style="--0:#ECC48D"> storage cat &lt;STATE_PATH&gt; </span><span style="--0:#7FDBCA">|</span><span style="--0:#ECC48D"> </span><span style="--0:#82AAFF;--0fs:italic">jq</span><span style="--0:#ECC48D"> </span><span style="--0:#82AAFF">-r</span><span style="--0:#ECC48D"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">.outputs.image_tag.value</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">)</span><span style="--0:#D9F5DD">"</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="curl -fsSL https://raw.githubusercontent.com/gke-labs/kube-agents/<CURRENT_RELEASE>/upgrade.sh \  | KUBE_AGENTS_INSTALL_ENV=&quot;$PWD/install.env&quot; bash -s -- --plan \    --image-tag=&quot;$(gcloud storage cat <STATE_PATH> | jq -r &#x27;.outputs.image_tag.value&#x27;)&quot;"><div></div></button></div></figure></div>
+<p>Exit code 0 means the file renders the install as it is. If the exit code is 2, find the key
+that differs and plan again (one exception: <code dir="auto">THIRD_PARTY_REGISTRY_PREFIX</code> added per the table’s
+note below is expected to differ on older releases; keep it). The plan masks the Helm values,
+so compare <code dir="auto">values.json</code> with the file.</p>
+</li>
+</ol>
+<p>Then upgrade to the new release with the same file.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="keys-in-the-values-record">Keys in the values record</h3><a class="sl-anchor-link" href="#keys-in-the-values-record"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Keys in the values record”</span></a></div>
+<p>Each path is a <code dir="auto">jq</code> path on <code dir="auto">values.json</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Path</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">PROJECT_ID</code></td>
+<td><code dir="auto">.platformAgent.harness.projectId</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">CLUSTER_NAME</code></td>
+<td><code dir="auto">.platformAgent.harness.clusterName</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">REGION</code></td>
+<td><code dir="auto">.platformAgent.harness.location</code></td>
+<td>Copy it exactly. It can be a zone.</td>
+</tr>
+<tr>
+<td><code dir="auto">NAMESPACE</code></td>
+<td>the release namespace</td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">PLATFORM_AGENT_MODE</code></td>
+<td><code dir="auto">.platformAgent.mode</code></td>
+<td>Empty means <code dir="auto">today</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">PLATFORM_AGENT_STORAGE_SIZE</code></td>
+<td><code dir="auto">.platformAgent.storage.size</code></td>
+<td>Empty means the operator default.</td>
+</tr>
+<tr>
+<td><code dir="auto">MODEL_PROVIDER</code></td>
+<td><code dir="auto">.litellm.modelProvider</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">MODEL_DEFAULT_NAME</code></td>
+<td><code dir="auto">.litellm.modelDefaultName</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">MODEL_MAX_TOKENS</code></td>
+<td><code dir="auto">.litellm.maxTokens</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">VERTEX_PROJECT_ID</code>, <code dir="auto">VERTEX_LOCATION</code></td>
+<td><code dir="auto">.litellm.vertex.projectId</code>, <code dir="auto">.litellm.vertex.location</code></td>
+<td><code dir="auto">vertex_ai</code> only.</td>
+</tr>
+<tr>
+<td><code dir="auto">LITELLM_REDACTION_ENABLED</code></td>
+<td><code dir="auto">.litellm.redaction.enabled</code></td>
+<td>If it is <code dir="auto">true</code>, also copy <code dir="auto">.litellm.redaction.ip.action</code> to <code dir="auto">LITELLM_REDACTION_IP_ACTION</code>, <code dir="auto">.litellm.redaction.ip.allowCidrs</code> to <code dir="auto">LITELLM_REDACTION_IP_ALLOW_CIDRS</code> and <code dir="auto">.litellm.redaction.rules</code> to <code dir="auto">LITELLM_REDACTION_RULES</code> (as JSON in single quotes).</td>
+</tr>
+<tr>
+<td><code dir="auto">GOOGLE_CHAT_ENABLED</code></td>
+<td><code dir="auto">.platformAgent.integration.googleChat.enabled</code></td>
+<td>If it is <code dir="auto">true</code>, also copy these fields of <code dir="auto">.platformAgent.integration.googleChat</code>: <code dir="auto">topicName</code> to <code dir="auto">CHAT_TOPIC_NAME</code>, <code dir="auto">subscriptionName</code> to <code dir="auto">CHAT_SUB_NAME</code>, <code dir="auto">mode</code> to <code dir="auto">GOOGLE_CHAT_MODE</code>, <code dir="auto">allowedUsers</code> to <code dir="auto">ALLOWED_USERS</code> and <code dir="auto">homeChannel</code> to <code dir="auto">GOOGLE_CHAT_HOME_CHANNEL</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">SLACK_ENABLED</code></td>
+<td><code dir="auto">.platformAgent.integration.slack.enabled</code></td>
+<td>If it is <code dir="auto">true</code>, also copy these fields of <code dir="auto">.platformAgent.integration.slack</code>: <code dir="auto">allowedUsers</code> to <code dir="auto">SLACK_ALLOWED_USERS</code>, <code dir="auto">homeChannel</code> to <code dir="auto">SLACK_HOME_CHANNEL</code> and <code dir="auto">homeChannelName</code> to <code dir="auto">SLACK_HOME_CHANNEL_NAME</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">GITOPS_ORG</code></td>
+<td><code dir="auto">.platformAgent.integration.github.org</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">GITOPS_REPO</code></td>
+<td><code dir="auto">.platformAgent.integration.github.gitRepo</code></td>
+<td>The value is <code dir="auto">&lt;org&gt;/&lt;repo&gt;</code>. Write only the part after the <code dir="auto">/</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">GITHUB_APP_ID</code></td>
+<td><code dir="auto">.githubMinter.appId</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">KMS_KEYRING</code>, <code dir="auto">KMS_KEY</code></td>
+<td><code dir="auto">.githubMinter.kms.keyring</code>, <code dir="auto">.githubMinter.kms.key</code></td>
+<td></td>
+</tr>
+<tr>
+<td>GitLab keys</td>
+<td><code dir="auto">.platformAgent.integration.forges[0]</code>, <code dir="auto">.platformAgent.integration.repositories[0]</code></td>
+<td>If the forge’s <code dir="auto">provider</code> is <code dir="auto">gitlab</code>, set <code dir="auto">GITOPS_FORGE=gitlab</code>. Copy the forge’s <code dir="auto">host</code> to <code dir="auto">GITOPS_HOST</code>, <code dir="auto">credentialsRef.name</code> to <code dir="auto">GITLAB_TOKEN_SECRET</code> and <code dir="auto">caBundleRef.name</code> to <code dir="auto">GITOPS_CA_SECRET</code>, and the repository’s <code dir="auto">repository</code> to <code dir="auto">GITOPS_REPO</code>.</td>
+</tr>
+<tr>
+<td>GitHub Enterprise Server keys</td>
+<td><code dir="auto">.platformAgent.integration.forges[0]</code>, <code dir="auto">.platformAgent.integration.repositories[0]</code></td>
+<td>If the forge’s <code dir="auto">provider</code> is <code dir="auto">github</code> and it has a <code dir="auto">host</code>, set <code dir="auto">GITOPS_FORGE=github</code>. Copy the forge’s <code dir="auto">host</code> to <code dir="auto">GITOPS_HOST</code>, <code dir="auto">caBundleRef.name</code> to <code dir="auto">GITOPS_CA_SECRET</code> and <code dir="auto">namespace</code> to <code dir="auto">GITOPS_ORG</code>, and the repository’s <code dir="auto">repository</code> to <code dir="auto">GITOPS_REPO</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">ENABLE_GVISOR</code></td>
+<td><code dir="auto">.platformAgent.deployment.availability.runtimeClassName</code></td>
+<td><code dir="auto">gvisor</code> means <code dir="auto">true</code>. Always write the key: the upgrade’s default is <code dir="auto">false</code>, not the installer’s <code dir="auto">true</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">MEMORY</code></td>
+<td><code dir="auto">.platformAgent.harness.memory.provider</code></td>
+<td><code dir="auto">kube_agents_memory</code> is <code dir="auto">hindsight</code>, <code dir="auto">multiuser_memory</code> is <code dir="auto">file</code> and <code dir="auto">none</code> is <code dir="auto">off</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">USER_PROFILE_ENABLED</code></td>
+<td><code dir="auto">.platformAgent.harness.memory.userProfileEnabled</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">HERMES_DASHBOARD_ENABLED</code></td>
+<td><code dir="auto">.platformAgent.harness.hermes.dashboardEnabled</code></td>
+<td>The upgrade does not read the old <code dir="auto">ENABLE_WEBUI</code> name.</td>
+</tr>
+<tr>
+<td><code dir="auto">ENABLE_DRIFT_DETECTOR</code></td>
+<td><code dir="auto">.platformAgent.harness.driftDetector</code></td>
+<td>If <code dir="auto">enabled</code> is <code dir="auto">true</code>, write <code dir="auto">true</code>. If the path is absent (<code dir="auto">null</code>), write <code dir="auto">false</code>. If it has a <code dir="auto">subscription</code> but no <code dir="auto">enabled</code>, write <code dir="auto">false</code> and <code dir="auto">TF_VAR_enable_drift_pubsub=true</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">ENABLE_PUBSUB_PLATFORM</code></td>
+<td><code dir="auto">.plugins.pubsubPlatform.enabled</code></td>
+<td>When <code dir="auto">.plugins.stockoutInvestigator.enabled</code> is <code dir="auto">true</code>, this value is always <code dir="auto">true</code> and does not show the key. Write the key only if you know its old value.</td>
+</tr>
+<tr>
+<td><code dir="auto">ENABLE_STOCKOUT_INVESTIGATOR</code></td>
+<td><code dir="auto">.plugins.stockoutInvestigator.enabled</code></td>
+<td>If it is <code dir="auto">true</code>, also copy these fields of <code dir="auto">.plugins.stockoutInvestigator.pubsub</code>: <code dir="auto">topic</code> to <code dir="auto">TF_VAR_stockout_pubsub_topic</code>, <code dir="auto">subscription</code> to <code dir="auto">TF_VAR_stockout_pubsub_subscription</code> and <code dir="auto">sink</code> to <code dir="auto">TF_VAR_stockout_pubsub_sink</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">SCOPE_*</code></td>
+<td><code dir="auto">.platformAgent.scope</code></td>
+<td>Copy <code dir="auto">projects</code>, <code dir="auto">folders</code>, <code dir="auto">organizations</code>, <code dir="auto">sharedVpcHosts</code>, <code dir="auto">metricsScopes</code>, <code dir="auto">maxProjects</code>, <code dir="auto">exclude.projects</code> and <code dir="auto">exclude.clusters</code> (each as <code dir="auto">project/location/cluster</code>).</td>
+</tr>
+<tr>
+<td><code dir="auto">SCOPED_SA_POOL_ENABLED</code></td>
+<td><code dir="auto">.platformAgent.security.scopedServiceAccountPool.enabled</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">ACCEPT_NO_NETWORK_POLICY</code></td>
+<td><code dir="auto">.platformAgent.annotations["kubeagents.x-k8s.io/network-policy-enforcement"]</code></td>
+<td><code dir="auto">absent-accepted</code> means <code dir="auto">true</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">REGISTRY_PREFIX</code>, <code dir="auto">THIRD_PARTY_REGISTRY_PREFIX</code></td>
+<td><code dir="auto">.global.imageRegistry</code>, <code dir="auto">.global.thirdPartyImageRegistry</code></td>
+<td>If <code dir="auto">.global.imageRegistry</code> was set but <code dir="auto">.global.thirdPartyImageRegistry</code> was empty: for an install created before the third-party fallback was removed whose mirror holds third-party images (the <code dir="auto">make mirror-images MIRROR_PREFIX=</code> default), copy <code dir="auto">.global.imageRegistry</code> to <code dir="auto">THIRD_PARTY_REGISTRY_PREFIX</code> to keep third-party images on the mirror; step 5 exits 2 on this key, keep it. If the mirror holds only first-party images, leave <code dir="auto">THIRD_PARTY_REGISTRY_PREFIX</code> unset.</td>
+</tr>
+<tr>
+<td><code dir="auto">PLATFORM_AGENT_GSA_NAME</code></td>
+<td><code dir="auto">.platformAgent.security.serviceAccountAnnotations["iam.gke.io/gcp-service-account"]</code></td>
+<td>Write the part before the <code dir="auto">@</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">GITHUB_MINTER_GSA_NAME</code></td>
+<td><code dir="auto">.githubMinter.gsaName</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">LITELLM_GSA_NAME</code></td>
+<td><code dir="auto">.litellm.vertex.serviceAccountAnnotations["iam.gke.io/gcp-service-account"]</code></td>
+<td><code dir="auto">vertex_ai</code> only. Write the part before the <code dir="auto">@</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">TF_VAR_agent_ksa_name</code></td>
+<td><code dir="auto">.platformAgent.security.serviceAccountName</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">TF_VAR_image_pull_secrets</code></td>
+<td><code dir="auto">.global.imagePullSecrets</code></td>
+<td>Write it as a JSON list in single quotes.</td>
+</tr>
+</tbody>
+</table>
+<div class="sl-heading-wrapper level-h3"><h3 id="keys-outside-the-values-record">Keys outside the values record</h3><a class="sl-anchor-link" href="#keys-outside-the-values-record"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Keys outside the values record”</span></a></div>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Where to read it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">PLATFORM_AGENT_PERMISSION_SET</code>, <code dir="auto">PLATFORM_AGENT_CUSTOM_ROLES</code></td>
+<td>The state output <code dir="auto">agent_project_roles</code>. If it is not the <a href="/kube-agents/reference/security-and-iam/#roles-per-set"><code dir="auto">read-only</code> set</a>, write <code dir="auto">custom</code> and the roles.</td>
+</tr>
+<tr>
+<td><code dir="auto">ENABLE_GKE_BACKUP_PLAN</code></td>
+<td>The state output <code dir="auto">backup_plan_name</code>. A value means <code dir="auto">true</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">TF_VAR_drift_pubsub_topic</code>, <code dir="auto">TF_VAR_drift_pubsub_subscription</code>, <code dir="auto">TF_VAR_drift_pubsub_sink</code></td>
+<td>The state outputs <code dir="auto">drift_pubsub_topic</code> and <code dir="auto">drift_pubsub_subscription</code>. The sink has no output: <code dir="auto">gcloud storage cat &lt;STATE_PATH&gt; | jq -r '.resources[] | select(.type=="google_logging_project_sink" and .name=="drift_audit") | .instances[0].attributes.name'</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">VERTEX_MANAGE_SERVING_PROJECT</code></td>
+<td>On a <code dir="auto">vertex_ai</code> install, <code dir="auto">false</code> when this prints <code dir="auto">0</code>: <code dir="auto">gcloud storage cat &lt;STATE_PATH&gt; | jq '[.resources[] | select(.name=="litellm_vertex_user")] | length'</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">SKIP_CERT_MANAGER</code></td>
+<td><code dir="auto">true</code> when the cluster runs cert-manager and this prints <code dir="auto">0</code>: <code dir="auto">gcloud storage cat &lt;STATE_PATH&gt; | jq '[.resources[] | select(.type=="helm_release" and .name=="cert_manager")] | length'</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">TF_VAR_extra_helm_values</code></td>
+<td><code dir="auto">gcloud storage cat &lt;STATE_PATH&gt; | jq -r '.resources[] | select(.type=="helm_release" and .name=="kube_agents") | .instances[0].attributes.values[1]'</code>. If it is not <code dir="auto">{}</code>, convert it to JSON and write it in single quotes.</td>
+</tr>
+<tr>
+<td><code dir="auto">GKE_DB_KMS_KEYRING</code>, <code dir="auto">GKE_DB_KMS_KEY</code></td>
+<td><code dir="auto">gcloud container clusters describe &lt;CLUSTER_NAME&gt; --location &lt;REGION&gt; --format='value(databaseEncryption.keyName)'</code>. Write the names after <code dir="auto">keyRings/</code> and <code dir="auto">cryptoKeys/</code>. Only for a cluster the install created or encrypted.</td>
+</tr>
+<tr>
+<td><code dir="auto">GVISOR_POOL_NAME</code></td>
+<td>On a Standard cluster with gVisor, <code dir="auto">gcloud container node-pools list --cluster &lt;CLUSTER_NAME&gt; --location &lt;REGION&gt; --filter='config.sandboxConfig.type=GVISOR' --format='value(name)'</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">SCOPED_SA_POOL_MAX_ACCOUNTS</code></td>
+<td>No copy. If the cap is too low for the pool, the plan stops before any change.</td>
+</tr>
+<tr>
+<td>Any other <code dir="auto">TF_VAR_</code> line</td>
+<td>These lines have no installer key, so only the lost file had them. The composition README’s <a href="https://github.com/gke-labs/kube-agents/blob/main/terraform/examples/full-install/README.md#drift-audit-log-ingress">drift section</a> lists the drift ones. For <code dir="auto">TF_VAR_drift_pubsub_source_exclude_projects</code>, compare the state output <code dir="auto">drift_pubsub_source_projects</code> with <code dir="auto">scope_projects</code>. For the writer identity overrides, read each sink’s <code dir="auto">writer_identity</code> in the state. If step 5 shows a change that no key in these tables explains, look for a lost <code dir="auto">TF_VAR_</code> line.</td>
+</tr>
+</tbody>
+</table>
+<p>Leave out <code dir="auto">CLUSTER_MODE</code>, <code dir="auto">GITHUB_PEM_PATH</code>, <code dir="auto">GEMINI_API_KEY_SECRET_NAME</code>, <code dir="auto">MIGRATE_NODE_POOLS</code>,
+<code dir="auto">ENABLE_NETWORK_POLICY</code> and <code dir="auto">ALLOW_UNENCRYPTED_SECRETS</code>. They do not change what the upgrade renders
+for an existing install.</p>
+<p>A missing key takes its default, and some defaults remove or add things on a full upgrade. The
+installer README lists these keys in its
+<a href="https://github.com/gke-labs/kube-agents/blob/main/scripts/installer/README.md#the-install-configuration-installenv"><code dir="auto">install.env</code> section</a>,
+in the paragraph that starts “That precedence has a sharp edge” and the paragraph after it. A
+rebuilt file has more cases:</p>
+<ul>
+<li>Without the GitHub App keys, a full upgrade stops while the token minter runs, and prints the
+lines to set. See <a href="#when-an-upgrade-is-refused">When an upgrade is refused</a>.</li>
+<li>Without the GitLab keys, the <code dir="auto">PlatformAgent</code> loses its GitLab repository.</li>
+<li>Without the GitHub Enterprise Server keys, the <code dir="auto">PlatformAgent</code> names its repository on github.com, and the agent loses its repositories on the instance.</li>
+<li>Without <code dir="auto">MODEL_PROVIDER=vertex_ai</code>, the upgrade deletes the LiteLLM service account and its
+Vertex AI grant.</li>
+<li>Without a drift or stockout <code dir="auto">TF_VAR_</code> name that the install changed, the upgrade replaces that
+resource with one that has the default name.</li>
+</ul>
+<p>Do not skip step 5.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="run-the-upgrade">Run the upgrade</h2><a class="sl-anchor-link" href="#run-the-upgrade"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Run the upgrade”</span></a></div>
+<p>Substitute <code dir="auto">&lt;RELEASE_VERSION&gt;</code> with the release tag you are moving to, from
+<a href="https://github.com/gke-labs/kube-agents/releases">GitHub Releases</a>:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">curl</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-fsSL</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">https://raw.githubusercontent.com/gke-labs/kube-agents/&lt;RELEASE_VERSION&gt;/upgrade.sh</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">bash</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-s</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">--non-interactive</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">--gcp-project-id=</span><span style="--0:#D9F5DD">"</span><span style="--0:#ECC48D">my-gcp-project</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">--gke-cluster-name=</span><span style="--0:#D9F5DD">"</span><span style="--0:#ECC48D">platform-agent-host</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">--gcp-region=</span><span style="--0:#D9F5DD">"</span><span style="--0:#ECC48D">us-central1</span><span style="--0:#D9F5DD">"</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="curl -fsSL https://raw.githubusercontent.com/gke-labs/kube-agents/<RELEASE_VERSION>/upgrade.sh | bash -s -- \  --non-interactive \  --gcp-project-id=&quot;my-gcp-project&quot; \  --gke-cluster-name=&quot;platform-agent-host&quot; \  --gcp-region=&quot;us-central1&quot;"><div></div></button></div></figure></div>
+<p>The release-pinned script upgrades to its own version, so you pass no tag. It reuses the install
+checkout in <code dir="auto">$HOME/kube-agents</code>, moving it to the release you asked for, and reads the <code dir="auto">install.env</code>
+in it. A checkout with uncommitted changes is left alone and the run stops rather than upgrading
+from sources that do not match the release. Only a release copy is flagless: a copy built from
+<code dir="auto">main</code> carries no version and asks for one, so name a release tag in the URL rather than <code dir="auto">main</code>.</p>
+<p>The release bundle is the other supported source, and the one to use on a machine with no install
+checkout:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">curl</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-fsSL</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">https://github.com/gke-labs/kube-agents/releases/download/&lt;RELEASE_VERSION&gt;/kube-agents-&lt;RELEASE_VERSION&gt;.tar.gz</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">tar</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-xz</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C5E478;--0fs:italic">cd</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kube-agents-&lt;RELEASE_VERSION&gt;</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">cp</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">/path/to/your/install/install.env</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">.</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">./upgrade.sh</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--non-interactive</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--gcp-project-id=</span><span style="--0:#D9F5DD">"</span><span style="--0:#ECC48D">my-gcp-project</span><span style="--0:#D9F5DD">"</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="curl -fsSL https://github.com/gke-labs/kube-agents/releases/download/<RELEASE_VERSION>/kube-agents-<RELEASE_VERSION>.tar.gz | tar -xzcd kube-agents-<RELEASE_VERSION>cp /path/to/your/install/install.env ../upgrade.sh --non-interactive --gcp-project-id=&quot;my-gcp-project&quot;"><div></div></button></div></figure></div>
+<div class="sl-heading-wrapper level-h2"><h2 id="moving-across-more-than-one-release">Moving across more than one release</h2><a class="sl-anchor-link" href="#moving-across-more-than-one-release"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Moving across more than one release”</span></a></div>
+<p><code dir="auto">upgrade.sh</code> does not check which release the install runs now. A full run applies the target
+release’s CRDs, chart and Terraform composition to the install as it is. An operator run applies
+the CRDs and the chart, and a harness run applies only the chart.</p>
+<ul>
+<li>No step depends on the release that the install came from. The Secret backfills add only the
+keys that are missing. The checks that can refuse a run read the target chart and the live
+install.</li>
+<li>Every release serves one version of each CRD, <code dir="auto">v1alpha1</code>, so no CRD conversion is necessary.</li>
+<li>The composition’s only <code dir="auto">moved</code> block, in the <code dir="auto">gke-cluster</code> module, is in every release since
+0.1.0. The composition has no <code dir="auto">removed</code> blocks.</li>
+<li>Some retired inputs still work for a time, with a warning, for example <code dir="auto">GITHUB_REPO</code> and
+<code dir="auto">TF_VAR_agent_service_account_id</code>. If a run prints such a warning, change <code dir="auto">install.env</code> before
+the next upgrade. A later release can remove them.</li>
+</ul>
+<p>The release pipeline moves the newest release to the candidate in the operator and harness modes.
+Staging does a full upgrade between consecutive candidates. No CI job moves an install across
+several releases, and no policy says whether such a move is supported.</p>
+<p>Before a move across several releases:</p>
+<ol>
+<li>Read the release notes of each release in between, and the breaking changes below.</li>
+<li>Use <code dir="auto">--upgrade-mode=full</code>, so that the CRDs, the chart and the Terraform composition all move.</li>
+<li>Run <code dir="auto">--plan</code> with the target release’s <code dir="auto">upgrade.sh</code>, and read the whole plan. <code dir="auto">--plan</code> compares
+the target composition with the install’s Terraform state. It does not know which releases you
+skipped.</li>
+<li>Run the upgrade.</li>
+</ol>
+<div class="sl-heading-wrapper level-h3"><h3 id="breaking-changes-in-recent-releases">Breaking changes in recent releases</h3><a class="sl-anchor-link" href="#breaking-changes-in-recent-releases"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Breaking changes in recent releases”</span></a></div>
+<p>The release notes list pull request titles only. A <code dir="auto">!</code> before the colon marks a breaking change.
+0.10.0 and 0.11.0 have no <code dir="auto">!</code> changes. The table also lists changes with no <code dir="auto">!</code> that turn on something new for an existing install.</p>
+<table>
+<thead>
+<tr>
+<th>Release</th>
+<th>Change</th>
+<th>What an existing install meets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pending</td>
+<td>#3675: the A2A bus requires TLS</td>
+<td><code dir="auto">spec.mode: next</code> only. The upgrade restarts the bus once with TLS required, and every client the operator renders rolls onto <code dir="auto">tls://</code> and the bus CA in the same pass. A session task running at that moment fails, as on any bus restart. Anything you run by hand against the bus, such as a <code dir="auto">nats</code> CLI session, needs <code dir="auto">tls://</code> and the CA from the <code dir="auto">&lt;name&gt;-a2a-nats-ca-bundle</code> ConfigMap afterwards. If you roll back to an earlier release, delete the session pods (<code dir="auto">kubectl delete pod -l app.kubernetes.io/component=a2a-session</code>): the earlier gateway would otherwise reuse them against a plaintext bus.</td>
+</tr>
+<tr>
+<td>0.14.0</td>
+<td>#3362: the agent’s data volume is 50Gi</td>
+<td>The operator grows the agent’s <code dir="auto">&lt;name&gt;-data</code> claim and the shell sandbox’s data claim to 50Gi, online, where the StorageClass has <code dir="auto">allowVolumeExpansion: true</code> (GKE’s <code dir="auto">standard-rwo</code> does). Where the class cannot expand a claim, the claims keep their size and the CR carries the <code dir="auto">DataVolumeNotExpanded</code> condition (reason <code dir="auto">StorageClassCannotExpand</code>); see <a href="/kube-agents/operator/platformagent-crd/#status"><code dir="auto">status</code></a>. <a href="/kube-agents/operator/platformagent-crd/#specstorage"><code dir="auto">spec.storage.size</code></a> raises the size above 50Gi. The upgrade adds 80 GiB of disk: a namespace <code dir="auto">ResourceQuota</code> on <code dir="auto">requests.storage</code> and the project’s regional SSD quota both need room for it. A quota failure after the operator’s patch leaves the claim <code dir="auto">Bound</code> at its old <code dir="auto">status.capacity</code>; the operator log says the resize has not landed, and the claim’s events say why; see <a href="/kube-agents/install/prerequisites/">Prerequisites</a>.</td>
+</tr>
+<tr>
+<td>0.12.0</td>
+<td>#2891: the credential proxy requests 1Gi of memory</td>
+<td>The operator refuses a <code dir="auto">credentialProxy.resources</code> that sets <code dir="auto">limits.memory</code> under 1Gi without <code dir="auto">requests.memory</code>. Set the request with the limit, or raise the limit. See <a href="/kube-agents/operator/platformagent-crd/#specdeployment"><code dir="auto">spec.deployment</code></a>.</td>
+</tr>
+<tr>
+<td>0.12.0</td>
+<td>#2862: the drift export covers the scope’s other projects</td>
+<td>The drift export also creates sinks in other projects of the scope. See <a href="/kube-agents/deploy/multi-project/">Multi-project</a> for which projects, the permission the apply needs, and how to leave a project out.</td>
+</tr>
+<tr>
+<td>0.9.0</td>
+<td>#2264: the drift detector is on by default</td>
+<td>If <code dir="auto">install.env</code> does not set <code dir="auto">ENABLE_DRIFT_DETECTOR</code>, a full upgrade creates a Log Router sink, a Pub/Sub topic and a subscription, and starts the detector. The sink exports the GKE admin-activity audit records of every cluster in the project. The subscription keeps unacknowledged records for up to 31 days. To keep it off, write <code dir="auto">ENABLE_DRIFT_DETECTOR=false</code>. In a project where another install has the drift resources, the upgrade stops until you write that line or set the <code dir="auto">TF_VAR_drift_pubsub_*</code> names.</td>
+</tr>
+<tr>
+<td>0.9.0</td>
+<td>#2350: the scoped service account pool is keyed per project</td>
+<td>The upgrade turns off a pool armed under the old per-cluster field. See <a href="/kube-agents/reference/security-and-iam/#the-scoped-service-account-pool">the scoped service account pool</a>.</td>
+</tr>
+<tr>
+<td>0.9.0</td>
+<td>#2706: the Slack UX is on by default</td>
+<td>Slack users see new reactions, buttons and cards. See <a href="/kube-agents/concepts/chatops/#reactions">Reactions</a> and <a href="/kube-agents/concepts/chatops/#buttons">Buttons</a>. The buttons use the Slack app’s Interactivity setting. An app made from <code dir="auto">hermes slack manifest</code> has it on. On an app made by hand, turn on Interactivity: Socket Mode needs no request URL. If a button does not work, a typed reply still works. To keep the old behaviour, see below. Under <code dir="auto">spec.mode: next</code>, 0.9.0 also moves Slack to the A2A gateway, and <code dir="auto">KAGE_SLACK_UX</code> does not turn off the gateway’s reactions and buttons. See <a href="/kube-agents/install/slack-app/">Slack app setup</a>.</td>
+</tr>
+<tr>
+<td>0.8.0</td>
+<td>#2065: the <code dir="auto">litellm</code> Service is renamed <code dir="auto">inference-gateway</code></td>
+<td>Model calls can fail for a short time during the upgrade. See the chart README’s <a href="https://github.com/gke-labs/kube-agents/blob/main/charts/kube-agents/README.md#upgrade-notes-inference-gateway-service-rename">upgrade note</a>.</td>
+</tr>
+<tr>
+<td>0.8.0</td>
+<td>#2070: forges and repositories in <code dir="auto">spec.integration</code></td>
+<td>The operator refuses some repository spellings that worked before. See the upgrade notes under <a href="/kube-agents/operator/platformagent-crd/#specintegration"><code dir="auto">spec.integration</code></a>.</td>
+</tr>
+<tr>
+<td>0.8.0</td>
+<td>#2010, #2042: the A2A bus reserves more consumers</td>
+<td><code dir="auto">spec.mode: next</code> only. If 0.7.0 or earlier created the TASKS stream, the provision Job can stop the upgrade. Do what its message says.</td>
+</tr>
+<tr>
+<td>0.8.0</td>
+<td>#1756: the upgrade follows the release-pinned contract</td>
+<td>The upgrade refuses an install with only <code dir="auto">k8s-operator/scripts/vars.sh</code>. See <a href="#when-an-upgrade-is-refused">When an upgrade is refused</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>To keep the Slack UX off across upgrades, add <code dir="auto">KAGE_SLACK_UX=false</code> to the chart’s
+<code dir="auto">platformAgent.deployment.env</code> list. <code dir="auto">install.env</code> has no key for it. On an install made with
+<code dir="auto">install.sh</code>, put the list in a <code dir="auto">TF_VAR_extra_helm_values</code> line in <code dir="auto">install.env</code>. A full-mode
+<code dir="auto">install.sh</code> or <code dir="auto">upgrade.sh</code> run applies the line:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#C5E478">TF_VAR_extra_helm_values</span><span style="--0:#C792EA">=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{platformAgent={deployment={env=[{name="KAGE_SLACK_UX",value="false"}]}}}</span><span style="--0:#D9F5DD">'</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="TF_VAR_extra_helm_values=&#x27;{platformAgent={deployment={env=[{name=&quot;KAGE_SLACK_UX&quot;,value=&quot;false&quot;}]}}}&#x27;"><div></div></button></div></figure></div>
+<p><code dir="auto">install.env</code> holds one such line, so put every extra value in it. If the line already has a
+<code dir="auto">platformAgent</code> key, put <code dir="auto">deployment={env=[...]}</code> inside that key. A second <code dir="auto">platformAgent</code> key
+replaces the first one, with no error. If the line already has a <code dir="auto">platformAgent.deployment.env</code>
+list, add the entry to that list, because Helm replaces a list as a whole. See
+<a href="/kube-agents/install/quickstart-gke/#operator-settings">Operator settings</a> for how the line works.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="upgrade-modes">Upgrade modes</h2><a class="sl-anchor-link" href="#upgrade-modes"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Upgrade modes”</span></a></div>
+<ul>
+<li><code dir="auto">--upgrade-mode=harness</code> re-tags the Platform Agent image, the sandbox image it reaches over
+ssh, and every plugin image the release records — all are built from the same revision —
+through one <code dir="auto">helm upgrade</code> that re-applies the values the release recorded over the chart’s
+defaults. Before any of the new release is applied it names and stops on any recorded key the
+chart’s values schema refuses as undeclared, since Helm would refuse the whole upgrade over it. On an upgrade
+the usual cause is a setting the new chart renamed or removed: take that upgrade through
+<code dir="auto">--upgrade-mode=full</code>. On a rollback to a release that predates the key, pass
+<code dir="auto">--drop-undeclared-values</code> to drop and name each one instead; a later release that declares the
+key renders it from that chart’s default until a full-mode run there renders <code dir="auto">install.env</code> onto
+the chart again.</li>
+<li><code dir="auto">--upgrade-mode=operator</code> applies the chart’s CRDs with <code dir="auto">kubectl</code> first — Helm never touches
+<code dir="auto">crds/</code> on an upgrade — then re-tags the operator image the same way.</li>
+<li><code dir="auto">--upgrade-mode=full</code>, the default, applies the CRDs and then runs a full <code dir="auto">terraform apply</code>
+through the install engine: every image tag moves, and every setting in <code dir="auto">install.env</code> is
+re-rendered. It is the only mode that applies <code dir="auto">PLATFORM_AGENT_MODE</code>, so it is the one that
+<a href="#switching-specmode">switches <code dir="auto">spec.mode</code></a>.</li>
+</ul>
+<p>The operator moves before the harness because the operator owns the resources the harness runs as.
+Every mode needs the <code dir="auto">kube-agents</code> Helm release to exist in the target namespace; an install
+without one predates the Terraform and Helm engine, and has to be re-installed to adopt it.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="choosing-what-the-run-targets">Choosing what the run targets</h2><a class="sl-anchor-link" href="#choosing-what-the-run-targets"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Choosing what the run targets”</span></a></div>
+<p>A release copy of the script carries the version it upgrades to, which is what makes the one-liner
+above flagless. That baked version is the run’s target from the moment it starts, before any flag
+is read, so two of the flags below behave differently depending on which copy you are holding. One
+copy is the exception: <code dir="auto">upgrade.sh</code> in a checkout of a release line (<code dir="auto">release/&lt;X.Y&gt;</code>) that has moved
+past its latest release still carries that release’s version but is not that release, so run from
+there, with the release’s tag and full history fetched, it drops the baked default, says which line
+and commit it is on, and asks for <code dir="auto">--image-tag</code> the way a copy with no baked version does; a clone that
+lacks the tag, or whose shallow history stops short of the release, is refused and told which fetch
+to run.</p>
+<ul>
+<li><code dir="auto">--image-tag</code> names a revision to move to instead: a release tag or a full commit SHA. It
+overrides the baked version, and it exists for development and CI/CD testing — a candidate
+commit, or a release the script does not itself carry. It is not part of upgrading to a published
+release. Mutable refs such as <code dir="auto">latest</code>, <code dir="auto">main</code> and <code dir="auto">HEAD</code> are rejected, so the scripts and the
+container images always name the same revision.
+A commit on <code dir="auto">main</code> carries the chart’s unstamped placeholder version, <code dir="auto">0.1.0</code>, so
+<code dir="auto">helm history</code> and the plan show the chart moving from your release to <code dir="auto">kube-agents-0.1.0</code>.
+That is the placeholder, not a downgrade: only the release pipeline stamps the version.</li>
+<li><code dir="auto">--keep-image-tag</code> upgrades everything except the images, leaving them on the tag the install
+already serves. It refuses <code dir="auto">--image-tag</code>, because the two ask for opposite things — and since a
+release copy already carries a version, it refuses this flag as well. Run it from a checkout,
+which is where the scheduled reconciles that need it run.</li>
+<li><code dir="auto">--plan</code> changes nothing and reports what an upgrade would do. From a release copy it plans at
+that release: the question it answers is whether moving to that version would change anything.
+From a copy with no baked version and no <code dir="auto">--image-tag</code>, it plans at the tag the install’s
+Terraform state records, so the report is composition drift rather than image lag. Either way it
+exits 0 when the install is in sync, 2 when there are changes, and 1 when the plan itself failed.</li>
+</ul>
+<p>Given no tag and no flag, a copy of the script built from <code dir="auto">main</code> has no version to default to, and
+asks for one.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="previewing">Previewing</h2><a class="sl-anchor-link" href="#previewing"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Previewing”</span></a></div>
+<p><code dir="auto">--dry-run</code> and <code dir="auto">--plan</code> are both previews and are deliberately not the same one. <code dir="auto">--dry-run</code>
+answers offline, from configuration alone, and never contacts the install. <code dir="auto">--plan</code> answers from
+the install’s real Terraform state, so it needs credentials, and it is the only one of the two that
+can report drift. The two are refused together.</p>
+<p>Neither moves the install checkout in <code dir="auto">$HOME/kube-agents</code> or edits <code dir="auto">install.env</code>: a preview that
+needs sources the checkout does not have reads them from a temporary copy instead, so the checkout
+is still on the release the install runs when the preview is over. When a run is configured from
+<code dir="auto">$(pwd)/install.env</code> or <code dir="auto">KUBE_AGENTS_INSTALL_ENV</code> outside <code dir="auto">$HOME/kube-agents</code>, it fetches a
+temporary copy as well rather than touching <code dir="auto">$HOME/kube-agents</code>. When <code dir="auto">--plan</code> reuses the
+install’s own checkout because it is already on the target release (or runs from inside it),
+<code dir="auto">--plan</code> refreshes the generated <code dir="auto">terraform/examples/full-install/terraform.tfvars</code> and
+<code dir="auto">.terraform/</code> working directory there so Terraform can plan against the live backend; <code dir="auto">--dry-run</code>
+exits before Terraform runs and writes nothing.</p>
+<p>Neither is refused by an edited checkout either. A preview of what an uncommitted change would
+apply is the one report that answers “what have I edited here”, so both previews warn and continue
+where a real upgrade stops. When the configuration the run loaded records a different install than
+the flags name, only <code dir="auto">--dry-run</code> warns and continues — <code dir="auto">--plan</code> refuses alongside a real upgrade
+because planning writes <code dir="auto">terraform.tfvars</code> and reconfigures <code dir="auto">.terraform/</code> in the working sources
+(see <a href="#naming-the-install">Naming the install</a>).</p>
+<p>What a preview will not do is report on a run that could not happen: with no <code dir="auto">install.env</code> anywhere
+it stops with the same refusal a real upgrade gives, rather than printing a plan you could not
+execute.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="naming-the-install">Naming the install</h2><a class="sl-anchor-link" href="#naming-the-install"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Naming the install”</span></a></div>
+<p>The lookup order above is what keeps the configuration and the target install in step, because
+standing in an install’s directory upgrades that install. The piped one-liner has nowhere to stand,
+so on a machine with two installs it loads <code dir="auto">$HOME/kube-agents/install.env</code> whichever cluster the
+flags name — and a full upgrade re-renders the <code dir="auto">PlatformAgent</code> resource from that file, so the
+mismatch writes one install’s chat space, allowed users, model provider and namespace into the
+other.</p>
+<p>So the run compares them. When <code dir="auto">--gcp-project-id</code>, <code dir="auto">--gke-cluster-name</code> or <code dir="auto">--gcp-region</code> names
+something the loaded <code dir="auto">install.env</code> records differently, both a real upgrade and <code dir="auto">--plan</code> refuse,
+while <code dir="auto">--dry-run</code> reports the mismatch and goes on. Point <code dir="auto">KUBE_AGENTS_INSTALL_ENV</code> at the
+<code dir="auto">install.env</code> of the install you are upgrading, run from its checkout, or drop the flag that
+disagrees.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="checking-the-result">Checking the result</h2><a class="sl-anchor-link" href="#checking-the-result"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Checking the result”</span></a></div>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deployment</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent-gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">jsonpath=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{.spec.template.spec.containers[?(@.name=="platform-agent")].image}{"\n"}</span><span style="--0:#D9F5DD">'</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deployment</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kube-agents-controller-manager</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">jsonpath=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{.spec.template.spec.containers[*].image}{"\n"}</span><span style="--0:#D9F5DD">'</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platformagent</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">jsonpath=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{.status.conditions[?(@.type=="Ready")].status}{"\n"}</span><span style="--0:#D9F5DD">'</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">pods</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">helm</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">history</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kube-agents</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl get deployment platform-agent-gateway -n kubeagents-system \  -o jsonpath=&#x27;{.spec.template.spec.containers[?(@.name==&quot;platform-agent&quot;)].image}{&quot;\n&quot;}&#x27;kubectl get deployment kube-agents-controller-manager -n kubeagents-system \  -o jsonpath=&#x27;{.spec.template.spec.containers[*].image}{&quot;\n&quot;}&#x27;kubectl get platformagent platform-agent -n kubeagents-system \  -o jsonpath=&#x27;{.status.conditions[?(@.type==&quot;Ready&quot;)].status}{&quot;\n&quot;}&#x27;kubectl get pods -n kubeagents-systemhelm history kube-agents -n kubeagents-system"><div></div></button></div></figure></div>
+<p>Both images end in <code dir="auto">:&lt;RELEASE_VERSION&gt;</code>, the <code dir="auto">Ready</code> condition reads <code dir="auto">True</code>, the gateway pod is
+<code dir="auto">Running</code>, and the newest Helm revision is <code dir="auto">deployed</code>. <code dir="auto">kubeagents-system</code> is the default
+namespace; an install that set <code dir="auto">NAMESPACE</code> in <code dir="auto">install.env</code> uses that one. <code dir="auto">platform-agent</code> is the
+chart’s default <code dir="auto">platformAgent.name</code> value.</p>
+<p>The run also writes a machine-readable report to <code dir="auto">/tmp/kube-agents-upgrade-report.json</code>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="slack">Slack</h3><a class="sl-anchor-link" href="#slack"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Slack”</span></a></div>
+<p>On an install with Slack enabled, check that Slack still answers. Which process holds the Slack
+connection depends on <code dir="auto">spec.mode</code> (the third command under <a href="#before-you-start">Before you start</a>):</p>
+<ul>
+<li>
+<p><strong>Empty or <code dir="auto">today</code></strong>, or <code dir="auto">next</code> with Google Chat also enabled: the credential broker.</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">logs</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/platform-agent-credential-proxy</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">grep</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-E</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">Slack relay enabled|Slack relay initialization failed|Slack bot token authentication failed</span><span style="--0:#D9F5DD">'</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl logs deploy/platform-agent-credential-proxy -n kubeagents-system \  | grep -E &#x27;Slack relay enabled|Slack relay initialization failed|Slack bot token authentication failed&#x27;"><div></div></button></div></figure></div>
+<p>The pattern matches exactly three kinds of line. <code dir="auto">Slack relay enabled workspaces=1</code> as the last line is
+the healthy reading: the number counts the bot tokens Slack accepted, one per workspace.
+<code dir="auto">Slack bot token authentication failed</code> means Slack refused one of the bot tokens; it gives the
+error type and Slack’s error, not which token. <code dir="auto">Slack relay initialization failed; retrying</code>
+means no bot token was accepted or the Socket Mode connection failed, and the broker tries again
+every 30 seconds. No output has no reading of its own (on a broker that has run for a while the
+startup lines may have rotated out of the log): go by the DM test below.</p>
+</li>
+<li>
+<p><strong><code dir="auto">next</code></strong>: the A2A gateway.</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">logs</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/platform-agent-a2a-gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-c</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">grep</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-E</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">slack connected|chat backend stopped</span><span style="--0:#D9F5DD">'</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl logs deploy/platform-agent-a2a-gateway -c gateway -n kubeagents-system \  | grep -E &#x27;slack connected|chat backend stopped&#x27;"><div></div></button></div></figure></div>
+<p>The last line contains <code dir="auto">"msg":"slack connected"</code> and names the bot user and the workspace
+(<code dir="auto">team</code>). The gateway logs it once it has joined the bus and Slack has accepted the bot token,
+and then opens the Socket Mode connection. A <code dir="auto">chat backend stopped</code> line after it means that
+connection failed. One with no <code dir="auto">slack connected</code> before it means the gateway’s first call to
+Slack failed: its <code dir="auto">err</code> reads <code dir="auto">invalid_auth</code> when Slack refused the bot token, and anything else
+(a DNS error or a timeout, say) is the gateway not reaching Slack. The gateway retries either
+way. No output means the gateway has not tried Slack yet: it first joins the bus, retrying for up
+to 45 seconds, and exits if that fails. Wait a minute and run the command again. If the pod’s
+restart count is climbing, <code dir="auto">kubectl logs ... --previous</code> shows why the last run exited.</p>
+</li>
+</ul>
+<p>Either way, DM the app a question such as <code dir="auto">what clusters can you see?</code> and wait for the answer (an
+AI agent asks a person to do this): the log line does not prove that messages reach the agent. If
+nothing comes back, <a href="/kube-agents/install/slack-app/#verify">Slack app setup → Verify</a> has the next
+checks.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="switching-specmode">Switching <code dir="auto">spec.mode</code></h2><a class="sl-anchor-link" href="#switching-specmode"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Switching spec.mode”</span></a></div>
+<p><code dir="auto">PLATFORM_AGENT_MODE</code> in <code dir="auto">install.env</code> sets the install’s <code dir="auto">spec.mode</code>: <code dir="auto">next</code>, which a first install
+gets, or <code dir="auto">today</code>, the previous stack, kept as a rollback. A file with no such line means <code dir="auto">today</code> in
+<code dir="auto">upgrade.sh</code>, so upgrading an install made before <code dir="auto">next</code> became the default leaves it on <code dir="auto">today</code>;
+<code dir="auto">install.sh</code> keeps the mode the cluster runs and records it there, and a full <code dir="auto">upgrade.sh</code> over such
+a file is refused when the install may run <code dir="auto">next</code>. Of <code dir="auto">upgrade.sh</code>’s modes only
+full applies the key; a re-run of <code dir="auto">install.sh</code> applies it too. Only the <code dir="auto">install.sh</code> and
+<code dir="auto">upgrade.sh</code> of releases after 0.9.0 read it, so upgrade to such a release first.
+<a href="https://github.com/gke-labs/kube-agents/blob/main/scripts/installer/README.md"><code dir="auto">scripts/installer/README.md</code></a>
+has the rules for the key, and
+<a href="https://github.com/gke-labs/kube-agents/blob/main/docs/designs/spec-mode-switch.md"><code dir="auto">docs/designs/spec-mode-switch.md</code></a>
+what a switch changes inside the install. This section covers what a switch does to chat: Google Chat first, then
+Slack, in order.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="google-chat">Google Chat</h3><a class="sl-anchor-link" href="#google-chat"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Google Chat”</span></a></div>
+<p>With Google Chat enabled, Google Chat takes the A2A gateway under <code dir="auto">next</code>. The thing that changes for
+it is the home channel, where alerts and scheduled reports land. Under <code dir="auto">next</code> the gateway posts them
+only to <code dir="auto">GOOGLE_CHAT_HOME_CHANNEL</code> in <code dir="auto">install.env</code> (the <code dir="auto">PlatformAgent</code>’s
+<code dir="auto">spec.integration.googleChat.homeChannel</code>), and it must be a space name, <code dir="auto">spaces/&lt;id&gt;</code>. A home
+channel set from chat with <code dir="auto">/sethome</code>, or by the install’s first chat message, is kept in the
+Planning Agent’s profile and does not count. With the key unset or not a space name, the agent posts
+nothing to Google Chat unprompted. So before switching to <code dir="auto">next</code>, set <code dir="auto">GOOGLE_CHAT_HOME_CHANNEL</code> in
+the same <code dir="auto">install.env</code> as <code dir="auto">PLATFORM_AGENT_MODE</code>, so the one full run applies both
+(<a href="/kube-agents/concepts/chatops/#home-channel">ChatOps → Home channel</a>). After the switch, check
+that a scheduled report or an alert reaches that space.</p>
+<p>With Slack enabled too, Slack stays on the credential broker under <code dir="auto">next</code>, as under <code dir="auto">today</code>. Then
+none of the Slack steps below apply: switch, check Slack as in <a href="#slack">Checking the result</a>, and
+leave the Slack app as it is. The rest of this section is for an install whose Slack takes the
+gateway.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="before-the-switch">Before the switch</h3><a class="sl-anchor-link" href="#before-the-switch"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Before the switch”</span></a></div>
+<ol>
+<li>
+<p>Check that Slack answers now, as in <a href="#slack">Checking the result</a>.</p>
+</li>
+<li>
+<p>Check the Slack settings <code dir="auto">next</code> depends on. A full upgrade refuses a switch to <code dir="auto">next</code> that
+would hand the gateway a setting it cannot use, and names it
+(<a href="#when-an-upgrade-is-refused">When an upgrade is refused</a>); <code dir="auto">--plan</code> warns of the same
+ones. Checking first saves a refused run:</p>
+<ul>
+<li>
+<p>The bot token is one <code dir="auto">xoxb-</code> token, not a comma-separated list: the A2A gateway takes a
+single workspace’s token
+(<a href="/kube-agents/install/slack-app/#get-the-tokens">Get the tokens</a>). This counts the
+<code dir="auto">xoxb-</code> tokens in the installer’s Secret without printing them, and should print <code dir="auto">1</code>:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">secret</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent-secrets</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">jsonpath=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{.data.SLACK_BOT_TOKEN}</span><span style="--0:#D9F5DD">'</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">base64</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-d</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">tr</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">,</span><span style="--0:#D9F5DD">'</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">\n</span><span style="--0:#D9F5DD">'</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">grep</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-c</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">^xoxb-</span><span style="--0:#D9F5DD">'</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl get secret platform-agent-secrets -n kubeagents-system \  -o jsonpath=&#x27;{.data.SLACK_BOT_TOKEN}&#x27; | base64 -d | tr &#x27;,&#x27; &#x27;\n&#x27; | grep -c &#x27;^xoxb-&#x27;"><div></div></button></div></figure></div>
+<p><code dir="auto">0</code> means nothing was read: check that the <code dir="auto">PlatformAgent</code>’s
+<code dir="auto">spec.integration.slack.botTokenSecretRef</code>, if set, names this Secret and key.</p>
+</li>
+<li>
+<p><code dir="auto">SLACK_ALLOWED_USERS</code> in <code dir="auto">install.env</code> holds member IDs such as <code dir="auto">U0123ABCD</code>, not emails
+(<a href="/kube-agents/install/slack-app/#allowed-users">Allowed users</a>).</p>
+</li>
+<li>
+<p><code dir="auto">SLACK_HOME_CHANNEL</code> in <code dir="auto">install.env</code> is the ID of the channel for alerts and scheduled
+reports: <code dir="auto">C…</code>, or <code dir="auto">G…</code> for some private channels. In Slack, the ID is at the bottom of the
+channel’s details. Under <code dir="auto">next</code> the gateway posts the agent’s proactive messages to this
+channel only. A home channel set from Slack with <code dir="auto">/sethome</code> is kept in the Planning Agent’s
+profile, not in <code dir="auto">install.env</code>, so it does not carry over. A DM ID (<code dir="auto">D…</code>) or a channel name
+turns off the gateway’s notify route, and with it the reports of board cards
+(<a href="/kube-agents/install/slack-app/#home-channel">Slack app setup → Home channel</a>). With no home
+channel those posts are dropped while conversations keep working: the run warns, and the
+<code dir="auto">PlatformAgent</code> carries the <code dir="auto">HomeChannelUnset</code> condition.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Check the board for cards in flight:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">exec</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/platform-agent-gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-c</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#ECC48D">hermes</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kanban</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">ls</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--status</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">running</span></div></div><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">exec</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/platform-agent-gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-c</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#ECC48D">hermes</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kanban</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">ls</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--status</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">blocked</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl exec deploy/platform-agent-gateway -c platform-agent -n kubeagents-system -- \  hermes kanban ls --status runningkubectl exec deploy/platform-agent-gateway -c platform-agent -n kubeagents-system -- \  hermes kanban ls --status blocked"><div></div></button></div></figure></div>
+<p>Wait until neither command lists a card: answer each blocked card in its Slack thread, and let
+running ones finish (<a href="#what-carries-over">What carries over</a> says why). If scheduled jobs keep
+filing cards, switch between their runs.</p>
+</li>
+<li>
+<p>Switch when nobody is using the agent, and tell its users that Slack will not answer for a
+while.</p>
+</li>
+</ol>
+<div class="sl-heading-wrapper level-h3"><h3 id="the-switch">The switch</h3><a class="sl-anchor-link" href="#the-switch"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “The switch”</span></a></div>
+<p>Edit the <code dir="auto">install.env</code> the upgrade reads (<a href="#before-you-start">Before you start</a> says where it
+looks). Set the key, adding the line if the file has none:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#C5E478">PLATFORM_AGENT_MODE</span><span style="--0:#C792EA">=</span><span style="--0:#ECC48D">next</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="PLATFORM_AGENT_MODE=next"><div></div></button></div></figure></div>
+<p><a href="#run-the-upgrade">Run the upgrade</a> again at the release the install runs, in the default full
+mode: pass no <code dir="auto">--upgrade-mode</code>. Before it applies anything, the run warns:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="text"><code><div class="ec-line"><div class="code"><span style="--0:#d6deeb">This apply switches the install from spec.mode today to next (PLATFORM_AGENT_MODE in install.env): a mode switch, not a settings change.</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="This apply switches the install from spec.mode today to next (PLATFORM_AGENT_MODE in install.env): a mode switch, not a settings change."><div></div></button></div></figure></div>
+<p>It does not stop to ask. To stay on <code dir="auto">today</code>, press Ctrl-C at that warning and set the key back.</p>
+<p><code dir="auto">--upgrade-mode=harness</code> and <code dir="auto">--upgrade-mode=operator</code> leave the mode as it is and say that a full
+upgrade would switch it. If the run says instead that the <code dir="auto">PlatformAgent</code> carries a <code dir="auto">spec.mode</code> set
+outside the installer, the resource was patched by hand (<code dir="auto">kubectl patch</code>, as 0.9.0 needed). That
+mode survives upgrades, because Helm sees no change in a value the release already renders, so the
+run leaves the resource as it is. To bring the two together, patch <code dir="auto">spec.mode</code> on the resource to
+the mode you want, or apply once with <code dir="auto">PLATFORM_AGENT_MODE</code> set to the mode the resource carries and
+then again with the one you want.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="during-the-switch">During the switch</h3><a class="sl-anchor-link" href="#during-the-switch"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “During the switch”</span></a></div>
+<p>The operator moves Slack in three steps:</p>
+<ol>
+<li>It restarts the credential broker without the Slack tokens, stopping the old broker pod before
+it starts the new one, and restarts the agent’s pod without its Slack listener. From here, no
+process holds the app’s Socket Mode connection.
+<ul>
+<li>Messages the broker had taken from Slack but not yet handed to the agent are lost: the
+broker acknowledges each event to Slack when it arrives and holds it in memory.</li>
+<li>A question the agent was answering stops with its pod and gets no answer.</li>
+<li>A board card that was running is put back in the queue once the board reclaims its stale
+claim, which can take up to 30 minutes (<code dir="auto">kanban.dispatch_stale_timeout_seconds</code>), and runs
+again from the start.</li>
+</ul>
+</li>
+<li>It creates the NATS bus and the auth callout. It creates the A2A gateway once a callout
+replica is ready, which needs the bus to be running. The provisioning Job, started at the same
+point, creates the bus’s streams.</li>
+<li>The gateway joins the bus, retrying for up to 45 seconds while the streams do not exist and
+restarting after that. It then checks the bot token with Slack, logs <code dir="auto">slack connected</code>, and
+opens the Socket Mode connection.</li>
+</ol>
+<p>The broker’s connection stops when the switch starts, and the gateway exists only once the bus is
+up, so in practice the two never take the same message. How long Slack goes unanswered depends on
+how fast the cluster schedules and pulls the new pods. Slack has no connection to deliver a message
+sent in that gap to, and nothing in kube-agents fetches it later: treat it as lost, and ask its
+sender to send it again. Wait for the gateway, for up to 15 minutes:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--0fs:italic">for</span><span style="--0:#D6DEEB"> </span><span style="--0:#C5E478">i</span><span style="--0:#D6DEEB"> </span><span style="--0:#C792EA;--0fs:italic">in</span><span style="--0:#D6DEEB"> $(</span><span style="--0:#82AAFF;--0fs:italic">seq</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">90</span><span style="--0:#D6DEEB">); </span><span style="--0:#C792EA;--0fs:italic">do</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">logs</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/platform-agent-a2a-gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-c</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">2&gt;</span><span style="--0:#ECC48D">/dev/null</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">grep</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-q</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">slack connected</span><span style="--0:#D9F5DD">'</span><span style="--0:#D6DEEB"> &amp;&amp; { </span><span style="--0:#C5E478;--0fs:italic">echo</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">connected</span><span style="--0:#D6DEEB">; </span><span style="--0:#C792EA;--0fs:italic">break</span><span style="--0:#D6DEEB">; }</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF;--0fs:italic">sleep</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">10</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--0fs:italic">done</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="for i in $(seq 90); do  kubectl logs deploy/platform-agent-a2a-gateway -c gateway -n kubeagents-system 2>/dev/null \    | grep -q &#x27;slack connected&#x27; &amp;&amp; { echo connected; break; }  sleep 10done"><div></div></button></div></figure></div>
+<p>It prints <code dir="auto">connected</code> once the gateway has logged <code dir="auto">slack connected</code>. The operator then restarts
+the agent’s pod once more, to add the bridge that runs the gateway’s tasks, and that can take a few
+minutes if the cluster has to add a node for it. Wait for the <code dir="auto">PlatformAgent</code> to report <code dir="auto">Ready</code>,
+then check Slack as in <a href="#slack">Checking the result</a>:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">wait</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platformagent/platform-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--for=condition=Ready</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--timeout=15m</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl wait platformagent/platform-agent -n kubeagents-system --for=condition=Ready --timeout=15m"><div></div></button></div></figure></div>
+<p>If the loop prints nothing, the <code dir="auto">Ready</code> condition’s message names what the
+operator is waiting on, and
+<a href="https://github.com/gke-labs/kube-agents/blob/main/INSTALL.md#6-tracing-where-a-chat-message-stops">Troubleshooting</a>
+has the checks for the bus and the gateway. Slack stays unanswered until the gateway connects or
+you <a href="#switching-back-to-today">switch back</a>.</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">get</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platformagent</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF">-o</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">jsonpath=</span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">{.status.conditions[?(@.type=="Ready")].message}{"\n"}</span><span style="--0:#D9F5DD">'</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl get platformagent platform-agent -n kubeagents-system \  -o jsonpath=&#x27;{.status.conditions[?(@.type==&quot;Ready&quot;)].message}{&quot;\n&quot;}&#x27;"><div></div></button></div></figure></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="what-carries-over">What carries over</h3><a class="sl-anchor-link" href="#what-carries-over"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “What carries over”</span></a></div>
+<ul>
+<li><strong>The same app, tokens and allowlist.</strong> The gateway reads the tokens from the same Secret.</li>
+<li><strong>The board and the agent’s data volume.</strong> The new pod mounts the same volume.</li>
+<li><strong>Not the conversations.</strong> Under <code dir="auto">next</code> the agent starts every Slack conversation with no
+history from <code dir="auto">today</code>. In a channel, a reply without a mention in a thread started before the
+switch gets no answer: mention the app.</li>
+<li><strong>Not the cards in flight, outside the home channel.</strong> A card filed before the switch from a
+DM or from any channel other than the home channel posts nothing after it: the gateway refuses
+the post and, with a home channel set, logs <code dir="auto">thread "&lt;channel&gt;/&lt;ts&gt;" is not a thread of the home channel</code>. A card filed
+in a home-channel thread still posts its progress and report there. Either way its buttons stop
+working: the gateway answers only the buttons it drew itself.</li>
+<li><strong>The home channel only from <code dir="auto">install.env</code></strong>, as in step 2 above.</li>
+</ul>
+<p>Slash commands, buttons, cards and the other Slack features that do not carry over are listed in
+<a href="/kube-agents/concepts/chatops/#what-carries-over-from-default-mode">ChatOps → What carries over from default mode</a>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="after-the-switch-the-slack-app">After the switch: the Slack app</h3><a class="sl-anchor-link" href="#after-the-switch-the-slack-app"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “After the switch: the Slack app”</span></a></div>
+<p>Once a DM gets an answer as in <a href="#slack">Checking the result</a>, edit the app as
+<a href="/kube-agents/install/slack-app/#moving-an-existing-app-to-next">Slack app setup → Moving an existing app to <code dir="auto">next</code></a>
+describes: delete the slash commands from its manifest and leave interactivity on, since the gateway
+answers the buttons it draws. Edit the app rather than pasting the <code dir="auto">next</code> manifest over it: a
+manifest replaces the app’s whole configuration, including its name. Do it after the switch rather
+than before, because the <code dir="auto">today</code> listener answers slash commands until then. Until you do, a slash
+command gets Slack’s timeout error.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="switching-back-to-today">Switching back to <code dir="auto">today</code></h3><a class="sl-anchor-link" href="#switching-back-to-today"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Switching back to today”</span></a></div>
+<ol>
+<li>
+<p>Set <code dir="auto">PLATFORM_AGENT_MODE=today</code> in <code dir="auto">install.env</code>, or delete the line, and run the upgrade again
+in full mode. The run warns
+<code dir="auto">This apply switches the install from spec.mode next to today (PLATFORM_AGENT_MODE in install.env): a mode switch, not a settings change.</code></p>
+</li>
+<li>
+<p>The operator restarts the credential broker with the Slack tokens and deletes the A2A stack,
+the gateway with it. For the seconds the gateway pod takes to stop, both can hold a
+connection, and a message the stopping gateway takes gets no answer. The bus volume and its
+credentials Secret stay; <a href="/kube-agents/install/uninstall/#what-specmode-next-leaves-behind">Uninstall</a>
+says how to remove them. Wait for the broker, for up to 5 minutes:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#C792EA;--0fs:italic">for</span><span style="--0:#D6DEEB"> </span><span style="--0:#C5E478">i</span><span style="--0:#D6DEEB"> </span><span style="--0:#C792EA;--0fs:italic">in</span><span style="--0:#D6DEEB"> $(</span><span style="--0:#82AAFF;--0fs:italic">seq</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">30</span><span style="--0:#D6DEEB">); </span><span style="--0:#C792EA;--0fs:italic">do</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">logs</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/platform-agent-credential-proxy</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#7FDBCA">2&gt;</span><span style="--0:#ECC48D">/dev/null</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#7FDBCA">|</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF;--0fs:italic">grep</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-q</span><span style="--0:#D6DEEB"> </span><span style="--0:#D9F5DD">'</span><span style="--0:#ECC48D">Slack relay enabled</span><span style="--0:#D9F5DD">'</span><span style="--0:#D6DEEB"> &amp;&amp; { </span><span style="--0:#C5E478;--0fs:italic">echo</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">connected</span><span style="--0:#D6DEEB">; </span><span style="--0:#C792EA;--0fs:italic">break</span><span style="--0:#D6DEEB">; }</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#82AAFF;--0fs:italic">sleep</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">10</span></div></div><div class="ec-line"><div class="code"><span style="--0:#C792EA;--0fs:italic">done</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="for i in $(seq 30); do  kubectl logs deploy/platform-agent-credential-proxy -n kubeagents-system 2>/dev/null \    | grep -q &#x27;Slack relay enabled&#x27; &amp;&amp; { echo connected; break; }  sleep 10done"><div></div></button></div></figure></div>
+<p>It prints <code dir="auto">connected</code> once the broker has connected to Slack. If it prints nothing, read the
+broker’s log as in <a href="#slack">Checking the result</a>.</p>
+</li>
+<li>
+<p>Put the slash commands back. Print the <code dir="auto">today</code> manifest:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">kubectl</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">exec</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">deploy/platform-agent-gateway</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-c</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">platform-agent</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">-n</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">kubeagents-system</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--</span><span style="--0:#D6DEEB"> </span><span style="--0:#F78C6C">\</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#ECC48D">hermes</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">slack</span><span style="--0:#D6DEEB"> </span><span style="--0:#ECC48D">manifest</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="kubectl exec deploy/platform-agent-gateway -c platform-agent -n kubeagents-system -- \  hermes slack manifest"><div></div></button></div></figure></div>
+<p>Before you paste it into the app’s <strong>App Manifest</strong> page, change its <code dir="auto">name</code>, <code dir="auto">description</code> and
+<code dir="auto">display_name</code> to the app’s current values: the manifest replaces the app’s whole
+configuration. <a href="/kube-agents/install/slack-app/#create-the-app">Slack app setup</a> covers its
+options; read its warning about agent view first. Reinstall the app if Slack asks.</p>
+</li>
+<li>
+<p>Check Slack as in <a href="#slack">Checking the result</a>.</p>
+</li>
+</ol>
+<p>Conversations and cards started under <code dir="auto">next</code> do not carry back, for the same reasons as above.</p>
+<p>To roll back to an older release, switch to <code dir="auto">today</code> first:
+<a href="/kube-agents/deploy/rollback/#before-you-start">Rolling back a release</a> says why.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="the-gateways-own-serviceaccount">The gateway’s own ServiceAccount</h2><a class="sl-anchor-link" href="#the-gateways-own-serviceaccount"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “The gateway’s own ServiceAccount”</span></a></div>
+<p>From the release in which the gateway Pod runs as its own ServiceAccount, an upgrade moves the
+gateway from the agent ServiceAccount (<code dir="auto">spec.security.serviceAccountName</code>, <code dir="auto">kubeagents-platform-agent</code>
+by default) to <code dir="auto">&lt;name&gt;-gateway-agent</code>, which the operator creates with no annotation. The agent
+ServiceAccount, its Workload Identity annotation and its IAM binding stay where they are, with the
+credential broker, so neither Terraform nor IAM changes. The new ServiceAccount is bound to the same
+read-only <code dir="auto">kubeagents:minimal</code> ClusterRole and the <code dir="auto">kubeagents:local</code> and <code dir="auto">kubeagents:leader</code> Roles
+the gateway already used.</p>
+<p>Two things an install may have added by hand do not follow the gateway:</p>
+<ul>
+<li><strong>RBAC bound to your own ServiceAccount.</strong> If you set <code dir="auto">serviceAccountName</code> and bound extra roles to
+it expecting the gateway to use them, the gateway no longer runs as it. Bind them to
+<code dir="auto">&lt;name&gt;-gateway-agent</code> if the gateway needs them; the broker keeps whatever is bound to yours.</li>
+<li><strong>IAM granted to the gateway’s Kubernetes identity directly.</strong> A <code dir="auto">principal://…/subject/ns/&lt;ns&gt;/sa/&lt;sa&gt;</code>
+or namespace-wide <code dir="auto">principalSet://</code> grant reaches whichever Pod runs as that ServiceAccount, and the
+gateway’s metadata path is closed, so such a grant no longer reaches the gateway. Anything in the
+gateway that needs Google goes through the broker.</li>
+</ul>
+<p>To check: <code dir="auto">kubectl get deployment platform-agent-gateway -n kubeagents-system -o jsonpath='{.spec.template.spec.serviceAccountName}'</code> prints <code dir="auto">platform-agent-gateway-agent</code> for the
+chart’s default name.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="when-an-upgrade-is-refused">When an upgrade is refused</h2><a class="sl-anchor-link" href="#when-an-upgrade-is-refused"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “When an upgrade is refused”</span></a></div>
+<p>Every one of these stops the run before any of the new release is applied. The first four are
+settled before the run touches the cluster at all. The last six need the cluster: they are settled
+after <code dir="auto">kubectl</code> has been pointed at it, and except for the breaking-change check, after a real run’s
+pre-flight Secret backfills — a plan skips those — but still before any CRD, chart or Terraform
+change of the new release.</p>
+<ul>
+<li>
+<p><strong>The sources do not match the release.</strong> The checkout’s <code dir="auto">HEAD</code> is not the release’s commit, the
+tree has uncommitted changes, or an unpacked tree names a release other than the one asked for —
+either in its <code dir="auto">.release-bundle</code> marker or in the version stamped into its root scripts. A release
+script carries its version with it, so standing in an older unpacked tree and running a newer one
+is refused rather than silently applying the older tree. The stamp is read from <code dir="auto">install.sh</code> and
+<code dir="auto">uninstall.sh</code> before <code dir="auto">upgrade.sh</code>, because saving a newer <code dir="auto">upgrade.sh</code> into an older tree
+overwrites the one file that would otherwise be asked. Start again from a clean checkout or from
+the bundle of the release you want.</p>
+</li>
+<li>
+<p><strong><code dir="auto">KUBE_AGENTS_INSTALL_ENV</code> names a file that is not there.</strong> An explicit pointer is taken
+literally, not fallen back from, so a stale or mistyped value is reported with the path you gave
+rather than searched past. Fix the path or unset the variable.</p>
+</li>
+<li>
+<p><strong>No install configuration.</strong> Neither <code dir="auto">KUBE_AGENTS_INSTALL_ENV</code> nor an <code dir="auto">install.env</code> was found in
+any of the configuration locations described at the top of this page. An install predating 0.4.0,
+which kept its settings in the retired <code dir="auto">k8s-operator/scripts/vars.sh</code> and never gained an
+<code dir="auto">install.env</code>, is refused here: copy those settings into an <code dir="auto">install.env</code> first.
+If the machine that held the file is gone, see
+<a href="#recovering-installenv">Recovering <code dir="auto">install.env</code></a>.</p>
+</li>
+<li>
+<p><strong><code dir="auto">GITHUB_APP_ID</code> is not a number.</strong> The token minter needs the GitHub App’s numeric ID, the “App
+ID” on the App’s General settings page, not its name or slug. <code dir="auto">--dry-run</code> refuses it too.</p>
+</li>
+<li>
+<p><strong>The move leaves behind a commit marked as a breaking change.</strong> When the target does not
+contain the installed commit — a rollback to an older release, or a commit build moved to a
+release that lacks some of its commits — the run reads the commits the target lacks. It stops
+before the Secret backfills if any has a <code dir="auto">type!:</code> subject or a <code dir="auto">BREAKING CHANGE:</code> footer, and
+names each one. Read them, then re-run with <code dir="auto">--allow-breaking-downgrade</code>, in any mode. <code dir="auto">--plan</code>
+warns instead. A move between two release tags to the newer one is not checked, and neither is a
+run whose tag is read off the install. See <a href="/kube-agents/deploy/rollback/">Rolling back a release</a>.</p>
+</li>
+<li>
+<p><strong>No Helm release.</strong> The target namespace has no <code dir="auto">kube-agents</code> release to upgrade.</p>
+</li>
+<li>
+<p><strong>The memory store cannot be checked and nothing named one.</strong> When the configuration records no
+<code dir="auto">MEMORY</code>, the upgrade asks the cluster whether it runs the Hindsight memory store, so that a store
+that is there is kept rather than planned away. If the cluster cannot be asked — <code dir="auto">kubectl</code> is
+pointed elsewhere, the credentials have expired, the API server times out — the run stops instead
+of guessing. Record <code dir="auto">MEMORY=hindsight|file|off</code> in <code dir="auto">install.env</code>, or restore access to the cluster
+and re-run.</p>
+</li>
+<li>
+<p><strong>The chart does not declare a value the release recorded.</strong> The operator and harness modes
+re-apply the values the release recorded, and name each one the new chart’s values schema refuses
+as undeclared. On an upgrade that is usually a setting the new chart renamed or removed: run
+<code dir="auto">--upgrade-mode=full</code>, which renders <code dir="auto">install.env</code> onto the chart instead. On a rollback to a
+release that predates the value, re-run with <code dir="auto">--drop-undeclared-values</code>. A full upgrade refuses
+that flag, since it has no recorded values to drop.</p>
+</li>
+<li>
+<p><strong>A Slack setting the A2A gateway cannot use.</strong> A full upgrade applies <code dir="auto">PLATFORM_AGENT_MODE</code> from
+<code dir="auto">install.env</code>. With <code dir="auto">next</code>, Slack on and Google Chat off, the A2A gateway takes Slack, and the run
+refuses three settings it cannot use, naming each one:</p>
+<ul>
+<li>a <code dir="auto">SLACK_ALLOWED_USERS</code> entry with an <code dir="auto">@</code>: the list matches Slack member IDs exactly, so an
+email matches nobody. Replace it with the person’s member ID (in Slack, their profile, then
+<strong>⋮</strong> (More), then <strong>Copy member ID</strong>).</li>
+<li>a <code dir="auto">SLACK_HOME_CHANNEL</code> that is not a channel ID (<code dir="auto">C...</code> or <code dir="auto">G...</code>): the gateway’s notify route
+does not arm, so proactive posts and board-card reports stop. The ID is at the bottom of the
+channel details’ About tab.</li>
+<li>a <code dir="auto">SLACK_BOT_TOKEN</code> that holds several tokens, or one with a comma or space left in it: the
+gateway takes one workspace’s token, whole. The run gives the count, never the token. Keep a
+multi-workspace install on <code dir="auto">today</code>.</li>
+</ul>
+<p><code dir="auto">--plan</code> warns of the same three without refusing.</p>
+</li>
+<li>
+<p><strong>The apply would remove GitOps.</strong> The PlatformAgent opens pull requests through the GitHub token
+minter, but <code dir="auto">install.env</code> does not carry that repository in <code dir="auto">GITOPS_ORG</code>, <code dir="auto">GITOPS_REPO</code> and
+<code dir="auto">GITHUB_APP_ID</code>, so the run would render GitOps off and destroy the minter’s Cloud KMS key, key
+ring and service account. This is what an install whose GitOps came from <code dir="auto">install.sh</code>’s flags looks like when it
+was set up by a release that did not record them in <code dir="auto">install.env</code>. The run prints the lines to
+set, with the live values filled in where it can read them; set them and re-run the same command. To remove GitOps on purpose, re-run with <code dir="auto">KUBE_AGENTS_REMOVE_GITOPS=true</code> in the
+environment. <code dir="auto">--plan</code> warns instead. A minter that this install did not make (one made by hand,
+by <code dir="auto">make deploy-github</code>, or by another Helm release) is not removed by the apply, so the run does
+not ask for <code dir="auto">GITHUB_APP_ID</code>. It refuses when <code dir="auto">GITOPS_ORG</code>, <code dir="auto">GITOPS_REPO</code> and <code dir="auto">GITOPS_HOST</code> do not
+name the PlatformAgent’s GitOps repository, or when it cannot read the PlatformAgent or the
+repository it names. The run decides that the minter is not this install’s only when the
+<code dir="auto">kube-agents</code> release record has <code dir="auto">githubMinter.enabled</code> false, the minter’s Deployment carries no
+Helm annotations for that release, and the install’s Terraform state holds no minter module (its
+service account and Cloud KMS key); with no release (a first install), or a state it cannot
+read, it applies the check above.</p>
+</li>
+<li>
+<p><strong>The chart’s minter would land on another minter.</strong> This run renders the chart’s own token
+minter, but a minter that this install did not make runs under the same names, and Helm does not
+take over objects it does not own. Remove all of the other minter’s objects first: run
+<code dir="auto">make -C k8s-operator undeploy-github</code> with the same <code dir="auto">GITHUB_MINTER_KSA_NAME</code> for the kustomize
+path, or turn the minter off in the Helm release that made it, and delete a
+<code dir="auto">github-app-credentials</code> Secret that you made by hand. Or keep the other minter: set
+<code dir="auto">GITHUB_APP_ID</code> empty in <code dir="auto">install.env</code> (and, with <code dir="auto">install.sh</code>, give no <code dir="auto">--github-app-id</code>).
+<code dir="auto">--plan</code> warns instead.</p>
+</li>
+</ul>
+<div class="sl-heading-wrapper level-h2"><h2 id="what-stops-during-an-upgrade">What stops during an upgrade</h2><a class="sl-anchor-link" href="#what-stops-during-an-upgrade"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “What stops during an upgrade”</span></a></div>
+<p>This section describes <code dir="auto">spec.mode: today</code>, which an install made before <code dir="auto">next</code> became the first-install default keeps.</p>
+<p>At the default of one replica, the agent gateway and the credential broker each run one pod with
+the <code dir="auto">Recreate</code> strategy. Kubernetes stops the old pod before it starts the new one, so chat stops
+until the new pods are ready. The operator and LiteLLM keep serving. The operator starts its new
+pod first, and LiteLLM runs two replicas and keeps one serving.</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What restarts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">operator</code></td>
+<td>The operator. The agent gateway also restarts if the run added keys to <code dir="auto">platform-agent-secrets</code>. The agent gateway, the credential broker and the shell sandbox restart if the new operator renders them differently.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness</code></td>
+<td>The agent gateway, the credential broker, whose image tag follows the agent’s, and the shell sandbox.</td>
+</tr>
+<tr>
+<td><code dir="auto">full</code></td>
+<td>The workloads of both other modes, and each object that a changed setting touches.</td>
+</tr>
+</tbody>
+</table>
+<p>In each mode, a chart workload such as LiteLLM also restarts if the target release’s chart changed
+it. In CI runs, a harness upgrade made the agent unavailable for 41 seconds to about 3 minutes. A
+full upgrade on staging took about 8 minutes. These are examples, not limits. In the harness and full modes, and in an
+operator run that added Secret keys, the script waits up to 25 minutes for the agent gateway. That
+allows for a cold image pull. An operator run that re-renders the gateway does not wait for it, so
+the script can end before chat is back.</p>
+<p>During the restart:</p>
+<ul>
+<li><strong>Slack.</strong> The broker confirms each Slack event to Slack when it arrives, and keeps it in memory
+until the agent takes it. If the broker restarts, the events it holds are lost. If only the agent
+restarts, the broker gives its events to the new agent. The sender must send an event again in
+two cases: the old agent took it but did not finish it, or it arrived up to 20 seconds after
+the old agent stopped.</li>
+<li><strong>Google Chat.</strong> A message stays in the Pub/Sub subscription until the agent confirms it. If the
+agent took a message but did not confirm it, Pub/Sub delivers it again after 60 seconds.</li>
+<li><strong>Board cards.</strong> The board is on the agent’s volume, so the cards stay. A card that was running
+usually goes back to <code dir="auto">ready</code> soon after the new pod starts, and runs again from the start. This
+does not count against the card’s retries. If the old worker’s process ID is in use in the new
+pod, the card waits until its claim times out.</li>
+</ul>
+<div class="sl-heading-wrapper level-h2"><h2 id="where-to-go-next">Where to go next</h2><a class="sl-anchor-link" href="#where-to-go-next"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Where to go next”</span></a></div>
+<ul>
+<li><a href="/kube-agents/deploy/rollback/">Rolling back a release</a> — the reverse move, and what each mode
+leaves behind when it goes backwards.</li>
+<li><a href="/kube-agents/deploy/release-versioning/">Release versioning and promotion</a> — what a release tag
+guarantees about the artifacts it names.</li>
+<li><a href="/kube-agents/install/uninstall/">Uninstall</a> — removing the install instead of moving it.</li>
+</ul>
+</div><footer class="sl-flex astro-vcsylbkx"><div class="meta sl-flex astro-vcsylbkx"><a href="https://github.com/gke-labs/kube-agents/edit/main/docs/site/src/content/docs/install/upgrade.md" class="sl-flex print:hidden astro-7hm6odgq"><svg aria-hidden="true" class="astro-7hm6odgq astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a></div><div class="pagination-links print:hidden astro-bnkpfcrs" dir="ltr"><a href="/kube-agents/install/gitea/" rel="prev" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-bnkpfcrs">Previous<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Gitea as the GitOps forge</span></span></a><a href="/kube-agents/install/uninstall/" rel="next" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-bnkpfcrs">Next<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Uninstall</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>

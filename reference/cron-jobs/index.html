@@ -1,0 +1,424 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-ae72s45h"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Cron jobs | kube-agents</title><link rel="canonical" href="https://gke-labs.github.io/kube-agents/reference/cron-jobs/"/><link rel="sitemap" href="/kube-agents/sitemap-index.xml"/><script is:inline="true">document.documentElement.dataset.theme = 'dark';</script><script type="module" src="/kube-agents/mermaid-render.js"></script><link rel="shortcut icon" href="/kube-agents/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.3.8"/><meta name="generator" content="Starlight v0.42.6"/><meta property="og:title" content="Cron jobs"/><meta property="og:type" content="article"/><meta property="og:url" content="https://gke-labs.github.io/kube-agents/reference/cron-jobs/"/><meta property="og:locale" content="en"/><meta property="og:description" content="The two shipped cron rosters — the Planning Agent's plumbing and the Platform Agent's governance watchdogs."/><meta property="og:site_name" content="kube-agents"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="The two shipped cron rosters — the Planning Agent's plumbing and the Platform Agent's governance watchdogs."/><script>
+  document.documentElement.dataset.theme = 'dark';
+</script><link rel="stylesheet" href="/kube-agents/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/kube-agents/_astro/common.CvG8RBkb.css"><style>@layer starlight.components{svg:where(.astro-havoivjf){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em;overflow:visible}}
+@layer starlight.components{:root{--sl-badge-default-border:var(--sl-color-accent);--sl-badge-default-bg:var(--sl-color-accent-low);--sl-badge-default-text:#fff;--sl-badge-note-border:var(--sl-color-blue);--sl-badge-note-bg:var(--sl-color-blue-low);--sl-badge-note-text:#fff;--sl-badge-danger-border:var(--sl-color-red);--sl-badge-danger-bg:var(--sl-color-red-low);--sl-badge-danger-text:#fff;--sl-badge-success-border:var(--sl-color-green);--sl-badge-success-bg:var(--sl-color-green-low);--sl-badge-success-text:#fff;--sl-badge-caution-border:var(--sl-color-orange);--sl-badge-caution-bg:var(--sl-color-orange-low);--sl-badge-caution-text:#fff;--sl-badge-tip-border:var(--sl-color-purple);--sl-badge-tip-bg:var(--sl-color-purple-low);--sl-badge-tip-text:#fff}[data-theme=light]:root{--sl-badge-default-bg:var(--sl-color-accent-high);--sl-badge-note-bg:var(--sl-color-blue-high);--sl-badge-danger-bg:var(--sl-color-red-high);--sl-badge-success-bg:var(--sl-color-green-high);--sl-badge-caution-bg:var(--sl-color-orange-high);--sl-badge-tip-bg:var(--sl-color-purple-high)}.sl-badge:where(.astro-6yf3h5sn){border:1px solid var(--sl-color-border-badge);font-family:var(--sl-font-system-mono);color:var(--sl-color-text-badge);background-color:var(--sl-color-bg-badge);overflow-wrap:anywhere;border-radius:.25rem;line-height:normal;display:inline-block}.sidebar-content .sl-badge:where(.astro-6yf3h5sn){line-height:1;font-size:var(--sl-text-xs);padding:.125rem .375rem}.sidebar-content a[aria-current=page]>.sl-badge:where(.astro-6yf3h5sn){--sl-color-bg-badge:transparent;--sl-color-border-badge:currentColor;color:inherit}.default:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-default-bg);--sl-color-border-badge:var(--sl-badge-default-border);--sl-color-text-badge:var(--sl-badge-default-text)}.note:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-note-bg);--sl-color-border-badge:var(--sl-badge-note-border);--sl-color-text-badge:var(--sl-badge-note-text)}.danger:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-danger-bg);--sl-color-border-badge:var(--sl-badge-danger-border);--sl-color-text-badge:var(--sl-badge-danger-text)}.success:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-success-bg);--sl-color-border-badge:var(--sl-badge-success-border);--sl-color-text-badge:var(--sl-badge-success-text)}.tip:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-tip-bg);--sl-color-border-badge:var(--sl-badge-tip-border);--sl-color-text-badge:var(--sl-badge-tip-text)}.caution:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-caution-bg);--sl-color-border-badge:var(--sl-badge-caution-border);--sl-color-text-badge:var(--sl-badge-caution-text)}.small:where(.astro-6yf3h5sn){font-size:var(--sl-text-xs);padding:.125rem .25rem}.medium:where(.astro-6yf3h5sn){font-size:var(--sl-text-sm);padding:.175rem .35rem}.large:where(.astro-6yf3h5sn){font-size:var(--sl-text-base);padding:.225rem .45rem}.sl-markdown-content :is(h1,h2,h3,h4,h5,h6) .sl-badge:where(.astro-6yf3h5sn){vertical-align:middle}}
+</style><script type="module" src="/kube-agents/_astro/page.cNngjUgL.js"></script></head><body class="astro-ae72s45h"><a class="sl-skip-link astro-t2grfou4" href="#_top">Skip to content</a><div class="page sl-flex astro-euo27uub"><header class="header astro-euo27uub"><div class="header astro-6k6kswk6"><div class="title-wrapper sl-flex astro-6k6kswk6"><a href="/kube-agents/" class="site-title sl-flex astro-iaj22pny"><span class="astro-iaj22pny" translate="no">kube-agents</span></a></div><div class="sl-flex print:hidden astro-6k6kswk6"><site-search class="astro-6k6kswk6 astro-ulwrr7k6" data-translations="{&quot;placeholder&quot;:&quot;Search&quot;}"><button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-ulwrr7k6"><svg aria-hidden="true" class="astro-ulwrr7k6 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-ulwrr7k6" aria-hidden="true">Search</span><kbd class="sl-hidden md:sl-flex astro-ulwrr7k6" style="display: none;"><kbd class="astro-ulwrr7k6">Ctrl</kbd><kbd class="astro-ulwrr7k6">K</kbd></kbd></button><dialog style="padding:0" aria-label="Search" class="astro-ulwrr7k6"><div class="dialog-frame sl-flex astro-ulwrr7k6"><button data-close-modal class="sl-flex md:sl-hidden astro-ulwrr7k6">Cancel</button><div class="search-container astro-ulwrr7k6"><div id="starlight__search" class="astro-ulwrr7k6"></div></div></div></dialog></site-search><script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script><script type="module" src="/kube-agents/_astro/Search.astro_astro_type_script_index_0_lang.DzR8jAgX.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-6k6kswk6"><div class="sl-flex social-icons astro-6k6kswk6"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></header><nav class="sidebar print:hidden astro-euo27uub" aria-label="Main"><button popovertarget="starlight__sidebar" class="sl-menu-button sl-flex md:sl-hidden print:hidden astro-5zlzgk4i"><svg aria-hidden="true" class="open-menu astro-5zlzgk4i astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-5zlzgk4i astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg><span class="sr-only astro-5zlzgk4i">Menu</span></button><script type="module">var e=class extends HTMLElement{constructor(){super();let e=matchMedia(`(min-width: 50em)`),t=()=>{this.popover=e.matches?null:`auto`};t(),e.addEventListener(`change`,()=>t()),this.addEventListener(`toggle`,({newState:e})=>this.trapFocus(e===`open`))}trapFocus(e){document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}};customElements.define(`sl-sidebar-pane`,e);</script><sl-sidebar-pane popover id="starlight__sidebar" class="sidebar-pane astro-euo27uub"><div class="sidebar-content sl-flex astro-euo27uub"><sl-sidebar-state-persist data-hash="11352sw" class="astro-vnnkyq4l"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><ul class="top-level astro-4c2piv4z"><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Overview</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Introduction</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/what-is-kube-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">What is kube-agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/proactive-autonomy/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Proactive autonomy</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/day-in-the-life/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">A day with kube-agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/architecture/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Architecture</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Install</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/install/prerequisites/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Prerequisites</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/quickstart-gke/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Quick start (GKE)</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/first-prompts/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">First prompts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/slack-app/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Slack app setup</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/manual/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Manual install</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/helm-and-kind/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Helm and Kind</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/gitlab/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">GitLab as the GitOps forge</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/gitea/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Gitea as the GitOps forge</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/upgrade/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Upgrade</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/uninstall/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Uninstall</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Concepts</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Concepts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/platform-agent/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Platform Agent</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/cluster-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Cluster Agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/chatops/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">ChatOps</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/skills/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Skills</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/governance-sops/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Governance SOPs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/autonomous-watchdogs/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Autonomous watchdogs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/declarative-workflow/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Declarative workflow</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/inference-gateway/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Inference gateway</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/observability/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Observability</span></a></li></ul></details></li><li class="astro-4c2piv4z"><a href="/kube-agents/skills/" class="large astro-4c2piv4z"><span class="astro-4c2piv4z">Skill catalog</span></a></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Operator</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/operator/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Operator overview</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/platformagent-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">PlatformAgent CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentplugin-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentPlugin CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentprofile-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentProfile CRD</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Deploy</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Deploy overview</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/kustomize/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Network policies and Service</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/docker-images/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Docker images</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/token-minter/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Token minter (Minty)</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/release-versioning/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Release lifecycle, versioning &amp; operations</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/telemetry/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Telemetry</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/gitops-argocd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">GitOps with ArgoCD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/rollback/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Rolling back a release</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/multi-project/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Multiple GCP projects</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Reference</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/reference/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Reference</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/config/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Config reference</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/cron-jobs/" aria-current="page" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Cron jobs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/examples/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Examples</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/glossary/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Glossary</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/attribution/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">User attribution</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/security-and-iam/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Security &amp; IAM</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/credential-isolation/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Credential isolation</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/resource-labels/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Resource labels</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/admin-console/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Admin console</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/certified-capabilities/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Certified capabilities</span></a></li></ul></details></li><li class="astro-4c2piv4z"><a href="/kube-agents/contributing/" class="large astro-4c2piv4z"><span class="astro-4c2piv4z">Contributing</span></a></li></ul><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-7it4zgwh"><div class="social-icons astro-7it4zgwh"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div></div></div></div></sl-sidebar-pane></nav><div class="main-frame astro-euo27uub"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-axz53cfb"><aside class="right-sidebar-container print:hidden astro-axz53cfb"><div class="right-sidebar astro-axz53cfb"><div class="lg:sl-hidden astro-gl637vfx"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-kwxnrgy4"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-kwxnrgy4"><details id="starlight__mobile-toc" class="astro-kwxnrgy4"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-kwxnrgy4"><span class="toggle sl-flex astro-kwxnrgy4">On this page<svg aria-hidden="true" class="caret astro-kwxnrgy4 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-kwxnrgy4"></span></summary><div class="dropdown astro-kwxnrgy4"><ul class="isMobile astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#the-shipping-jobs" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">The shipping jobs</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#job-schema" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Job schema</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#editing" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Editing</span></a><ul class="isMobile astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#how-an-edit-reaches-an-existing-pod" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">How an edit reaches an existing pod</span></a></li></ul></li></ul></div></details></nav></mobile-starlight-toc><script type="module" src="/kube-agents/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C3fM4Kra.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-gl637vfx"><div class="sl-container astro-gl637vfx"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#the-shipping-jobs" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">The shipping jobs</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#job-schema" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Job schema</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#editing" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Editing</span></a><ul class="astro-oai5hpdy" style="--depth: 1;"><li style="--depth: 1;" class="astro-oai5hpdy"><a href="#how-an-edit-reaches-an-existing-pod" style="--depth: 1;" class="astro-oai5hpdy"><span style="--depth: 1;" class="astro-oai5hpdy">How an edit reaches an existing pod</span></a></li></ul></li></ul></nav></starlight-toc><script type="module" src="/kube-agents/_astro/TableOfContents.astro_astro_type_script_index_0_lang.BpJaGz7G.js"></script></div></div></div></aside><div class="main-pane astro-axz53cfb"><main data-pagefind-body class="astro-ae72s45h" lang="en" dir="ltr"><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><h1 id="_top" class="astro-dfqzrgu7">Cron jobs</h1></div></div><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><div class="sl-markdown-content"><p>Two files define the scheduled jobs, one per profile, and which one an entry belongs in follows from what runs it. For the story of what these jobs achieve together, see <a href="/kube-agents/overview/proactive-autonomy/">Proactive autonomy</a>; for the mechanism, <a href="/kube-agents/concepts/autonomous-watchdogs/#what-fires-the-schedule">What fires the schedule</a>.</p>
+<p><code dir="auto">agents/chat/defaults/cron/jobs.json</code> is the Planning Agent’s roster, and the only store the gateway’s own ticker advances — unless the experimental <a href="/kube-agents/operator/platformagent-crd/#platformfrontdoor"><code dir="auto">platformFrontDoor</code></a> flag has re-homed the gateway, which moves the ticked store to the Platform Agent’s roster and stops this one. Every entry on it is a <code dir="auto">no_agent</code> <strong>script</strong> job — a plain subprocess, no model prompted — because that profile’s toolsets are stripped to <code dir="auto">mcp-router</code>, <code dir="auto">kanban</code> and <code dir="auto">memory</code> and it could not run an audit if asked. Five jobs ship: <code dir="auto">profile-cron-tick</code>, the every-minute dispatcher that ticks every named profile with work due; the hourly <code dir="auto">cluster-agent-reconcile</code> sweep that keeps <a href="/kube-agents/concepts/cluster-agents/">Cluster Agent</a> profiles aligned with the live fleet; <code dir="auto">oobe</code>, which runs <a href="/kube-agents/concepts/chatops/#first-run-onboarding">first-run onboarding</a> as stages (delivery of the inventory report, the inventory scan, and <code dir="auto">fleet-wide-cost-analysis</code>, <code dir="auto">compliance-audit</code>, <code dir="auto">obtainability-audit</code> and <code dir="auto">stockout-prevention</code> once, one after another, starting as soon as the scan settles) and removes itself once the report was claimed a few minutes ago and its audits stage is done; and the old <code dir="auto">bootstrap-inventory-scan</code> and <code dir="auto">bootstrap-inventory-delivery</code> entries, which ship disabled.</p>
+<p><code dir="auto">agents/platform/cron/jobs.json</code> is the Platform Agent’s roster, and carries the nine governance watchdogs plus the <code dir="auto">no_agent</code> entries that run no model: <code dir="auto">github-repo-watcher</code>, the daily recap described below, <code dir="auto">upgrade-readiness-watch</code> and <code dir="auto">upgrade-readiness-weekly-review</code> (the daily and the Saturday readiness readers; the Saturday one feeds the findings queue and is followed by <code dir="auto">upgrade-readiness-weekly-brief</code>, a prompt job that is not an audit), <code dir="auto">sa-role-watch</code>, which says in chat when the agent’s Google service account holds a role beyond the <code dir="auto">read-only</code> permission set in the management project or a project in <code dir="auto">spec.scope</code>, when the role appears, once a day from 12:00 UTC while it is held, and when it goes, the findings-queue nudge described below, the kanban workspace collector, <code dir="auto">kanban-board-health</code>, which names any kanban card blocked past a day in chat (newest first, grouped on repeated titles, with footer commands to move a card), <code dir="auto">chat-delivery-watch</code>, which notices when scheduled reports stop reaching chat and says so on a GitHub ledger issue and in Cloud Logging rather than in chat, <code dir="auto">stall-watch</code>, which sweeps the namespaces of every running or reconciling cluster that has a Cluster Agent every half hour for controllers that stopped reconciling and raises an alert per namespace with a new stall, at most three a tick (the cluster’s Cluster Agent triages it in the alert’s thread, and the watch posts one line of its own when the stall clears, and one when a sweep stops at its budget, saying what it covered and where the next tick resumes; <a href="/kube-agents/operator/platformagent-crd/#specharnessstallwatch"><code dir="auto">spec.harness.stallWatch</code></a> tunes which namespaces and kinds it reads and how old a stall must be before it alerts), and <code dir="auto">feedback-prompt</code>, described below. <code dir="auto">profile-cron-tick</code> is what makes it live: each watchdog is a real cron run in its own process, with that profile’s persona and toolsets and the entry’s own <code dir="auto">skills</code>, <code dir="auto">model</code> and <code dir="auto">max_turns</code>. No id may appear on both rosters — two rosters both carrying one is that audit running twice per schedule, concurrently with itself.</p>
+<p><code dir="auto">eod-event-watcher-daily-report</code> is one of those: a script that renders the k8s-event-watcher recap straight from the session ledger and delivers its stdout verbatim. It sits here despite needing none of the profile’s toolsets because what it reads belongs to the Platform Agent: the session database. Scripts are shared rather than per-profile (the entrypoint links <code dir="auto">profiles/platform/scripts</code> at the shared directory), so <code dir="auto">script</code> resolves here exactly as it does on the Planning Agent’s roster.</p>
+<p><code dir="auto">findings-morning-nudge</code> names findings from the findings queue in the home chat channel, paced so the first days bring a short list rather than the whole queue. It runs hourly and says nothing on most runs. New critical findings are added from 12:00 UTC, at most two a UTC day; non-critical ones from 16:00 UTC, at most three a UTC day, and only while no critical is waiting for a decision, for 12:00 UTC, or for the next day’s allowance. While any non-critical finding it named is still undecided, it adds nothing new of any severity until that finding is dismissed, snoozed or accepted. Once a UTC day, on its first run at or after 12:00 UTC, it repeats up to <code dir="auto">FINDINGS_DAILY_CRITICALS</code> of the undecided critical findings it named before, with their ids. It also names any non-critical finding that is holding new findings back, with its id and those three decisions, so that hold is never silent for more than a day. While a critical finding it named is undecided, non-critical findings wait, and that wait is not called out separately. One check failing on several objects in one cluster counts as one finding, and a decision on its id applies to every one of those objects still undecided; the count printed beside the id is how many objects that is. It includes objects the last complete sweep did not report, which are not listed by name; the message says how many of them there are. Findings you ask for yourself are never counted, and dismissing or snoozing a finding gives no allowance back the same day. The critical findings the <a href="/kube-agents/concepts/chatops/#first-run-onboarding">first inventory report</a> names count as added on the UTC day it is delivered, against that day’s allowance, and are repeated from the next day. It adds nothing until the first inventory report’s delivery is claimed, or until 24 hours after onboarding filed its sweep if the report has still not been delivered by then. A run that cannot read the queue fails, which is reported in chat, at most once a UTC day.</p>
+<p>These environment variables, set through the <code dir="auto">PlatformAgent</code> CR’s <code dir="auto">spec.deployment.env</code> (the chart’s <code dir="auto">platformAgent.deployment.env</code>), change the limits:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">FINDINGS_FIRST_REPORT_CRITICALS</code></td>
+<td><code dir="auto">2</code></td>
+<td>critical findings the first inventory report names</td>
+</tr>
+<tr>
+<td><code dir="auto">FINDINGS_DAILY_CRITICALS</code></td>
+<td><code dir="auto">2</code></td>
+<td>new critical findings added per UTC day, and how many are repeated</td>
+</tr>
+<tr>
+<td><code dir="auto">FINDINGS_NONCRITICAL_MAX</code></td>
+<td><code dir="auto">3</code></td>
+<td>new non-critical findings added per UTC day</td>
+</tr>
+<tr>
+<td><code dir="auto">FINDINGS_NONCRITICAL_AFTER_HOUR</code></td>
+<td><code dir="auto">16</code></td>
+<td>the UTC hour (0–23) from which non-critical findings are added</td>
+</tr>
+</tbody>
+</table>
+<p><code dir="auto">FINDINGS_FIRST_REPORT_CRITICALS</code> is read once, when onboarding files the card that writes the first report, so a later change does not reach that report. <code dir="auto">0</code> adds none of that kind, and for the first report it means the report names none; it does not lift the limit, unlike the alert ceilings’ <code dir="auto">ALERT_DAILY_LIMIT_*</code>. A value that is not a whole number, is negative, or (for the hour) is outside 0–23 is ignored and the default applies; the warning goes to the run’s stderr, which the scheduler keeps nowhere for a run that succeeds. On an install managed by <code dir="auto">install.sh</code>, the installer regenerates <code dir="auto">terraform.tfvars</code> from <code dir="auto">install.env</code> on every <code dir="auto">install.sh</code> and <code dir="auto">upgrade.sh</code> run and <code dir="auto">install.env</code> has no key for these, so a value added there (in <code dir="auto">extra_helm_values</code>) is removed by the next run, and a value set only on the Helm release may be reverted with it: set it again after each upgrade. <code dir="auto">enabled: false</code> on the roster entry turns the nudge off.</p>
+<p><code dir="auto">feedback-prompt</code> is the one entry that asks the operator something instead of reporting on the fleet. A week after its first tick it posts one message in the install’s home chat channel: how kube-agents has been working out, the public feedback form’s short link, the form’s disclosure that a submission becomes a public issue, and that a reply in the thread reaches the agent. It is delivered once per install, guarded by two marker files in the Platform Agent’s profile home on the data volume, <code dir="auto">.feedback_prompt_armed</code> (the first tick, which starts the clock) and <code dir="auto">.feedback_prompt_sent</code> (the claim, taken before the message is printed), so a pod restart or an upgrade never re-sends it; only an uninstall and reinstall does. It is at most once: a post the scheduler records as undelivered (the relay or the chat platform was down that day, or no chat platform was bound yet) is not retried, because the delivery record cannot tell a post that landed from one that did not, and a repeat would risk posting twice; removing <code dir="auto">.feedback_prompt_sent</code> sends it again on the next tick. Two environment variables, set through the chart value <code dir="auto">platformAgent.deployment.env</code> (on an <code dir="auto">install.sh</code> install, a <code dir="auto">TF_VAR_extra_helm_values</code> line in <code dir="auto">install.env</code>, as <a href="/kube-agents/install/quickstart-gke/#operator-settings">Operator settings</a> shows; on a hand-driven Terraform apply, <code dir="auto">extra_helm_values</code> in <code dir="auto">terraform.tfvars</code>), are its per-install configuration. A hand edit of the CR’s <code dir="auto">spec.deployment.env</code> can be lost at the next chart apply. The two variables are <code dir="auto">FEEDBACK_PROMPT_ENABLED</code> (default <code dir="auto">true</code>; <code dir="auto">false</code> turns it off, and an install that turns it back on later still gets exactly one) and <code dir="auto">FEEDBACK_PROMPT_DELAY</code> (default <code dir="auto">7d</code>; <code dir="auto">&lt;n&gt;d</code>, <code dir="auto">&lt;n&gt;h</code> or <code dir="auto">&lt;n&gt;m</code>; the job runs daily, so the message lands on the first 13:00 UTC tick at or after the delay, and a value that does not parse fails the run, which is reported in chat like any other script failure). The form URL is not configurable. <code dir="auto">enabled: false</code> on the roster entry is the fleet-wide switch, as for every other job.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="the-shipping-jobs">The shipping jobs</h2><a class="sl-anchor-link" href="#the-shipping-jobs"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “The shipping jobs”</span></a></div>
+<p>Generated from <a href="https://github.com/gke-labs/kube-agents/blob/main/agents/chat/defaults/cron/jobs.json"><code dir="auto">agents/chat/defaults/cron/jobs.json</code></a> and <a href="https://github.com/gke-labs/kube-agents/blob/main/agents/platform/cron/jobs.json"><code dir="auto">agents/platform/cron/jobs.json</code></a>. Retired ids are omitted: an id on its way out ships switched off for a release before it is deleted, and a disabled entry on the Platform Agent’s roster is left out of this table rather than listed as a job an operator could reach. See <a href="/kube-agents/concepts/autonomous-watchdogs/#the-retired-jobs">The retired jobs</a>.</p>
+<!-- BEGIN GENERATED: cron-jobs -->
+<!-- Regenerate with: make docs-generate -- do not edit by hand. -->
+<!-- prettier-ignore-start -->
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Profile</th>
+<th>Schedule</th>
+<th>Cadence</th>
+<th style="text-align: center">Enabled</th>
+<th>Runs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">profile-cron-tick</code></td>
+<td>Planning Agent</td>
+<td><code dir="auto">* * * * *</code></td>
+<td>—</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">profile_cron_tick.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">cluster-agent-reconcile</code></td>
+<td>Planning Agent</td>
+<td><code dir="auto">11 * * * *</code></td>
+<td>Hourly at :11</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">cluster_agent_reconcile.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">bootstrap-inventory-scan</code></td>
+<td>Planning Agent</td>
+<td><code dir="auto">* * * * *</code></td>
+<td>—</td>
+<td style="text-align: center">no</td>
+<td><code dir="auto">bootstrap_scan_gate.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">bootstrap-inventory-delivery</code></td>
+<td>Planning Agent</td>
+<td><code dir="auto">* * * * *</code></td>
+<td>—</td>
+<td style="text-align: center">no</td>
+<td><code dir="auto">bootstrap_delivery.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">oobe</code></td>
+<td>Planning Agent</td>
+<td><code dir="auto">* * * * *</code></td>
+<td>—</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">oobe.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">compliance-audit</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">20 6 * * *</code></td>
+<td>Daily 06:20</td>
+<td style="text-align: center">yes</td>
+<td>Run the daily fleet security and RBAC posture audit. Read the SOP at ’/opt/data/profiles/platform/governanc…</td>
+</tr>
+<tr>
+<td><code dir="auto">obtainability-audit</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">50 6 * * *</code></td>
+<td>Daily 06:50</td>
+<td style="text-align: center">yes</td>
+<td>Run the daily workload reliability audit. Read the SOP at ’/opt/data/profiles/platform/governance/obtainabi…</td>
+</tr>
+<tr>
+<td><code dir="auto">security-patch-orchestrator</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">20 7 * * 1</code></td>
+<td>Weekly, Monday 07:20</td>
+<td style="text-align: center">yes</td>
+<td>Run the weekly GKE upgrade and patch readiness audit. Read the SOP at ’/opt/data/profiles/platform/governan…</td>
+</tr>
+<tr>
+<td><code dir="auto">fleet-wide-cost-analysis</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">50 7 * * 1</code></td>
+<td>Weekly, Monday 07:50</td>
+<td style="text-align: center">yes</td>
+<td>Run the weekly fleet waste audit. Read the SOP at ’/opt/data/profiles/platform/governance/fleet_wide_cost_a…</td>
+</tr>
+<tr>
+<td><code dir="auto">fleet-consistency-drift</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">20 8 * * 1</code></td>
+<td>Weekly, Monday 08:20</td>
+<td style="text-align: center">yes</td>
+<td>Run the weekly fleet consistency drift audit. Read the SOP at ’/opt/data/profiles/platform/governance/fleet…</td>
+</tr>
+<tr>
+<td><code dir="auto">ai-security-audit</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">50 8 * * *</code></td>
+<td>Daily 08:50</td>
+<td style="text-align: center">yes</td>
+<td>Run the daily AI workload security audit. Read the SOP at ’/opt/data/profiles/platform/governance/ai_securi…</td>
+</tr>
+<tr>
+<td><code dir="auto">stockout-prevention</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">20 9 * * *</code></td>
+<td>Daily 09:20</td>
+<td style="text-align: center">yes</td>
+<td>Run the daily fleet stockout prevention and capacity audit. Read the SOP at ’/opt/data/profiles/platform/go…</td>
+</tr>
+<tr>
+<td><code dir="auto">gcp-networking-fabric-audit</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">0 8 * * *</code></td>
+<td>Daily 08:00</td>
+<td style="text-align: center">yes</td>
+<td>Run the daily GCP networking fabric and VPC IPAM audit. Read the SOP at ’/opt/data/profiles/platform/govern…</td>
+</tr>
+<tr>
+<td><code dir="auto">gce-compute-fleet-audit</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">45 7 * * *</code></td>
+<td>Daily 07:45</td>
+<td style="text-align: center">yes</td>
+<td>Run the daily GCE Compute Engine and MIG fleet audit. Read the SOP at ’/opt/data/profiles/platform/governan…</td>
+</tr>
+<tr>
+<td><code dir="auto">upgrade-retrospective</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">0 18 * * 0</code></td>
+<td>Weekly, Sunday 18:00</td>
+<td style="text-align: center">yes</td>
+<td>Run the weekly upgrade retrospective. Read the SOP at ’/opt/data/profiles/platform/governance/upgrade_retro…</td>
+</tr>
+<tr>
+<td><code dir="auto">findings-morning-nudge</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">0 * * * *</code></td>
+<td>Hourly</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">findings_nudge.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">github-repo-watcher</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">*/10 * * * *</code></td>
+<td>Every 10 minutes</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">github_scan_gate.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">kanban-workspace-gc</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">40 5 * * *</code></td>
+<td>Daily 05:40</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">kanban_workspace_gc.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">kanban-board-health</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">35 12 * * *</code></td>
+<td>Daily 12:35</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">kanban_board_health.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">feedback-prompt</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">0 13 * * *</code></td>
+<td>Daily 13:00</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">feedback_prompt.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">eod-event-watcher-daily-report</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">0 21 * * 1-5</code></td>
+<td>Weekdays 21:00</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">eod_report_generator.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">stall-watch</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">*/30 * * * *</code></td>
+<td>Every 30 minutes</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">stall_watch.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">upgrade-readiness-watch</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">10 10 * * *</code></td>
+<td>Daily 10:10</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">upgrade_readiness_watch.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">upgrade-readiness-weekly-review</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">0 6 * * 6</code></td>
+<td>Weekly, Saturday 06:00</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">upgrade_readiness_review.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">upgrade-readiness-weekly-brief</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">0 7 * * 6</code></td>
+<td>Weekly, Saturday 07:00</td>
+<td style="text-align: center">yes</td>
+<td>Write this week’s upgrade readiness brief. Read the SOP at ’/opt/data/profiles/platform/governance/upgrade_…</td>
+</tr>
+<tr>
+<td><code dir="auto">sa-role-watch</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">25 * * * *</code></td>
+<td>Hourly at :25</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">sa_role_watch.py</code></td>
+</tr>
+<tr>
+<td><code dir="auto">chat-delivery-watch</code></td>
+<td>Platform Agent</td>
+<td><code dir="auto">*/30 * * * *</code></td>
+<td>Every 30 minutes</td>
+<td style="text-align: center">yes</td>
+<td><code dir="auto">chat_delivery_watch.py</code></td>
+</tr>
+</tbody>
+</table>
+<!-- prettier-ignore-end -->
+<!-- END GENERATED: cron-jobs -->
+<div class="sl-heading-wrapper level-h2"><h2 id="job-schema">Job schema</h2><a class="sl-anchor-link" href="#job-schema"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Job schema”</span></a></div>
+<p>Both rosters use one schema. A governance watchdog:</p>
+<!-- BEGIN GENERATED: cron-job-example -->
+<!-- Regenerate with: make docs-generate -- do not edit by hand. -->
+<!-- prettier-ignore-start -->
+<div class="expressive-code"><link rel="stylesheet" href="/kube-agents/_astro/ec.rw6j1.css"><script type="module" src="/kube-agents/_astro/ec.0vx5m.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#D6DEEB">{</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"id"</span><span style="--0:#D6DEEB">: </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">compliance-audit</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"name"</span><span style="--0:#D6DEEB">: </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">Security &amp; RBAC Posture Audit</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"schedule"</span><span style="--0:#D6DEEB">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#7FDBCA">"kind"</span><span style="--0:#D6DEEB">: </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">cron</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#7FDBCA">"expr"</span><span style="--0:#D6DEEB">: </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">20 6 * * *</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#7FDBCA">"display"</span><span style="--0:#D6DEEB">: </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">20 6 * * *</span><span style="--0:#D9F5DD">"</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB">  </span></span><span style="--0:#D6DEEB">},</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"prompt"</span><span style="--0:#D6DEEB">: </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">Run the daily fleet security and RBAC posture audit. Read the SOP at '/opt/data/profiles/platform/governance/compliance_audit_sop.md' — all 461 lines of it, before you run anything. Its seventeen checks are section 2, lines 90-389, so a read that stops early skips almost the entire audit and reports a clean fleet it never looked at. Section 2 opens by running the collector (`/opt/data/profiles/platform/skills/fleet-audit/scripts/collect.py compliance-audit`) in the foreground with the terminal tool's timeout: 600 (the foreground maximum), --workspace set to the workspace start returned and --out /opt/data/scratch/manifest_compliance-audit.json: run it before evaluating any check by hand, read the manifest the way section 2 says, and pass the same file to finish as --manifest-file (if the collector wrote none, section 2 says what to pass instead). Then execute it exactly, using the fleet-audit skill to open and close the audit run.</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"skills"</span><span style="--0:#D6DEEB">: [</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">fleet-audit</span><span style="--0:#D9F5DD">"</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#D6DEEB">  </span></span><span style="--0:#D6DEEB">],</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"max_turns"</span><span style="--0:#D6DEEB">: </span><span style="--0:#F78C6C">250</span><span style="--0:#D6DEEB">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"risk"</span><span style="--0:#D6DEEB">: </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">low</span><span style="--0:#D9F5DD">"</span><span style="--0:#D6DEEB">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"enabled"</span><span style="--0:#D6DEEB">: </span><span style="--0:#FF5874">true</span><span style="--0:#D6DEEB">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#7FDBCA">"deliver"</span><span style="--0:#D6DEEB">: </span><span style="--0:#D9F5DD">"</span><span style="--0:#C789D6">chat</span><span style="--0:#D9F5DD">"</span></div></div><div class="ec-line"><div class="code"><span style="--0:#D6DEEB">}</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="{  &quot;id&quot;: &quot;compliance-audit&quot;,  &quot;name&quot;: &quot;Security &amp; RBAC Posture Audit&quot;,  &quot;schedule&quot;: {    &quot;kind&quot;: &quot;cron&quot;,    &quot;expr&quot;: &quot;20 6 * * *&quot;,    &quot;display&quot;: &quot;20 6 * * *&quot;  },  &quot;prompt&quot;: &quot;Run the daily fleet security and RBAC posture audit. Read the SOP at &#x27;/opt/data/profiles/platform/governance/compliance_audit_sop.md&#x27; — all 461 lines of it, before you run anything. Its seventeen checks are section 2, lines 90-389, so a read that stops early skips almost the entire audit and reports a clean fleet it never looked at. Section 2 opens by running the collector (&#x60;/opt/data/profiles/platform/skills/fleet-audit/scripts/collect.py compliance-audit&#x60;) in the foreground with the terminal tool&#x27;s timeout: 600 (the foreground maximum), --workspace set to the workspace start returned and --out /opt/data/scratch/manifest_compliance-audit.json: run it before evaluating any check by hand, read the manifest the way section 2 says, and pass the same file to finish as --manifest-file (if the collector wrote none, section 2 says what to pass instead). Then execute it exactly, using the fleet-audit skill to open and close the audit run.&quot;,  &quot;skills&quot;: [    &quot;fleet-audit&quot;  ],  &quot;max_turns&quot;: 250,  &quot;risk&quot;: &quot;low&quot;,  &quot;enabled&quot;: true,  &quot;deliver&quot;: &quot;chat&quot;}"><div></div></button></div></figure></div>
+<!-- prettier-ignore-end -->
+<!-- END GENERATED: cron-job-example -->
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">id</code></td>
+<td>string</td>
+<td>Stable identifier used in observability and enable/disable ops. It survives renames — <code dir="auto">obtainability-audit</code> is now the Workload Reliability Audit.</td>
+</tr>
+<tr>
+<td><code dir="auto">name</code></td>
+<td>string</td>
+<td>Human-readable name for logs. For the audits it is also the ledger issue title, via the <code dir="auto">AUDITS</code> map in <code dir="auto">fleet-audit</code>’s <code dir="auto">audit_report.py</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">risk</code></td>
+<td>string</td>
+<td>Declared risk tier (<code dir="auto">"low"</code> or <code dir="auto">"high"</code>). For agentic jobs, <code dir="auto">"high"</code> enforces a read-only policy (<code dir="auto">cron_command_policy_block</code>); <code dir="auto">"low"</code> retains the configured mode. Runtime-created jobs default to <code dir="auto">"low"</code>, legacy volume entries backfill to <code dir="auto">"low"</code>, and unannotated in-flight dispatches default fail-closed to <code dir="auto">"high"</code>. For <code dir="auto">no_agent: true</code> jobs, <code dir="auto">"high"</code> is an input-threat label: repository events for <code dir="auto">github-repo-watcher</code>, cluster status and event text for <code dir="auto">stall-watch</code>, which its alerts leave out and the Cluster Agent reads again, and the budget, pool, exclusion and webhook names of every cluster for <code dir="auto">upgrade-readiness-watch</code> and <code dir="auto">upgrade-readiness-weekly-review</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">schedule.kind</code></td>
+<td>string</td>
+<td><code dir="auto">"cron"</code> on every entry. <code dir="auto">"interval"</code> is supported but unused: Hermes re-anchors an interval job to when the last run <em>finished</em>, and the gateway ticker sleeps a fixed 60 seconds after each tick returns, so a 1-minute interval fires every two.</td>
+</tr>
+<tr>
+<td><code dir="auto">schedule.expr</code></td>
+<td>string</td>
+<td>Standard 5-field cron expression, evaluated in the pod’s time zone (UTC unless overridden).</td>
+</tr>
+<tr>
+<td><code dir="auto">schedule.display</code></td>
+<td>string</td>
+<td>Display form (usually equal to <code dir="auto">expr</code>).</td>
+</tr>
+<tr>
+<td><code dir="auto">prompt</code></td>
+<td>string</td>
+<td>What the run is asked to do, copied verbatim into the turn. Governance jobs name their SOP <strong>relative to the profile home</strong> — <code dir="auto">governance/&lt;sop&gt;.md</code>. It lives here and nowhere else.</td>
+</tr>
+<tr>
+<td><code dir="auto">skills</code></td>
+<td>array of string</td>
+<td>The skills the run needs. The scheduler force-loads each one’s text ahead of the first turn, rather than leaving the load to the model’s discretion. The audit watchdogs use <code dir="auto">fleet-audit</code>. A <code dir="auto">no_agent</code> job prompts no model, so the field is ignored there.</td>
+</tr>
+<tr>
+<td><code dir="auto">no_agent</code></td>
+<td>bool</td>
+<td>Set on every job on the Planning Agent’s roster and on the Platform Agent’s non-watchdog script entries, <code dir="auto">github-repo-watcher</code>, <code dir="auto">eod-event-watcher-daily-report</code>, <code dir="auto">findings-morning-nudge</code>, <code dir="auto">kanban-workspace-gc</code>, <code dir="auto">kanban-board-health</code>, <code dir="auto">chat-delivery-watch</code>, <code dir="auto">stall-watch</code>, <code dir="auto">upgrade-readiness-watch</code>, <code dir="auto">upgrade-readiness-weekly-review</code>, <code dir="auto">sa-role-watch</code> and <code dir="auto">feedback-prompt</code>: the tick is a subprocess, not an LLM turn. The governance watchdogs and <code dir="auto">upgrade-readiness-weekly-brief</code> omit it.</td>
+</tr>
+<tr>
+<td><code dir="auto">script</code></td>
+<td>string</td>
+<td>For a <code dir="auto">no_agent</code> job, the script to run, resolved in that profile’s <code dir="auto">scripts/</code>. The scheduler runs it with no arguments. On a prompt job it is a pre-run script: the scheduler runs it before the turn and puts its stdout above the prompt, or its error text under <code dir="auto">Script Error</code>; empty stdout skips the turn. Only <code dir="auto">upgrade-readiness-weekly-brief</code> has one, which reads the findings queue for a turn that holds no queue tool.</td>
+</tr>
+<tr>
+<td><code dir="auto">enabled_toolsets</code></td>
+<td>array of string</td>
+<td>The toolsets the run gets in place of the profile’s. Every enabled MCP server is added back unless the list names <code dir="auto">no_mcp</code>, which drops them all; a server named in the list is kept. Only <code dir="auto">upgrade-readiness-weekly-brief</code> sets it, to the terminal tool: its turn reads tenant-written names and holds no <code dir="auto">platform_control</code> tool, so nothing a name says can make it register or decide a finding.</td>
+</tr>
+<tr>
+<td><code dir="auto">enabled</code></td>
+<td>bool</td>
+<td>Set <code dir="auto">false</code> to disable without deleting the entry. See <a href="/kube-agents/concepts/autonomous-watchdogs/#disabling-a-watchdog">Disabling a watchdog</a> — a deleted entry is not removed from a cluster that already has it.</td>
+</tr>
+<tr>
+<td><code dir="auto">deliver</code></td>
+<td>string</td>
+<td>Where the run’s outcome goes. <code dir="auto">"all"</code> sends it to the configured target; <code dir="auto">"chat"</code> posts it into a thread where a reply reaches the Planning Agent with the report attached; <code dir="auto">"local"</code> resolves to no target at all and drops it. Every enabled job on the Platform Agent’s roster uses <code dir="auto">"chat"</code> or <code dir="auto">"all"</code>, so a job that has stopped working is visible rather than indistinguishable from a quiet fleet, with one exception: <code dir="auto">chat-delivery-watch</code> uses <code dir="auto">"local"</code> because its product is a GitHub issue and a log line, and its purpose is to work when chat does not.</td>
+</tr>
+</tbody>
+</table>
+<div class="sl-heading-wrapper level-h2"><h2 id="editing">Editing</h2><a class="sl-anchor-link" href="#editing"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Editing”</span></a></div>
+<p>Adding or editing a job is a one-file change — see <a href="/kube-agents/concepts/autonomous-watchdogs/#adding-a-watchdog">Adding a watchdog</a>.</p>
+<p>Edit <code dir="auto">jobs.json</code>, then redeploy the agent image at the revision carrying the change:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--0fs:italic">./upgrade.sh</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--upgrade-mode=harness</span><span style="--0:#D6DEEB"> </span><span style="--0:#82AAFF">--image-tag=&lt;SEMVER_TAG_OR_FULL_COMMIT_SHA&gt;</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="./upgrade.sh --upgrade-mode=harness --image-tag=<SEMVER_TAG_OR_FULL_COMMIT_SHA>"><div></div></button></div></figure></div>
+<p>The change is picked up on the next pod restart.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="how-an-edit-reaches-an-existing-pod">How an edit reaches an existing pod</h3><a class="sl-anchor-link" href="#how-an-edit-reaches-an-existing-pod"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “How an edit reaches an existing pod”</span></a></div>
+<p>This part is about the <strong>Planning Agent’s</strong> file, <a href="https://github.com/gke-labs/kube-agents/blob/main/agents/chat/defaults/cron/jobs.json"><code dir="auto">agents/chat/defaults/cron/jobs.json</code></a> — the one the start-up reconcile below acts on. The Platform Agent’s roster, which the rest of this page documents, reaches its profile by a separate path: <code dir="auto">profile_scaffold.py</code> scaffolds it, and <code dir="auto">merge_cron_store</code> merges it under the same per-key rule.</p>
+<p><code dir="auto">$HERMES_HOME/cron/jobs.json</code> lives on the agent’s persistent volume, and the scheduler writes <code dir="auto">last_run</code> back into it on every tick — so the volume’s copy is always newer than the image’s, and the entrypoint’s update-only defaults copy never overwrites it. Simply overwriting the file is not an option either: it would reset every <code dir="auto">last_run</code> (making all jobs look due at once), discard the chat binding <a href="/kube-agents/concepts/chatops/#first-run-onboarding">first-run onboarding</a> writes, and reinstate the two onboarding jobs that finishing onboarding deliberately removes, and <code dir="auto">oobe</code> on an install that finished onboarding before it shipped.</p>
+<p>So <a href="https://github.com/gke-labs/kube-agents/blob/main/deploy/shared/docker-entrypoint.sh"><code dir="auto">docker-entrypoint.sh</code></a> runs <a href="https://github.com/gke-labs/kube-agents/blob/main/agents/chat/scripts/cron_jobs_sync.py"><code dir="auto">cron_jobs_sync.py</code></a> before the scheduler starts, merging the image’s declarations into the volume’s file <strong>by job id</strong>. The merge is per key, not per field-list: <strong>the image wins every key it ships, and every key it does not ship is left as the volume had it.</strong></p>
+<ul>
+<li>A job’s <strong>definition</strong> — <code dir="auto">name</code>, <code dir="auto">schedule</code>, <code dir="auto">prompt</code>, <code dir="auto">skills</code>, <code dir="auto">script</code>, <code dir="auto">no_agent</code>, and <code dir="auto">enabled</code> — is shipped, so it tracks the image. Shipping <code dir="auto">enabled: false</code> is therefore the fleet-wide off switch described in <a href="/kube-agents/concepts/autonomous-watchdogs/#disabling-a-watchdog">Disabling a watchdog</a>; the cost is that a job disabled by hand on a live pod is switched back on by the next image roll.</li>
+<li>The scheduler’s own state — <code dir="auto">last_run</code> and whatever else Hermes records per job — is shipped by nothing, so it survives untouched. Stating the rule this way rather than as a list of runtime-owned names is deliberate: a list has to be complete to be correct, and it stops being complete the day upstream records a new field.</li>
+<li><code dir="auto">deliver</code> is the single exception, because a runtime hook owns it: onboarding rewrites it to <code dir="auto">origin</code> on the delivery job, and taking the image’s value back would send the report nowhere.</li>
+<li>A job the image does not declare is never deleted; it may have been added by hand. Retirement therefore does not propagate to existing volumes — drop an id only once every live cluster has merged its disabled form.</li>
+<li>A job this script has installed before and that is now absent was removed on purpose, so it is not reinstalled. A ledger at <code dir="auto">$HERMES_HOME/.cron_jobs_installed</code> records which ids those are.</li>
+</ul>
+<p>The same start-up reconcile applies to the specialist profiles’ <code dir="auto">skills/</code> directories, which are wholly image-owned and replaced from the baked template on every start — see <a href="/kube-agents/concepts/skills/#importing-external-skills">Skills</a>.</p>
+</div><footer class="sl-flex astro-vcsylbkx"><div class="meta sl-flex astro-vcsylbkx"><a href="https://github.com/gke-labs/kube-agents/edit/main/docs/site/src/content/docs/reference/cron-jobs.md" class="sl-flex print:hidden astro-7hm6odgq"><svg aria-hidden="true" class="astro-7hm6odgq astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a></div><div class="pagination-links print:hidden astro-bnkpfcrs" dir="ltr"><a href="/kube-agents/reference/config/" rel="prev" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-bnkpfcrs">Previous<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Config reference</span></span></a><a href="/kube-agents/reference/examples/" rel="next" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-bnkpfcrs">Next<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Examples</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>
