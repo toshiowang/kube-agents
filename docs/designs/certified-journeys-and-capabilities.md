@@ -8,6 +8,8 @@ Status: concept document, 2026-10-27. It states what we promise, what we measure
 
 **The answer.** We publish a page of certified capabilities: for each model, what kube-agents can and cannot do today, computed from the nightly evaluation record. A capability is certified when it is evaluated on the published tests for it, on a named model, at the bar, with the record published. The same page states the one thing the product guarantees outside the model: the agent can only propose a change, never apply one.
 
+**The moat.** The tests are not only ours. Each month the set grows with the top cases from Google Cloud Support: the failures customers actually hit, turned into tests with a planted defect and a check. The page therefore measures the product against real incidents, and no plain model or home-built agent is evaluated against that set.
+
 **The two numbers we track.**
 
 | Number                 | Meaning                                                                                              | Today                                                   | Target for 2026-12-14                                            |
@@ -53,13 +55,14 @@ Most Kubernetes AI tools work like an emergency room. An outage happens, a perso
 
 **We do not replace your model. We give it a schedule, limits it cannot cross, and a nightly test record.**
 
-A chat session acts only when prompted, runs with whatever credentials a user pastes in, and keeps no record on the customer's fleet. A home-built scheduled agent needs the team to build and maintain identity, write-blocking, fleet collectors, procedures and a test fleet. kube-agents ships five things in one:
+A chat session acts only when prompted, runs with whatever credentials a user pastes in, and keeps no record on the customer's fleet. A home-built scheduled agent needs the team to build and maintain identity, write-blocking, fleet collectors, procedures and a test fleet. kube-agents ships six things in one:
 
 1. **An operator's calendar and written procedures.** Scheduling a model is easy; writing and maintaining what runs on that schedule is not. The product ships ten scheduled audits, each with a numbered procedure, plus upgrade readiness checks, a stall watch, warning triage, in-place tracking issues, proposed fixes for critical findings, and paced notifications.
 2. **Authority limits enforced outside the model.** Read-only access rights and a gateway that blocks every write hold whatever the prompt says. The worst outcome is a bad proposed change, never an unapproved change to a cluster.
 3. **A regression tripwire.** Every night the shipped configuration runs 159 tests, three times each, against a seeded multi-cluster fleet. When a provider updates a model, a maintainer edits a prompt, or GKE changes an API, the break shows up the next morning in our test system rather than on a customer fleet. Today's tests plant one defect at a time, so this proves non-regression and authority, not deep troubleshooting skill (section 4.4).
 4. **Executable GKE rules that age and get updated.** Wiki best practices rot because nothing executes them. The product encodes the perishable facts (release-channel versions, 52 deprecated or removed APIs, 33 version-specific known issues, version skew rules) into 117 audit checks and 24 upgrade-readiness rule modules. The customer can override any check by declaring intent in Git. Today 14 of the 15 governance procedures cite no published Google document; they encode maintainer practice. The plan adds a source line to every check and retires the rest (section 6.4).
 5. **A record per model, so the customer can switch.** Journeys are rated per model. A customer can change models and read the line for the new one.
+6. **A test set fed by Cloud Support.** Each month the top support cases become tests, so the nightly grades the product against the failures customers actually hit. A plain model is never evaluated against that set.
 
 All execution stays in the customer's own cloud project, on their own model provider and billing account. Only the model prompts leave.
 
