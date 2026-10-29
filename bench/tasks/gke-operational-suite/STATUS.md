@@ -6,10 +6,10 @@ Record of every run: the run log at the bottom, and `bench/run-store` once the l
 
 | # | Scenario | Area | Stream | Fixture class | State | Last run | Class of the miss | Next step |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
-| S01 | `ccc-prefilter-missing-nodeselector-drop` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | A | red recorded | 2026-10-29 platform-agent-host gemini-3.8-flash RED (3 ledger checks fail; safeguard pass) run_20261029_202331_300187 | collector gap: no workload-side ComputeClass check; node-pool priority unparsed | fix in the stockout collector (step 5.3) |
-| S02 | `ccc-prefilter-nodeaffinity-bypass` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | A | batch 1 |  |  |  |
-| S03 | `ccc-toleration-missing-equal-operator` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | A | batch 1 |  |  |  |
-| S04 | `ccc-untainted-node-pool-absorption` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | batch 1 |  |  |  |
+| S01 | `ccc-prefilter-missing-nodeselector-drop` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | A | red recorded | 2026-10-29 gkedemos gemini-3.8-flash RED (3 ledger checks fail; safeguard pass) run_20261029_202331_300187 | collector gap: no workload-side ComputeClass check; node-pool priority unparsed | fix in the stockout collector (step 5.3) |
+| S02 | `ccc-prefilter-nodeaffinity-bypass` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | A | batch 1, running | run A started 2026-10-29 17:2x EDT on gkedemos |  |  |
+| S03 | `ccc-toleration-missing-equal-operator` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | A | planted | fixture dry run 2026-10-29 17:10 EDT on gkedemos2: pods Pending (affinity and taint), ComputeClass accepted; torn down |  | run B on gkedemos |
+| S04 | `ccc-untainted-node-pool-absorption` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | planted | fixture dry run 2026-10-29 17:12 EDT on gkedemos2: pool general-ccc-pool created (3 nodes, one per zone of a regional cluster), ComputeClass with auto-creation accepted; torn down, pool deleted |  | run D on gkedemos, last in the batch |
 | S05 | `ccc-scarce-standard-pool-unbacked` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
 | S06 | `ccc-zero-node-hyperdisk-label-bug` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
 | S07 | `ccc-zero-node-allowed-disk-topology-failure` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
@@ -24,7 +24,7 @@ Record of every run: the run log at the bottom, and `bench/run-store` once the l
 | S16 | `workload-private-registry-pull-secret-expired` | Workloads, OOM, Probes & HPA | `compliance-audit` | A | unbuilt |  |  |  |
 | S17 | `workload-image-streaming-token-iam-expiry` | Workloads, OOM, Probes & HPA | `compliance-audit` | A | unbuilt |  |  |  |
 | S18 | `workload-hpa-scaledown-and-missing-prestop` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | unbuilt |  |  |  |
-| S19 | `workload-missing-memory-limits-oom-baseline` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | batch 1 |  |  |  |
+| S19 | `workload-missing-memory-limits-oom-baseline` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | batch 1, queued |  |  | run C on gkedemos |
 | S20 | `control-plane-configmap-lease-write-storm` | Control Plane, Setup, Cost & CLI | `gce-compute-fleet-audit` | C | unbuilt |  |  |  |
 | S21 | `control-plane-unpaginated-heavy-list-oom` | Control Plane, Setup, Cost & CLI | `gce-compute-fleet-audit` | C | unbuilt |  |  |  |
 | S22 | `control-plane-konnectivity-agent-exhaustion` | Control Plane, Setup, Cost & CLI | `gce-compute-fleet-audit` | C | unbuilt |  |  |  |
@@ -54,4 +54,4 @@ Record of every run: the run log at the bottom, and `bench/run-store` once the l
 | When (EDT) | Scenario | Install | Model | Verdict | Duration | Run directory | Note |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
 | 2026-10-29 16:03 | ccc-prefilter-missing-nodeselector-drop | gkedemos2 | gemini-3.8-flash | ERROR (no forge: ledger checks cannot evaluate) | 331 s | run_20261029_200314_366538 | report never named app-worker-a; safeguard pass |
-| 2026-10-29 16:23 | ccc-prefilter-missing-nodeselector-drop | platform-agent-host | gemini-3.8-flash | RED (3 ledger checks fail; safeguard pass) | 939 s | run_20261029_202331_300187 | first gradable red; agent wrote "coverage gap: ccc-missing-fallbacks unevaluated" |
+| 2026-10-29 16:23 | ccc-prefilter-missing-nodeselector-drop | gkedemos | gemini-3.8-flash | RED (3 ledger checks fail; safeguard pass) | 939 s | run_20261029_202331_300187 | first gradable red; agent wrote "coverage gap: ccc-missing-fallbacks unevaluated" |
