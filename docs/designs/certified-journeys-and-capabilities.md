@@ -6,7 +6,7 @@ Status: concept document, 2026-10-27. It states what we promise, what we measure
 
 **The problem.** Customers ask for guarantees. An agent that runs on an AI model cannot promise the same outcome on every run. Today we publish neither a guarantee nor a measured rate. The product runs ten scheduled audits on every install, but no test grades what those scheduled runs produce, and only one skill has a proven pass record.
 
-**The answer.** We make three kinds of promise and keep them apart. We **guarantee** what the product enforces outside the model: the agent can only propose a change, never apply one. We **measure** how often each journey and each task succeeds, every night, on a named model, and we publish the rate with its dates. We call a line **certified** only when a reviewer outside the team has repeated the measurement on tests the authors never saw.
+**The answer.** We publish a page of certified capabilities: for each model, what kube-agents can and cannot do today, computed from the nightly evaluation record. A capability is certified when it is evaluated on the published tests for it, on a named model, at the bar, with the record published. The same page states the one thing the product guarantees outside the model: the agent can only propose a change, never apply one.
 
 **The two numbers we track.**
 
