@@ -89,28 +89,25 @@ def main(argv: list[str] | None = None) -> int:
            f"**What certified means.** {DEFINITION}\n"]
     totals = {CAN: 0, FILLING: 0, MOSTLY: 0, PARTLY: 0, NOT_YET: 0, NO_TEST: 0}
     doc = {"model": a.model, "label": label, "as_of": a.as_of, "nights": nights, "graded_runs": len(graded),
+           "scheduled_rows": sum(1 for g in spec["groups"] for r in g["rows"] if r.get("scheduled")),
            "authority_fails": authority_fails, "other_safeguard_fails": other_safeguard_fails,
            "definition": DEFINITION, "guarantee": GUARANTEE, "groups": []}
     for g in spec["groups"]:
         out.append(f"## {g['name']}\n")
-        doc_group = {"name": g["name"], "scheduled": bool(g.get("scheduled")), "rows": []}
+        doc_group = {"name": g["name"], "rows": []}
         doc["groups"].append(doc_group)
-        sched = g.get("scheduled")
-        head = "| Capability | Status | Evidence | Graded on its schedule? | Note |\n| :-- | :-- | :-- | :-- | :-- |\n" if sched \
-            else "| Capability | Status | Evidence | Note |\n| :-- | :-- | :-- | :-- |\n"
-        body = ""
+        out += ["| Capability | Runs | Status | Evidence | Note |", "| :-- | :-- | :-- | :-- | :-- |"]
         for row in g["rows"]:
             ids = sorted({t for pat in row.get("tests", []) for t in tasks if fnmatch.fnmatch(t, pat)})
             windows = [window(by_case.get(t, [])) for t in ids]
             st, detail, numbers = status(windows)
             totals[st] += 1
             note = row.get("note", "")
-            doc_group["rows"].append({"capability": row["capability"], "subgroup": row.get("subgroup"), "status": st, "detail": detail, "note": note, "tests": ids, **numbers})
-            if sched:
-                body += f"| {row['capability']} | {st} | {detail} | ❌ not yet | {note} |\n"
-            else:
-                body += f"| {row['capability']} | {st} | {detail} | {note} |\n"
-        out.append(head + body)
+            sched = bool(row.get("scheduled"))
+            doc_group["rows"].append({"capability": row["capability"], "scheduled": sched, "subgroup": row.get("subgroup"),
+                                      "status": st, "detail": detail, "note": note, "tests": ids, **numbers})
+            out.append(f"| {row['capability']} | {'scheduled, no person in the loop' if sched else 'on request'} | {st} | {detail} | {note} |")
+        out.append("")
     out.insert(4, "| " + " | ".join(totals) + " |\n| :-- | :-- | :-- | :-- | :-- | :-- |\n| " + " | ".join(str(v) for v in totals.values()) + " |\n")
     out.append("## Not in this checklist\n")
     out.append("Twenty documented promises with no test, listed in `docs/designs/certified-journeys-inventory.md`; the dollar cost of a run; "

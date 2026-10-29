@@ -10,44 +10,69 @@ Edition of 2026-10-19, computed from 4969 graded runs over 29 nights (2026-09-17
 | :-- | :-- | :-- | :-- | :-- | :-- |
 | 2 | 1 | 5 | 10 | 5 | 6 |
 
-## Scheduled journeys (run with no person in the loop)
+## Upgrades
 
-| Capability | Status | Evidence | Graded on its schedule? | Note |
+| Capability | Runs | Status | Evidence | Note |
 | :-- | :-- | :-- | :-- | :-- |
-| Compliance audit finds risky access and respects declared exceptions | 🟠 Partly | 69 of 136 runs pass; lower bound 0.42; weakest test 44% | ❌ not yet |  |
-| Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones | ❌ Not yet | 109 of 246 runs pass; lower bound 0.38; weakest test 18% | ❌ not yet |  |
-| Patch readiness names the clusters behind on their version | ❌ Not yet | 39 of 96 runs pass; lower bound 0.31; weakest test 6% | ❌ not yet |  |
-| Cost audit finds idle resources and respects declared exceptions | ❌ Not yet | 30 of 98 runs pass; lower bound 0.22; weakest test 22% | ❌ not yet |  |
-| Consistency audit spots the cluster configured unlike its peers | 🟠 Partly | 94 of 126 runs pass; lower bound 0.66; weakest test 0% | ❌ not yet |  |
-| AI security audit finds exposed model-serving workloads | ❌ Not yet | 5 of 66 runs pass; lower bound 0.03; weakest test 0% | ❌ not yet |  |
-| Stockout prevention names node pools at risk | 🟠 Partly | 63 of 126 runs pass; lower bound 0.41; weakest test 2% | ❌ not yet | the collector misses the planted pool |
-| Networking fabric audit | ⬜ No test | no test exists | ❌ not yet |  |
-| Compute fleet audit | ⬜ No test | no test exists | ❌ not yet |  |
-| Upgrade retrospective explains a failed upgrade, stays quiet after a clean week | ⬜ No test | no graded run on this model | ❌ not yet |  |
-| Stall watch notices a controller that stopped, stays quiet on a healthy fleet | ✅ Can | 57 of 60 runs pass; lower bound 0.86; weakest test 95% | ❌ not yet | only the silence side has a fixture |
-| Upgrade readiness grades each cluster and names every blocker | 🟠 Partly | 141 of 252 runs pass; lower bound 0.50; weakest test 33% | ❌ not yet |  |
-| Weekly readiness brief names the decisions a person owes | ⬜ No test | no graded run on this model | ❌ not yet |  |
-| Repository watcher triages new issues | 🟠 Partly | 45 of 60 runs pass; lower bound 0.63; weakest test 75% | ❌ not yet |  |
-| Warning event becomes a root cause, fix options and a pull request on "apply" | 🟡 Mostly | 200 of 240 runs pass; lower bound 0.78; weakest test 55% | ❌ not yet |  |
-| GitOps drift alert is triaged against the declared source | 🟠 Partly | 63 of 80 runs pass; lower bound 0.69; weakest test 0% | ❌ not yet |  |
-| Autoscaler stockout investigator | ⬜ No test | no test exists | ❌ not yet | off by default |
-| Critical findings get a pull request, re-runs open no duplicate | 🟡 Mostly | 165 of 180 runs pass; lower bound 0.87; weakest test 78% | ❌ not yet | the pull request is graded on request; the audit-opened one is not |
-| Chat posts (audit report, findings nudge, daily recap, fallback to the home channel) | ⬜ No test | no test exists | ❌ not yet | no evaluation install has a chat platform |
+| Upgrade readiness grades each cluster and names every blocker | scheduled, no person in the loop | 🟠 Partly | 141 of 252 runs pass; lower bound 0.50; weakest test 33% |  |
+| Patch readiness names the clusters behind on their version | scheduled, no person in the loop | ❌ Not yet | 39 of 96 runs pass; lower bound 0.31; weakest test 6% |  |
+| Weekly readiness brief names the decisions a person owes | scheduled, no person in the loop | ⬜ No test | no graded run on this model |  |
+| Upgrade retrospective explains a failed upgrade, stays quiet after a clean week | scheduled, no person in the loop | ⬜ No test | no graded run on this model |  |
 
-## On-demand tasks (a person asks in chat)
+## Incidents and troubleshooting
 
-| Capability | Status | Evidence | Note |
-| :-- | :-- | :-- | :-- |
-| Diagnose a broken workload without changing it | 🟠 Partly | 218 of 300 runs pass; lower bound 0.67; weakest test 20% |  |
-| Run an audit now, or answer a fleet question from the collectors | 🟡 Mostly | 104 of 126 runs pass; lower bound 0.75; weakest test 0% |  |
-| Propose a change as a pull request, never apply it | 🟡 Mostly | 198 of 240 runs pass; lower bound 0.77; weakest test 55% |  |
-| Refuse an unsafe or direct change and name the safe path | 🟠 Partly | 88 of 117 runs pass; lower bound 0.67; weakest test 0% |  |
-| Repository work (review replies, branch reuse, issue triage, forge commands) | 🟠 Partly | 205 of 285 runs pass; lower bound 0.66; weakest test 2% |  |
-| Answer GKE knowledge questions with sources | 🟠 Partly | 159 of 240 runs pass; lower bound 0.60; weakest test 4% |  |
-| Check observability wiring (metrics, traces, alerts) | ❌ Not yet | 12 of 33 runs pass; lower bound 0.22; weakest test 10% |  |
-| Converse well (answer first, say the next step, back claims with evidence) | 🟡 Mostly | 8 of 9 runs pass; lower bound 0.57; weakest test 89% |  |
-| Record a person's decision on a finding (dismiss, snooze, accept) | ✅ Can | 61 of 63 runs pass; lower bound 0.89; weakest test 95% |  |
-| First-run audits start at onboarding | 🕒 Filling | no failure yet in 12 runs; the bar needs 24 |  |
+| Capability | Runs | Status | Evidence | Note |
+| :-- | :-- | :-- | :-- | :-- |
+| Stall watch notices a controller that stopped, stays quiet on a healthy fleet | scheduled, no person in the loop | ✅ Can | 57 of 60 runs pass; lower bound 0.86; weakest test 95% | only the silence side has a fixture |
+| Warning event becomes a root cause, fix options and a pull request on "apply" | scheduled, no person in the loop | 🟡 Mostly | 200 of 240 runs pass; lower bound 0.78; weakest test 55% |  |
+| GitOps drift alert is triaged against the declared source | scheduled, no person in the loop | 🟠 Partly | 63 of 80 runs pass; lower bound 0.69; weakest test 0% |  |
+| Diagnose a broken workload without changing it | on request | 🟠 Partly | 218 of 300 runs pass; lower bound 0.67; weakest test 20% |  |
+| Check observability wiring (metrics, traces, alerts) | on request | ❌ Not yet | 12 of 33 runs pass; lower bound 0.22; weakest test 10% |  |
+
+## Security and compliance
+
+| Capability | Runs | Status | Evidence | Note |
+| :-- | :-- | :-- | :-- | :-- |
+| Compliance audit finds risky access and respects declared exceptions | scheduled, no person in the loop | 🟠 Partly | 69 of 136 runs pass; lower bound 0.42; weakest test 44% |  |
+| AI security audit finds exposed model-serving workloads | scheduled, no person in the loop | ❌ Not yet | 5 of 66 runs pass; lower bound 0.03; weakest test 0% |  |
+| Networking fabric audit | scheduled, no person in the loop | ⬜ No test | no test exists |  |
+
+## Reliability and capacity
+
+| Capability | Runs | Status | Evidence | Note |
+| :-- | :-- | :-- | :-- | :-- |
+| Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones | scheduled, no person in the loop | ❌ Not yet | 109 of 246 runs pass; lower bound 0.38; weakest test 18% |  |
+| Stockout prevention names node pools at risk | scheduled, no person in the loop | 🟠 Partly | 63 of 126 runs pass; lower bound 0.41; weakest test 2% | the collector misses the planted pool |
+| Autoscaler stockout investigator | scheduled, no person in the loop | ⬜ No test | no test exists | off by default |
+
+## Cost and consistency
+
+| Capability | Runs | Status | Evidence | Note |
+| :-- | :-- | :-- | :-- | :-- |
+| Cost audit finds idle resources and respects declared exceptions | scheduled, no person in the loop | ❌ Not yet | 30 of 98 runs pass; lower bound 0.22; weakest test 22% |  |
+| Consistency audit spots the cluster configured unlike its peers | scheduled, no person in the loop | 🟠 Partly | 94 of 126 runs pass; lower bound 0.66; weakest test 0% |  |
+| Compute fleet audit | scheduled, no person in the loop | ⬜ No test | no test exists |  |
+
+## Changes and fixes
+
+| Capability | Runs | Status | Evidence | Note |
+| :-- | :-- | :-- | :-- | :-- |
+| Propose a change as a pull request, never apply it | on request | 🟡 Mostly | 198 of 240 runs pass; lower bound 0.77; weakest test 55% |  |
+| Critical findings get a pull request, re-runs open no duplicate | scheduled, no person in the loop | 🟡 Mostly | 165 of 180 runs pass; lower bound 0.87; weakest test 78% | the pull request is graded on request; the audit-opened one is not |
+| Refuse an unsafe or direct change and name the safe path | on request | 🟠 Partly | 88 of 117 runs pass; lower bound 0.67; weakest test 0% |  |
+| Repository work (review replies, branch reuse, issue triage, forge commands) | on request | 🟠 Partly | 205 of 285 runs pass; lower bound 0.66; weakest test 2% |  |
+| Repository watcher triages new issues | scheduled, no person in the loop | 🟠 Partly | 45 of 60 runs pass; lower bound 0.63; weakest test 75% |  |
+
+## Working with the agent
+
+| Capability | Runs | Status | Evidence | Note |
+| :-- | :-- | :-- | :-- | :-- |
+| Converse well (answer first, say the next step, back claims with evidence) | on request | 🟡 Mostly | 8 of 9 runs pass; lower bound 0.57; weakest test 89% |  |
+| Record a person's decision on a finding (dismiss, snooze, accept) | on request | ✅ Can | 61 of 63 runs pass; lower bound 0.89; weakest test 95% |  |
+| Run an audit now, or answer a fleet question from the collectors | on request | 🟡 Mostly | 104 of 126 runs pass; lower bound 0.75; weakest test 0% |  |
+| Answer GKE knowledge questions with sources | on request | 🟠 Partly | 159 of 240 runs pass; lower bound 0.60; weakest test 4% |  |
+| Chat posts (audit report, findings nudge, daily recap, fallback to the home channel) | scheduled, no person in the loop | ⬜ No test | no test exists | no evaluation install has a chat platform |
+| First-run audits start at onboarding | scheduled, no person in the loop | 🕒 Filling | no failure yet in 12 runs; the bar needs 24 |  |
 
 ## Not in this checklist
 

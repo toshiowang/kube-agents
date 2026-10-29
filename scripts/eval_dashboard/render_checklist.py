@@ -104,18 +104,14 @@ def render(doc: dict) -> str:
         f'<p class="h">{STATUS_HELP[STATUS_STYLE[s][0]]}</p></div>' for s, v in doc["totals"].items())
     sections = []
     for g in doc["groups"]:
-        sched = g["scheduled"]
-        head = ("<tr><th>Capability</th><th>Status</th><th>Evidence on this model</th>" + ("<th>Graded on its schedule</th>" if sched else "") + "<th>Note</th></tr>")
+        head = "<tr><th>Capability</th><th>Status</th><th>Evidence on this model</th><th>Note</th></tr>"
         rows = []
         for r in g["rows"]:
-            cells = [f'<td class="cap">{html.escape(r["capability"])}</td>', f'<td>{pill(r["status"])}</td>', f'<td>{evidence(r)}</td>']
-            if sched:
-                cells.append('<td class="sched">Not yet · graded on request only</td>')
-            cells.append(f'<td class="note">{html.escape(r.get("note") or "")}</td>')
+            mark = f'<span title="runs on a schedule with no person in the loop">{CLOCK}</span> ' if r.get("scheduled") else ''
+            cells = [f'<td class="cap">{mark}{html.escape(r["capability"])}</td>', f'<td>{pill(r["status"])}</td>', f'<td>{evidence(r)}</td>',
+                     f'<td class="note">{html.escape(r.get("note") or "")}</td>']
             rows.append("<tr>" + "".join(cells) + "</tr>")
-        lede = ("These run on a schedule with no person in the loop. Their scheduled results are not graded yet; the evidence comes from the same work requested by a test."
-                if sched else "A person asks for these in chat.")
-        sections.append(f'<h2>{html.escape(g["name"])}</h2><p class="lede">{lede}</p><table><thead>{head}</thead><tbody>{"".join(rows)}</tbody></table>')
+        sections.append(f'<h2>{html.escape(g["name"])}</h2><table><thead>{head}</thead><tbody>{"".join(rows)}</tbody></table>')
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Certified capabilities · {html.escape(doc["label"])}</title><style>{CSS}</style></head><body><main>
 <header><div><p class="eyebrow">kube-agents · certified capabilities</p><h1>What kube-agents can and cannot do today</h1>
@@ -123,7 +119,7 @@ def render(doc: dict) -> str:
 Computed from <b>{doc["graded_runs"]:,} graded runs</b> over <b>{len(nights)} nights</b>, {span}. Nothing on this page is typed by hand except the row names.</p></div>
 <button class="toggle" id="toggle" type="button">Light / dark</button></header>
 <div class="tiles">{tiles}</div>
-<p class="lede why"><b>Why so few rows are green.</b> The bar is per test: 57 of the newest 60 runs, or 24 of 24 while a window fills, and a row is green only when every one of its tests clears it. This record is {len(nights)} nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row below the bar. The meter shows the plain pass rate.</p>
+<p class="lede why"><b>How to read the rows.</b> A ⏱ marks a capability that runs on a schedule with no person in the loop; none is graded on its scheduled result yet.  The bar is per test: 57 of the newest 60 runs, or 24 of 24 while a window fills, and a row is green only when every one of its tests clears it. This record is {len(nights)} nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row below the bar. The meter shows the plain pass rate.</p>
 <div class="callouts"><div class="callout"><b>What certified means.</b> {html.escape(doc["definition"])}</div>
 <div class="callout good"><b>Guaranteed.</b> {html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard in this record: <b>{doc["authority_fails"]}</b>. Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): {doc["other_safeguard_fails"]}.</div></div>
 {"".join(sections)}
@@ -174,8 +170,11 @@ def _mdx_cell(row: dict) -> str:
             f'{_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small></span>')
 
 
+CLOCK = "⏱"
+
+
 def _mdx_compare(docs: list[dict]) -> list[str]:
-    """The single view: a column per model, the capability first (a page-local rule lets it wrap)."""
+    """The single view: groups a customer cares about, a column per model, the capability first."""
     labels = [d["label"] for d in docs]
     two = len(docs) == 2
     out = ['<style>{`.sl-markdown-content table:where(:not(.not-content *)) td:first-child { white-space: normal; min-width: 11rem; }`}</style>', '',
@@ -184,43 +183,35 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
     out.append('| Edition | ' + ' | '.join(d["as_of"] for d in docs) + ' |')
     out.append('| Record | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} night{"s" if len(d["nights"]) != 1 else ""}' for d in docs) + ' |')
     out.append('| Writes caught by a safeguard | ' + ' | '.join(f'**{d["authority_fails"]}**' for d in docs) + ' |')
+    out.append(f'| {CLOCK} Rows that run with no person in the loop | ' + ' | '.join(f'{d["scheduled_rows"]} of {sum(len(g["rows"]) for g in d["groups"])}' for d in docs) + ' |')
     for st in docs[0]["totals"]:
         out.append(f'| {_mdx_badge(st)} | ' + ' | '.join(str(d["totals"].get(st, 0)) for d in docs) + ' |')
     out.append('')
     out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(docs[0]["guarantee"])} The row above counts cluster or repository writes '
                'caught by a safeguard across each record.</Aside>\n')
-    out.append('<Aside type="caution" title="How to read the rows">Green needs 95 percent confidence of at least 85 percent pass on the row, '
+    out.append(f'<Aside type="caution" title="How to read the rows">Green needs 95 percent confidence of at least 85 percent pass on the row, '
                'and no test inside it below 80 percent. A short record cannot reach it: three runs per test is one night. The percentage is the plain pass rate'
-               + ('; the delta is the first model minus the second, in points.' if two else '.') + '</Aside>\n')
+               + ('; the delta is the first model minus the second, in points.' if two else '.')
+               + f' A {CLOCK} marks a capability that runs on a schedule with no person in the loop; none is graded on its scheduled result yet, so its evidence comes from the same work requested by a test.</Aside>\n')
     for gi, g in enumerate(docs[0]["groups"]):
         out.append(f'## {html.escape(g["name"])}\n')
-        out.append(("These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.\n"
-                    if g["scheduled"] else "A person asks for these in chat.\n"))
-        subgroups = []
-        for r in g["rows"]:
-            if r.get("subgroup") not in subgroups:
-                subgroups.append(r.get("subgroup"))
-        for sg in subgroups:
-            if sg:
-                out.append(f'### {html.escape(sg)}\n')
-            out.append('| Capability | ' + ' | '.join(labels) + (' | Delta |' if two else ' |'))
-            out.append('| :-- | ' + ' | '.join(':--' for _ in labels) + (' | --: |' if two else ' |'))
-            for ri, r in enumerate(g["rows"]):
-                if r.get("subgroup") != sg:
-                    continue
-                rows = [d["groups"][gi]["rows"][ri] for d in docs]
-                assert all(x["capability"] == r["capability"] for x in rows), r["capability"]
-                cells = [_mdx_cell(x) for x in rows]
-                note = f' <small>{html.escape(r["note"])}</small>' if r.get("note") else ""
-                line = f'| {html.escape(r["capability"])}{note} | ' + ' | '.join(cells)
-                if two:
-                    a, b = rows[0], rows[1]
-                    delta = f'{(100.0 * a["passes"] / a["n"]) - (100.0 * b["passes"] / b["n"]):+.0f}' if a["n"] and b["n"] else '–'
-                    line += f' | {delta} |'
-                else:
-                    line += ' |'
-                out.append(line)
-            out.append('')
+        out.append('| Capability | ' + ' | '.join(labels) + (' | Delta |' if two else ' |'))
+        out.append('| :-- | ' + ' | '.join(':--' for _ in labels) + (' | --: |' if two else ' |'))
+        for ri, r in enumerate(g["rows"]):
+            rows = [d["groups"][gi]["rows"][ri] for d in docs]
+            assert all(x["capability"] == r["capability"] for x in rows), r["capability"]
+            cells = [_mdx_cell(x) for x in rows]
+            mark = f'{CLOCK} ' if r.get("scheduled") else ''
+            note = f' <small>{html.escape(r["note"])}</small>' if r.get("note") else ""
+            line = f'| {mark}{html.escape(r["capability"])}{note} | ' + ' | '.join(cells)
+            if two:
+                a, b = rows[0], rows[1]
+                delta = f'{(100.0 * a["passes"] / a["n"]) - (100.0 * b["passes"] / b["n"]):+.0f}' if a["n"] and b["n"] else '–'
+                line += f' | {delta} |'
+            else:
+                line += ' |'
+            out.append(line)
+        out.append('')
     return out
 
 
@@ -250,7 +241,8 @@ def render_mdx(docs: list[dict]) -> str:
             out.append(f'## {html.escape(g["name"])}\n')
             for r in g["rows"]:
                 note = f' _{html.escape(r["note"])}._' if r.get("note") else ""
-                out.append(f'- {_mdx_badge(r["status"])} {_mdx_meter(r)}**{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
+                mark = f'{CLOCK} ' if r.get("scheduled") else ''
+                out.append(f'- {_mdx_badge(r["status"])} {_mdx_meter(r)}**{mark}{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
             out.append("")
     out += ['## Not on this page', '',
             'Twenty documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; '
