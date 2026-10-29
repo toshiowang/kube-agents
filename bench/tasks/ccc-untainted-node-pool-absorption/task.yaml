@@ -56,4 +56,4 @@ verification_spec:
       resource_name: "general-ccc"
       path: "spec.nodePoolAutoCreation.enabled"
       op: eq
-      value: "true"
+      value: true
