@@ -1,0 +1,64 @@
+# Scenario S40: Logging (FluentBit) & Managed Prometheus (fleet-consistency-drift)
+id: observability-fluentbit-dcgm-cpu-throttling-oom
+name: "fluentbit-gke, gke-metrics-agent & DCGM Exporter OOMKills or CPU Throttling >=80% Dropping Telemetry"
+domain: consistency
+expected_fail: true
+audit_streams:
+  - fleet-consistency-drift
+fixtures: []
+prompt: >-
+  Run the fleet-consistency-drift audit across the fleet, following the fleet-consistency-drift SOP.
+expected_output: >-
+  The ledger issue carries a finding for fluentbit-gke in namespace
+  kube-system explaining: `fluentbit-gke`, `gke-metrics-agent`, or `dcgm-exporter` DaemonSet pods hit `>= 80%` CFS CPU throttling or `OOMKilled` buffer overflows under high log volume. The closing response is the
+  SOP's one line with the ledger URL.
+infrastructure:
+  deployer: "tofu"
+  provider: "gcp"
+  stack: "prebuilt/observability-fluentbit-dcgm-cpu-throttling-oom"
+  teardown: true
+  variables:
+    namespace: "kube-system"
+    target_resource_name: "fluentbit-gke"
+validated: false
+
+verification_spec:
+  - name: ledger-tracks-target-resource
+    role: objective
+    mode: assert
+    check:
+      type: ledger_issue_contains
+      audit: fleet-consistency-drift
+      scope: finding_ids
+      required_phrases: ["fluentbit-gke"]
+  - name: ledger-uses-expected-check-slug
+    role: objective
+    mode: assert
+    check:
+      type: ledger_issue_contains
+      audit: fleet-consistency-drift
+      scope: finding_ids
+      any_of_phrases:
+        [
+          "fluentbit-metrics-agent-throttling-oom",
+          "fluentbit-gke-throttling",
+          "dcgm-exporter-oom",
+        ]
+  - name: ledger-explains-root-cause-and-fix
+    role: objective
+    mode: assert
+    check:
+      type: ledger_issue_contains
+      audit: fleet-consistency-drift
+      required_phrases: ["fluentbit-gke"]
+  - name: audit-remains-read-only-in-cluster
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: resource_property
+      kind: "daemonset"
+      resource_name: "fluentbit-gke"
+      namespace: "kube-system"
+      path: "metadata.name"
+      op: eq
+      value: "fluentbit-gke"
