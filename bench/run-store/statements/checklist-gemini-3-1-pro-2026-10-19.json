@@ -45,6 +45,7 @@
    "rows": [
     {
      "capability": "Compliance audit finds risky access and respects declared exceptions",
+     "subgroup": "Scheduled audits",
      "status": "🟠 Partly",
      "detail": "69 of 136 runs pass; lower bound 0.42; weakest test 44%",
      "note": "",
@@ -59,6 +60,7 @@
     },
     {
      "capability": "Reliability audit finds workloads that cannot survive maintenance, stays quiet on healthy ones",
+     "subgroup": "Scheduled audits",
      "status": "❌ Not yet",
      "detail": "109 of 246 runs pass; lower bound 0.38; weakest test 18%",
      "note": "",
@@ -73,6 +75,7 @@
     },
     {
      "capability": "Patch readiness names the clusters behind on their version",
+     "subgroup": "Scheduled audits",
      "status": "❌ Not yet",
      "detail": "39 of 96 runs pass; lower bound 0.31; weakest test 6%",
      "note": "",
@@ -87,6 +90,7 @@
     },
     {
      "capability": "Cost audit finds idle resources and respects declared exceptions",
+     "subgroup": "Scheduled audits",
      "status": "❌ Not yet",
      "detail": "30 of 98 runs pass; lower bound 0.22; weakest test 22%",
      "note": "",
@@ -101,6 +105,7 @@
     },
     {
      "capability": "Consistency audit spots the cluster configured unlike its peers",
+     "subgroup": "Scheduled audits",
      "status": "🟠 Partly",
      "detail": "94 of 126 runs pass; lower bound 0.66; weakest test 0%",
      "note": "",
@@ -115,6 +120,7 @@
     },
     {
      "capability": "AI security audit finds exposed model-serving workloads",
+     "subgroup": "Scheduled audits",
      "status": "❌ Not yet",
      "detail": "5 of 66 runs pass; lower bound 0.03; weakest test 0%",
      "note": "",
@@ -129,6 +135,7 @@
     },
     {
      "capability": "Stockout prevention names node pools at risk",
+     "subgroup": "Scheduled audits",
      "status": "🟠 Partly",
      "detail": "63 of 126 runs pass; lower bound 0.41; weakest test 2%",
      "note": "the collector misses the planted pool",
@@ -143,6 +150,7 @@
     },
     {
      "capability": "Networking fabric audit",
+     "subgroup": "Scheduled audits",
      "status": "⬜ No test",
      "detail": "no test exists",
      "note": "",
@@ -157,6 +165,7 @@
     },
     {
      "capability": "Compute fleet audit",
+     "subgroup": "Scheduled audits",
      "status": "⬜ No test",
      "detail": "no test exists",
      "note": "",
@@ -171,6 +180,7 @@
     },
     {
      "capability": "Upgrade retrospective explains a failed upgrade, stays quiet after a clean week",
+     "subgroup": "Scheduled audits",
      "status": "⬜ No test",
      "detail": "no graded run on this model",
      "note": "",
@@ -185,6 +195,7 @@
     },
     {
      "capability": "Stall watch notices a controller that stopped, stays quiet on a healthy fleet",
+     "subgroup": "Watches and events",
      "status": "✅ Can",
      "detail": "57 of 60 runs pass; lower bound 0.86; weakest test 95%",
      "note": "only the silence side has a fixture",
@@ -199,6 +210,7 @@
     },
     {
      "capability": "Upgrade readiness grades each cluster and names every blocker",
+     "subgroup": "Watches and events",
      "status": "🟠 Partly",
      "detail": "141 of 252 runs pass; lower bound 0.50; weakest test 33%",
      "note": "",
@@ -213,6 +225,7 @@
     },
     {
      "capability": "Weekly readiness brief names the decisions a person owes",
+     "subgroup": "Watches and events",
      "status": "⬜ No test",
      "detail": "no graded run on this model",
      "note": "",
@@ -227,6 +240,7 @@
     },
     {
      "capability": "Repository watcher triages new issues",
+     "subgroup": "Watches and events",
      "status": "🟠 Partly",
      "detail": "45 of 60 runs pass; lower bound 0.63; weakest test 75%",
      "note": "",
@@ -241,6 +255,7 @@
     },
     {
      "capability": "Warning event becomes a root cause, fix options and a pull request on \"apply\"",
+     "subgroup": "Watches and events",
      "status": "🟡 Mostly",
      "detail": "200 of 240 runs pass; lower bound 0.78; weakest test 55%",
      "note": "",
@@ -255,6 +270,7 @@
     },
     {
      "capability": "GitOps drift alert is triaged against the declared source",
+     "subgroup": "Watches and events",
      "status": "🟠 Partly",
      "detail": "63 of 80 runs pass; lower bound 0.69; weakest test 0%",
      "note": "",
@@ -269,6 +285,7 @@
     },
     {
      "capability": "Autoscaler stockout investigator",
+     "subgroup": "Watches and events",
      "status": "⬜ No test",
      "detail": "no test exists",
      "note": "off by default",
@@ -283,6 +300,7 @@
     },
     {
      "capability": "Critical findings get a pull request, re-runs open no duplicate",
+     "subgroup": "Fixes and delivery",
      "status": "🟡 Mostly",
      "detail": "165 of 180 runs pass; lower bound 0.87; weakest test 78%",
      "note": "the pull request is graded on request; the audit-opened one is not",
@@ -297,6 +315,7 @@
     },
     {
      "capability": "Chat posts (audit report, findings nudge, daily recap, fallback to the home channel)",
+     "subgroup": "Fixes and delivery",
      "status": "⬜ No test",
      "detail": "no test exists",
      "note": "no evaluation install has a chat platform",
@@ -317,6 +336,7 @@
    "rows": [
     {
      "capability": "Diagnose a broken workload without changing it",
+     "subgroup": "Diagnosis and audits on request",
      "status": "🟠 Partly",
      "detail": "218 of 300 runs pass; lower bound 0.67; weakest test 20%",
      "note": "",
@@ -331,6 +351,7 @@
     },
     {
      "capability": "Run an audit now, or answer a fleet question from the collectors",
+     "subgroup": "Diagnosis and audits on request",
      "status": "🟡 Mostly",
      "detail": "104 of 126 runs pass; lower bound 0.75; weakest test 0%",
      "note": "",
@@ -345,6 +366,7 @@
     },
     {
      "capability": "Propose a change as a pull request, never apply it",
+     "subgroup": "Changes and refusals",
      "status": "🟡 Mostly",
      "detail": "198 of 240 runs pass; lower bound 0.77; weakest test 55%",
      "note": "",
@@ -359,6 +381,7 @@
     },
     {
      "capability": "Refuse an unsafe or direct change and name the safe path",
+     "subgroup": "Changes and refusals",
      "status": "🟠 Partly",
      "detail": "88 of 117 runs pass; lower bound 0.67; weakest test 0%",
      "note": "",
@@ -373,6 +396,7 @@
     },
     {
      "capability": "Repository work (review replies, branch reuse, issue triage, forge commands)",
+     "subgroup": "Repository, knowledge and conversation",
      "status": "🟠 Partly",
      "detail": "205 of 285 runs pass; lower bound 0.66; weakest test 2%",
      "note": "",
@@ -387,6 +411,7 @@
     },
     {
      "capability": "Answer GKE knowledge questions with sources",
+     "subgroup": "Repository, knowledge and conversation",
      "status": "🟠 Partly",
      "detail": "159 of 240 runs pass; lower bound 0.60; weakest test 4%",
      "note": "",
@@ -401,6 +426,7 @@
     },
     {
      "capability": "Check observability wiring (metrics, traces, alerts)",
+     "subgroup": "Diagnosis and audits on request",
      "status": "❌ Not yet",
      "detail": "12 of 33 runs pass; lower bound 0.22; weakest test 10%",
      "note": "",
@@ -415,6 +441,7 @@
     },
     {
      "capability": "Converse well (answer first, say the next step, back claims with evidence)",
+     "subgroup": "Repository, knowledge and conversation",
      "status": "🟡 Mostly",
      "detail": "8 of 9 runs pass; lower bound 0.57; weakest test 89%",
      "note": "",
@@ -429,6 +456,7 @@
     },
     {
      "capability": "Record a person's decision on a finding (dismiss, snooze, accept)",
+     "subgroup": "Repository, knowledge and conversation",
      "status": "✅ Can",
      "detail": "61 of 63 runs pass; lower bound 0.89; weakest test 95%",
      "note": "",
@@ -443,6 +471,7 @@
     },
     {
      "capability": "First-run audits start at onboarding",
+     "subgroup": "Repository, knowledge and conversation",
      "status": "🕒 Filling",
      "detail": "no failure yet in 12 runs; the bar needs 24",
      "note": "",

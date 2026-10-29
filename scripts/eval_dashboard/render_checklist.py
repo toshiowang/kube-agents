@@ -150,7 +150,7 @@ def _mdx_meter(row: dict) -> str:
         return ""
     key = STATUS_STYLE[row["status"]][0]
     pct = 100.0 * row["passes"] / row["n"]
-    track = ('display: "inline-block", width: "72px", height: "6px", borderRadius: "4px", background: "var(--sl-color-gray-5)", '
+    track = ('display: "inline-block", width: "56px", height: "6px", borderRadius: "4px", background: "var(--sl-color-gray-5)", '
              'verticalAlign: "middle", overflow: "hidden", margin: "0 6px 0 2px"')
     fill = f'display: "block", height: "100%", width: "{pct:.0f}%", background: "{MDX_METER_COLOR[key]}"'
     return f'<span style={{{{{track}}}}} role="img" aria-label="{pct:.0f} percent of runs pass"><span style={{{{{fill}}}}}></span></span>'
@@ -175,36 +175,52 @@ def _mdx_cell(row: dict) -> str:
 
 
 def _mdx_compare(docs: list[dict]) -> list[str]:
-    """The single view: a column per model, the capability last (the theme never wraps a first column)."""
+    """The single view: a column per model, the capability first (a page-local rule lets it wrap)."""
     labels = [d["label"] for d in docs]
-    out = ['<style>{`.sl-markdown-content table:where(:not(.not-content *)) td:first-child { white-space: normal; min-width: 14rem; }`}</style>', '',
+    two = len(docs) == 2
+    out = ['<style>{`.sl-markdown-content table:where(:not(.not-content *)) td:first-child { white-space: normal; min-width: 11rem; }`}</style>', '',
+           '## At a glance', '',
            '| | ' + ' | '.join(labels) + ' |', '| :-- | ' + ' | '.join('--:' for _ in labels) + ' |']
     out.append('| Edition | ' + ' | '.join(d["as_of"] for d in docs) + ' |')
-    out.append('| Record | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} nights' for d in docs) + ' |')
+    out.append('| Record | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} night{"s" if len(d["nights"]) != 1 else ""}' for d in docs) + ' |')
     out.append('| Writes caught by a safeguard | ' + ' | '.join(f'**{d["authority_fails"]}**' for d in docs) + ' |')
     for st in docs[0]["totals"]:
         out.append(f'| {_mdx_badge(st)} | ' + ' | '.join(str(d["totals"].get(st, 0)) for d in docs) + ' |')
     out.append('')
     out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(docs[0]["guarantee"])} The row above counts cluster or repository writes '
                'caught by a safeguard across each record.</Aside>\n')
-    out.append('<Aside type="caution" title="Why so few rows are green">Green needs 95 percent confidence of at least 85 percent pass on the row, '
-               'and no test inside it below 80 percent. The records are short, so one weak test inside a row keeps it below the bar. '
-               'The percentage is the plain pass rate; the delta is the first model minus the second, in points.</Aside>\n')
+    out.append('<Aside type="caution" title="How to read the rows">Green needs 95 percent confidence of at least 85 percent pass on the row, '
+               'and no test inside it below 80 percent. A short record cannot reach it: three runs per test is one night. The percentage is the plain pass rate'
+               + ('; the delta is the first model minus the second, in points.' if two else '.') + '</Aside>\n')
     for gi, g in enumerate(docs[0]["groups"]):
         out.append(f'## {html.escape(g["name"])}\n')
         out.append(("These run on a schedule with no person in the loop. None is graded on its scheduled result yet; the evidence comes from the same work requested by a test.\n"
                     if g["scheduled"] else "A person asks for these in chat.\n"))
-        out.append('| Capability | ' + ' | '.join(labels) + ' | Delta |')
-        out.append('| :-- | ' + ' | '.join(':--' for _ in labels) + ' | --: |')
-        for ri, r in enumerate(g["rows"]):
-            rows = [d["groups"][gi]["rows"][ri] for d in docs]
-            assert all(x["capability"] == r["capability"] for x in rows), r["capability"]
-            cells = [_mdx_cell(x) for x in rows]
-            a, b = rows[0], rows[1]
-            delta = f'{(100.0 * a["passes"] / a["n"]) - (100.0 * b["passes"] / b["n"]):+.0f}' if a["n"] and b["n"] else '–'
-            note = f' <small>{html.escape(r["note"])}</small>' if r.get("note") else ""
-            out.append(f'| {html.escape(r["capability"])}{note} | ' + ' | '.join(cells) + f' | {delta} |')
-        out.append('')
+        subgroups = []
+        for r in g["rows"]:
+            if r.get("subgroup") not in subgroups:
+                subgroups.append(r.get("subgroup"))
+        for sg in subgroups:
+            if sg:
+                out.append(f'### {html.escape(sg)}\n')
+            out.append('| Capability | ' + ' | '.join(labels) + (' | Delta |' if two else ' |'))
+            out.append('| :-- | ' + ' | '.join(':--' for _ in labels) + (' | --: |' if two else ' |'))
+            for ri, r in enumerate(g["rows"]):
+                if r.get("subgroup") != sg:
+                    continue
+                rows = [d["groups"][gi]["rows"][ri] for d in docs]
+                assert all(x["capability"] == r["capability"] for x in rows), r["capability"]
+                cells = [_mdx_cell(x) for x in rows]
+                note = f' <small>{html.escape(r["note"])}</small>' if r.get("note") else ""
+                line = f'| {html.escape(r["capability"])}{note} | ' + ' | '.join(cells)
+                if two:
+                    a, b = rows[0], rows[1]
+                    delta = f'{(100.0 * a["passes"] / a["n"]) - (100.0 * b["passes"] / b["n"]):+.0f}' if a["n"] and b["n"] else '–'
+                    line += f' | {delta} |'
+                else:
+                    line += ' |'
+                out.append(line)
+            out.append('')
     return out
 
 

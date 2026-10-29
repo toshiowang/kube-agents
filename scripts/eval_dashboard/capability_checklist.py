@@ -105,7 +105,7 @@ def main(argv: list[str] | None = None) -> int:
             st, detail, numbers = status(windows)
             totals[st] += 1
             note = row.get("note", "")
-            doc_group["rows"].append({"capability": row["capability"], "status": st, "detail": detail, "note": note, "tests": ids, **numbers})
+            doc_group["rows"].append({"capability": row["capability"], "subgroup": row.get("subgroup"), "status": st, "detail": detail, "note": note, "tests": ids, **numbers})
             if sched:
                 body += f"| {row['capability']} | {st} | {detail} | ❌ not yet | {note} |\n"
             else:
