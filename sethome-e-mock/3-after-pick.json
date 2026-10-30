@@ -1,0 +1,227 @@
+{
+  "type": "home",
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Fleet",
+        "emoji": true
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "3 clusters · updated <!date^1793381692^{time}|Oct 30 17:25 UTC>"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "🟢 *seeded-a*  no open findings"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "🟠 *seeded-b*  2 pods CrashLoopBackOff in payments · 1 more finding"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "🔴 *seeded-c*  node pool default-pool at 97% CPU for 40 min"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Waiting on you",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "Roll back payments-api to v2.3.1 on seeded-b?"
+      },
+      "accessory": {
+        "type": "button",
+        "text": {
+          "type": "plain_text",
+          "text": "Open thread",
+          "emoji": true
+        },
+        "url": "https://slack.com/archives/C0CDC9563EE/p1793372386403369",
+        "action_id": "chat.link.0"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "asked <!date^1793380012^{time}|Oct 30 16:57 UTC>"
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Running",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "⏳  Weekly drift report"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "seeded-a · started <!date^1793381512^{time}|Oct 30 17:22 UTC>"
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Recent pull requests",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "<https://github.com/example/gke-infra/pull/142|#142 Raise payments HPA ceiling to 12 replicas>"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "example/gke-infra · opened <!date^1793363812^{date_short_pretty} {time}|Oct 30 12:27 UTC>"
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Last audit",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Fleet audit:* 3 findings, 1 critical"
+      },
+      "accessory": {
+        "type": "button",
+        "text": {
+          "type": "plain_text",
+          "text": "Ledger issue #88 ↗",
+          "emoji": true
+        },
+        "url": "https://github.com/example/gke-infra/issues/88",
+        "action_id": "chat.link.1"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "<!date^1793295412^{date_short_pretty} {time}|Oct 29 17:27 UTC>"
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "Home channel",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "Where alerts, drift reports and scheduled reports post.\n*<#C0CDC9563EE>* · set by <@U0C238RSB70> <!date^1793381792^{date_short_pretty} {time}|Oct 30 18:01 UTC>"
+      },
+      "accessory": {
+        "type": "conversations_select",
+        "action_id": "home_channel_select",
+        "placeholder": {
+          "type": "plain_text",
+          "text": "Select a channel",
+          "emoji": true
+        },
+        "filter": {
+          "include": [
+            "public",
+            "private"
+          ],
+          "exclude_bot_users": true
+        },
+        "initial_conversation": "C0CDC9563EE"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "✅ Recorded <#C0CDC9563EE> as the home channel; it takes effect within about two minutes. A post before that may still land in <#C0C9NAE2J5B>."
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "This week: 4 👍, 1 👎"
+        }
+      ]
+    }
+  ]
+}
