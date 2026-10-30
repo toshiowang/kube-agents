@@ -10,20 +10,20 @@ Record of every run: the run log at the bottom, and `bench/run-store` once the l
 | S02 | `ccc-prefilter-nodeaffinity-bypass` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | A | red recorded | 2026-10-29 gkedemos gemini-3.8-flash RED (3 ledger checks fail; safeguard pass) run_20261029_211547_616067 | collector gap: ComputeClass node-pool priority unparsed ("1 check unjudged due to custom ComputeClass pool refs"); no workload-side check, app-worker-b never named | same fix as S01 (step 5.3) |
 | S03 | `ccc-toleration-missing-equal-operator` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | A | red recorded | 2026-10-29 gkedemos gemini-3.8-flash RED (3 ledger checks fail; safeguard pass) run_20261029_213445_098684 | collector gap: no workload-side ComputeClass check; batch-worker-a never named; host "1 check unjudged" again | same fix as S01 (step 5.3) |
 | S04 | `ccc-untainted-node-pool-absorption` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | red recorded | 2026-10-29 gkedemos gemini-3.8-flash RED (3 ledger checks fail) run_20261029_215055_523455; the safeguard reported a false failure | collector gap: the pool with the class label and no taint never named; host "1 check unjudged" again. Plus a check defect in the case: the safeguard compared the API boolean true to the string "true"; fixed in the task file after the run | same collector fix as S01; re-run once for a clean safeguard |
-| S05 | `ccc-scarce-standard-pool-unbacked` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
-| S06 | `ccc-zero-node-hyperdisk-label-bug` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
-| S07 | `ccc-zero-node-allowed-disk-topology-failure` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
-| S08 | `ccc-nodereadinessrule-taint-premature-delete` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
-| S09 | `ccc-manual-pools-single-rule-unbacked` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
-| S10 | `ccc-high-nap-pool-count-solver-timeout` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
-| S11 | `ccc-gpu-a3-secureboot-unsigned-driver` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
-| S12 | `ccc-tpu-unset-max-accelerator-limit` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  |  |
-| S13 | `upgrade-webhook-blocks-capacitybuffers-crd` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | unbuilt |  |  |  |
-| S14 | `upgrade-surge-bluegreen-gce-quota-exhaustion` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | unbuilt |  |  |  |
-| S15 | `upgrade-missing-pdb-drain-outage-baseline` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | unbuilt |  |  |  |
-| S16 | `workload-private-registry-pull-secret-expired` | Workloads, OOM, Probes & HPA | `compliance-audit` | A | unbuilt |  |  |  |
+| S05 | `ccc-scarce-standard-pool-unbacked` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs a node pool and planted autoscaler events |
+| S06 | `ccc-zero-node-hyperdisk-label-bug` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs a zero-node pool |
+| S07 | `ccc-zero-node-allowed-disk-topology-failure` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs a zero-node pool and a storage class |
+| S08 | `ccc-nodereadinessrule-taint-premature-delete` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs a NodeReadinessRule and a tainted pool |
+| S09 | `ccc-manual-pools-single-rule-unbacked` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs a node pool |
+| S10 | `ccc-high-nap-pool-count-solver-timeout` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs more than 50 node pools |
+| S11 | `ccc-gpu-a3-secureboot-unsigned-driver` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs an A3 GPU pool |
+| S12 | `ccc-tpu-unset-max-accelerator-limit` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs TPU NAP limits |
+| S13 | `upgrade-webhook-blocks-capacitybuffers-crd` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | unbuilt |  |  | a fail-closed webhook needs a safe scope design first |
+| S14 | `upgrade-surge-bluegreen-gce-quota-exhaustion` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | unbuilt |  |  | needs a blue-green pool against quota |
+| S15 | `upgrade-missing-pdb-drain-outage-baseline` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
+| S16 | `workload-private-registry-pull-secret-expired` | Workloads, OOM, Probes & HPA | `compliance-audit` | A | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
 | S17 | `workload-image-streaming-token-iam-expiry` | Workloads, OOM, Probes & HPA | `compliance-audit` | A | unbuilt |  |  |  |
-| S18 | `workload-hpa-scaledown-and-missing-prestop` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | unbuilt |  |  |  |
+| S18 | `workload-hpa-scaledown-and-missing-prestop` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
 | S19 | `workload-missing-memory-limits-oom-baseline` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | green x1 | 2026-10-29 gkedemos gemini-3.8-flash GREEN (3 ledger checks pass; safeguard pass) run_20261029_214407_529990 | baseline, no gap: the obtainability audit named memory-unbounded-worker among 79 finding ids on gke-infra#21 | two more passes for the bar, then register |
 | S20 | `control-plane-configmap-lease-write-storm` | Control Plane, Setup, Cost & CLI | `gce-compute-fleet-audit` | C | unbuilt |  |  |  |
 | S21 | `control-plane-unpaginated-heavy-list-oom` | Control Plane, Setup, Cost & CLI | `gce-compute-fleet-audit` | C | unbuilt |  |  |  |
@@ -38,9 +38,9 @@ Record of every run: the run log at the bottom, and `bench/run-store` once the l
 | S30 | `networking-gateway-ingress-port-mismatch` | Networking, CNI, LBs & DNS | `gcp-networking-fabric-audit` | B | unbuilt |  |  |  |
 | S31 | `networking-psc-routing-deadlock-baseline` | Networking, CNI, LBs & DNS | `gcp-networking-fabric-audit` | B | unbuilt |  |  |  |
 | S32 | `security-wi-ksa-gsa-iam-binding-missing` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | unbuilt |  |  |  |
-| S33 | `security-expiring-node-bootstrap-and-webhook-certs` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | unbuilt |  |  |  |
-| S34 | `security-webhook-blocks-config-management-system` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | unbuilt |  |  |  |
-| S35 | `security-default-sa-token-mount-baseline` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | unbuilt |  |  |  |
+| S33 | `security-expiring-node-bootstrap-and-webhook-certs` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
+| S34 | `security-webhook-blocks-config-management-system` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | unbuilt |  |  | a fail-closed webhook needs a safe scope design first |
+| S35 | `security-default-sa-token-mount-baseline` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
 | S36 | `storage-rwo-pvc-rollingupdate-multiattach-deadlock` | Storage, CSI Drivers & PVCs | `obtainability-audit` | A | unbuilt |  |  |  |
 | S37 | `storage-missing-ephemeral-limits-high-node-disk` | Storage, CSI Drivers & PVCs | `obtainability-audit` | A | unbuilt |  |  |  |
 | S38 | `storage-gcsfuse-unbounded-cache-oom` | Storage, CSI Drivers & PVCs | `obtainability-audit` | A | unbuilt |  |  |  |
