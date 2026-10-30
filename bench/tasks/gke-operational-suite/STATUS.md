@@ -20,10 +20,10 @@ Record of every run: the run log at the bottom, and `bench/run-store` once the l
 | S12 | `ccc-tpu-unset-max-accelerator-limit` | Autoscaling, ComputeClass & Accelerators | `stockout-prevention` | B | unbuilt |  |  | needs TPU NAP limits |
 | S13 | `upgrade-webhook-blocks-capacitybuffers-crd` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | unbuilt |  |  | a fail-closed webhook needs a safe scope design first |
 | S14 | `upgrade-surge-bluegreen-gce-quota-exhaustion` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | unbuilt |  |  | needs a blue-green pool against quota |
-| S15 | `upgrade-missing-pdb-drain-outage-baseline` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
-| S16 | `workload-private-registry-pull-secret-expired` | Workloads, OOM, Probes & HPA | `compliance-audit` | A | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
+| S15 | `upgrade-missing-pdb-drain-outage-baseline` | Cluster & Node Upgrades & APIs | `security-patch-orchestrator` | B | batch 2, running | run E started 2026-10-29 22:03 EDT on gkedemos |  | expected to pass |
+| S16 | `workload-private-registry-pull-secret-expired` | Workloads, OOM, Probes & HPA | `compliance-audit` | A | planted | fixture dry run 2026-10-29 22:01 EDT on gkedemos2: pods in ErrImagePull with the planted secret; torn down |  | run F on gkedemos |
 | S17 | `workload-image-streaming-token-iam-expiry` | Workloads, OOM, Probes & HPA | `compliance-audit` | A | unbuilt |  |  |  |
-| S18 | `workload-hpa-scaledown-and-missing-prestop` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
+| S18 | `workload-hpa-scaledown-and-missing-prestop` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | planted | fixture dry run 2026-10-29 22:01 EDT on gkedemos2: HPA and Deployment created; torn down |  | run G on gkedemos |
 | S19 | `workload-missing-memory-limits-oom-baseline` | Workloads, OOM, Probes & HPA | `obtainability-audit` | A | green x1 | 2026-10-29 gkedemos gemini-3.8-flash GREEN (3 ledger checks pass; safeguard pass) run_20261029_214407_529990 | baseline, no gap: the obtainability audit named memory-unbounded-worker among 79 finding ids on gke-infra#21 | two more passes for the bar, then register |
 | S20 | `control-plane-configmap-lease-write-storm` | Control Plane, Setup, Cost & CLI | `gce-compute-fleet-audit` | C | unbuilt |  |  |  |
 | S21 | `control-plane-unpaginated-heavy-list-oom` | Control Plane, Setup, Cost & CLI | `gce-compute-fleet-audit` | C | unbuilt |  |  |  |
@@ -38,9 +38,9 @@ Record of every run: the run log at the bottom, and `bench/run-store` once the l
 | S30 | `networking-gateway-ingress-port-mismatch` | Networking, CNI, LBs & DNS | `gcp-networking-fabric-audit` | B | unbuilt |  |  |  |
 | S31 | `networking-psc-routing-deadlock-baseline` | Networking, CNI, LBs & DNS | `gcp-networking-fabric-audit` | B | unbuilt |  |  |  |
 | S32 | `security-wi-ksa-gsa-iam-binding-missing` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | unbuilt |  |  |  |
-| S33 | `security-expiring-node-bootstrap-and-webhook-certs` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
+| S33 | `security-expiring-node-bootstrap-and-webhook-certs` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | planted | fixture dry run 2026-10-29 22:01 EDT on gkedemos2: TLS secret with notAfter in 5 days; torn down |  | run H on gkedemos |
 | S34 | `security-webhook-blocks-config-management-system` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | unbuilt |  |  | a fail-closed webhook needs a safe scope design first |
-| S35 | `security-default-sa-token-mount-baseline` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | batch 2, queued |  |  | fixture written 2026-10-29 18:1x EDT; dry run on gkedemos2, then gkedemos |
+| S35 | `security-default-sa-token-mount-baseline` | Security, WI IAM, RBAC & CVEs | `compliance-audit` | A | batch 2, queued |  |  | run I on gkedemos; expected to pass |
 | S36 | `storage-rwo-pvc-rollingupdate-multiattach-deadlock` | Storage, CSI Drivers & PVCs | `obtainability-audit` | A | unbuilt |  |  |  |
 | S37 | `storage-missing-ephemeral-limits-high-node-disk` | Storage, CSI Drivers & PVCs | `obtainability-audit` | A | unbuilt |  |  |  |
 | S38 | `storage-gcsfuse-unbounded-cache-oom` | Storage, CSI Drivers & PVCs | `obtainability-audit` | A | unbuilt |  |  |  |
