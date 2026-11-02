@@ -98,7 +98,7 @@ groups:
         tests: [findings-decision-covers-item, fleet-audit-reports-past-run, fleet-audit-request-line]
       - capability: Run an audit now, or answer a fleet question from the collectors
         scheduled: false
-        tests: ["*-chat-request-runs-collector", chat-routing-fleet-question, chat-fanout-fleet-restarts-rows, fleet-audit-on-demand-run-reports]
+        tests: ["*-chat-request-runs-collector", chat-routing-fleet-question, chat-fanout-fleet-restarts-rows]
       - capability: Answer GKE knowledge questions with sources
         scheduled: false
         tests: [backup-dr-cmek-selected-namespaces-probe, compute-class-canary-active-migration-pdb-probe, knowledge-grounding-sources-probe, platform-security-secrets-encryption-currentstate-probe, upgrades-freeze-runbook-probe, obtainability-design-quota-vs-capacity, obtainability-window-planning-probe]

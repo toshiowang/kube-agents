@@ -72,7 +72,9 @@ def load_rows(store: pathlib.Path, model: str, as_of: str) -> list[dict]:
         with gzip.open(f, "rt", encoding="utf-8") as fh:
             for line in fh:
                 r = json.loads(line)
-                if r.get("model") == model:
+                # Only the recorded grade: a re-grade row carries another grader and
+                # would otherwise count the same run twice.
+                if r.get("model") == model and r.get("grader", "as-recorded") == "as-recorded":
                     rows.append(r)
     return rows
 

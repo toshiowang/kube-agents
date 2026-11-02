@@ -47,11 +47,13 @@ def status(windows: list[dict]) -> tuple[str, str, dict]:
     numbers.update(certified=sum(w["state"] == STATE_CERTIFIED for w in with_runs), passes=passes, n=n,
                    min_window=min(w["n"] for w in with_runs), lower=lower, weakest_rate=weakest)
     rate = passes / n
-    detail = f"{passes} of {n} runs pass; lower bound {lower:.2f}; weakest test {weakest:.0%}"
+    never_ran = len(windows) - len(with_runs)
+    unrun = f"; {never_ran} listed test{'s' if never_ran != 1 else ''} never ran on this model" if never_ran else ""
+    detail = f"{passes} of {n} runs pass; lower bound {lower:.2f}; weakest test {weakest:.0%}{unrun}"
     if lower >= ROW_LOWER_BOUND and weakest >= ROW_TEST_FLOOR:
         return CAN, detail, numbers
     if passes == n:
-        return FILLING, f"no failure yet in {n} runs; the bar needs {CERTIFIED_PASSES_FILLING}", numbers
+        return FILLING, f"no failure yet in {n} runs; the bar needs {CERTIFIED_PASSES_FILLING}{unrun}", numbers
     if rate >= MOSTLY_MIN_RATE:
         return MOSTLY, detail, numbers
     if rate >= PARTLY_MIN_RATE:
