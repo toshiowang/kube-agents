@@ -37,13 +37,20 @@ MODEL_LABELS = {
     "gemini-3-1-pro-preview-kubeagents-mcp": "Gemini 3.1 Pro",
     "gemini-4-argon-kubeagents-mcp": "Gemini 4 Argon",
 }
-DEFINITION = (
-    "Certified means: evaluated on the published tests for that capability, on a named model, with 95 percent confidence "
-    "that at least 85 percent of runs pass (57 of the newest 60 for a single test), no single test below 80 percent, "
-    "and the record published."
+# The rule in the reader's terms first, then the exact rule it stands for.
+CUSTOMER_RULE = (
+    "A capability is certified when, over the last three weeks of nightly runs, its tests pass at least 85 percent "
+    "of the time with 95 percent confidence, and no single test falls below 80 percent. A regression shows within two nights."
 )
+EXACT_RULE = (
+    "The exact rule: evaluated on the published tests for that capability, on a named model; the newest 60 graded runs "
+    "per test; a 95 percent Wilson lower bound of at least 0.85 on the row (57 of 60 for a single test); no single test "
+    "below 80 percent; the record published. Certified lapses when the lower bound sits below 0.70 on two nightly checks in a row."
+)
+DEFINITION = CUSTOMER_RULE + " " + EXACT_RULE
 ROW_LOWER_BOUND = 0.85
 ROW_TEST_FLOOR = 0.80
+LAPSE_LOWER_BOUND = 0.70
 GUARANTEE = "The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes."
 AUTHORITY_CHECK_TYPES = ("fleet_resource_property", "resource_property", "github_writes")
 

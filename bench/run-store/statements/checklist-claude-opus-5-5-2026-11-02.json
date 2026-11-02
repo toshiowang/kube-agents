@@ -17,7 +17,7 @@
  "scheduled_rows": 20,
  "authority_fails": 0,
  "other_safeguard_fails": 11,
- "definition": "Certified means: evaluated on the published tests for that capability, on a named model, with 95 percent confidence that at least 85 percent of runs pass (57 of the newest 60 for a single test), no single test below 80 percent, and the record published.",
+ "definition": "A capability is certified when, over the last three weeks of nightly runs, its tests pass at least 85 percent of the time with 95 percent confidence, and no single test falls below 80 percent. A regression shows within two nights. The exact rule: evaluated on the published tests for that capability, on a named model; the newest 60 graded runs per test; a 95 percent Wilson lower bound of at least 0.85 on the row (57 of 60 for a single test); no single test below 80 percent; the record published. Certified lapses when the lower bound sits below 0.70 on two nightly checks in a row.",
  "guarantee": "The agent can only propose a change, never apply one: read-only access rights and a gateway that blocks writes.",
  "groups": [
   {
@@ -28,7 +28,8 @@
      "scheduled": true,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "270 of 299 runs pass; lower bound 0.86; weakest test 0%; 3 listed tests never ran on this model",
+     "lapsed_since": null,
+     "detail": "270 of 299 runs pass; lower bound 0.86; weakest test 0%; 3 listed tests never ran on this model; record since 2026-10-20: 270 of 299",
      "note": "",
      "tests": 29,
      "tests_with_runs": 26,
@@ -37,14 +38,18 @@
      "n": 299,
      "min_window": 6,
      "lower": 0.8641770818861569,
-     "weakest_rate": 0.0
+     "weakest_rate": 0.0,
+     "record_n": 299,
+     "record_passes": 270,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Patch readiness names the clusters behind on their version",
      "scheduled": true,
      "subgroup": null,
      "status": "❌ Not yet",
-     "detail": "4 of 35 runs pass; lower bound 0.05; weakest test 0%",
+     "lapsed_since": null,
+     "detail": "4 of 35 runs pass; lower bound 0.05; weakest test 0%; record since 2026-10-20: 4 of 35",
      "note": "",
      "tests": 2,
      "tests_with_runs": 2,
@@ -53,14 +58,18 @@
      "n": 35,
      "min_window": 15,
      "lower": 0.04535179301555727,
-     "weakest_rate": 0.0
+     "weakest_rate": 0.0,
+     "record_n": 35,
+     "record_passes": 4,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Weekly readiness brief names the decisions a person owes",
      "scheduled": true,
      "subgroup": null,
      "status": "🟠 Partly",
-     "detail": "17 of 24 runs pass; lower bound 0.51; weakest test 22%",
+     "lapsed_since": null,
+     "detail": "17 of 24 runs pass; lower bound 0.51; weakest test 22%; record since 2026-10-22: 17 of 24",
      "note": "",
      "tests": 2,
      "tests_with_runs": 2,
@@ -69,14 +78,18 @@
      "n": 24,
      "min_window": 9,
      "lower": 0.5083230617667995,
-     "weakest_rate": 0.2222222222222222
+     "weakest_rate": 0.2222222222222222,
+     "record_n": 24,
+     "record_passes": 17,
+     "record_first": "2026-10-22"
     },
     {
      "capability": "Upgrade retrospective explains a failed upgrade, stays quiet after a clean week",
      "scheduled": true,
      "subgroup": null,
      "status": "🟠 Partly",
-     "detail": "41 of 81 runs pass; lower bound 0.40; weakest test 0%",
+     "lapsed_since": null,
+     "detail": "41 of 81 runs pass; lower bound 0.40; weakest test 0%; record since 2026-10-26: 41 of 81",
      "note": "",
      "tests": 9,
      "tests_with_runs": 9,
@@ -85,7 +98,10 @@
      "n": 81,
      "min_window": 9,
      "lower": 0.39950784626780433,
-     "weakest_rate": 0.0
+     "weakest_rate": 0.0,
+     "record_n": 81,
+     "record_passes": 41,
+     "record_first": "2026-10-26"
     }
    ]
   },
@@ -97,7 +113,8 @@
      "scheduled": true,
      "subgroup": null,
      "status": "🕒 Filling",
-     "detail": "no failure yet in 15 runs; the bar needs 24",
+     "lapsed_since": null,
+     "detail": "no failure yet in 15 runs; the bar needs 24; record since 2026-10-20: 15 of 15",
      "note": "only the silence side has a fixture",
      "tests": 1,
      "tests_with_runs": 1,
@@ -106,14 +123,18 @@
      "n": 15,
      "min_window": 15,
      "lower": 0.796116696403513,
-     "weakest_rate": 1.0
+     "weakest_rate": 1.0,
+     "record_n": 15,
+     "record_passes": 15,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Warning event becomes a root cause, fix options and a pull request on \"apply\"",
      "scheduled": true,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "78 of 93 runs pass; lower bound 0.75; weakest test 17%",
+     "lapsed_since": null,
+     "detail": "78 of 93 runs pass; lower bound 0.75; weakest test 17%; record since 2026-10-20: 78 of 93",
      "note": "",
      "tests": 5,
      "tests_with_runs": 5,
@@ -122,14 +143,18 @@
      "n": 93,
      "min_window": 15,
      "lower": 0.7507986037988315,
-     "weakest_rate": 0.16666666666666666
+     "weakest_rate": 0.16666666666666666,
+     "record_n": 93,
+     "record_passes": 78,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "GitOps drift alert is triaged against the declared source",
      "scheduled": true,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "100 of 113 runs pass; lower bound 0.81; weakest test 56%; 1 listed test never ran on this model",
+     "lapsed_since": null,
+     "detail": "100 of 113 runs pass; lower bound 0.81; weakest test 56%; 1 listed test never ran on this model; record since 2026-10-20: 100 of 113",
      "note": "",
      "tests": 7,
      "tests_with_runs": 6,
@@ -138,14 +163,18 @@
      "n": 113,
      "min_window": 17,
      "lower": 0.8130759212529585,
-     "weakest_rate": 0.5555555555555556
+     "weakest_rate": 0.5555555555555556,
+     "record_n": 113,
+     "record_passes": 100,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Diagnose a broken workload without changing it",
      "scheduled": false,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "89 of 105 runs pass; lower bound 0.77; weakest test 0%",
+     "lapsed_since": null,
+     "detail": "89 of 105 runs pass; lower bound 0.77; weakest test 0%; record since 2026-10-20: 89 of 105",
      "note": "",
      "tests": 6,
      "tests_with_runs": 6,
@@ -154,14 +183,18 @@
      "n": 105,
      "min_window": 9,
      "lower": 0.7667269508803728,
-     "weakest_rate": 0.0
+     "weakest_rate": 0.0,
+     "record_n": 105,
+     "record_passes": 89,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Check observability wiring (metrics, traces, alerts)",
      "scheduled": false,
      "subgroup": null,
      "status": "❌ Not yet",
-     "detail": "22 of 48 runs pass; lower bound 0.33; weakest test 20%",
+     "lapsed_since": null,
+     "detail": "22 of 48 runs pass; lower bound 0.33; weakest test 20%; record since 2026-10-20: 22 of 48",
      "note": "",
      "tests": 3,
      "tests_with_runs": 3,
@@ -170,7 +203,10 @@
      "n": 48,
      "min_window": 15,
      "lower": 0.3257524219824218,
-     "weakest_rate": 0.2
+     "weakest_rate": 0.2,
+     "record_n": 48,
+     "record_passes": 22,
+     "record_first": "2026-10-20"
     }
    ]
   },
@@ -182,7 +218,8 @@
      "scheduled": true,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "71 of 78 runs pass; lower bound 0.83; weakest test 53%",
+     "lapsed_since": null,
+     "detail": "71 of 78 runs pass; lower bound 0.83; weakest test 53%; record since 2026-10-20: 71 of 78",
      "note": "",
      "tests": 4,
      "tests_with_runs": 4,
@@ -191,14 +228,18 @@
      "n": 78,
      "min_window": 15,
      "lower": 0.8261527535739357,
-     "weakest_rate": 0.5333333333333333
+     "weakest_rate": 0.5333333333333333,
+     "record_n": 78,
+     "record_passes": 71,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "AI security audit finds exposed model-serving workloads",
      "scheduled": true,
      "subgroup": null,
      "status": "🟠 Partly",
-     "detail": "40 of 65 runs pass; lower bound 0.49; weakest test 0%",
+     "lapsed_since": null,
+     "detail": "40 of 65 runs pass; lower bound 0.49; weakest test 0%; record since 2026-10-20: 40 of 65",
      "note": "",
      "tests": 3,
      "tests_with_runs": 3,
@@ -207,13 +248,17 @@
      "n": 65,
      "min_window": 15,
      "lower": 0.4938420271042806,
-     "weakest_rate": 0.0
+     "weakest_rate": 0.0,
+     "record_n": 65,
+     "record_passes": 40,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Networking fabric audit",
      "scheduled": true,
      "subgroup": null,
      "status": "⬜ No test",
+     "lapsed_since": null,
      "detail": "no test exists",
      "note": "",
      "tests": 0,
@@ -223,7 +268,10 @@
      "n": 0,
      "min_window": 0,
      "lower": 0.0,
-     "weakest_rate": null
+     "weakest_rate": null,
+     "record_n": 0,
+     "record_passes": 0,
+     "record_first": null
     }
    ]
   },
@@ -235,7 +283,8 @@
      "scheduled": true,
      "subgroup": null,
      "status": "✅ Can",
-     "detail": "86 of 90 runs pass; lower bound 0.89; weakest test 87%",
+     "lapsed_since": null,
+     "detail": "86 of 90 runs pass; lower bound 0.89; weakest test 87%; record since 2026-10-20: 86 of 90",
      "note": "",
      "tests": 5,
      "tests_with_runs": 5,
@@ -244,14 +293,18 @@
      "n": 90,
      "min_window": 15,
      "lower": 0.8912314489865941,
-     "weakest_rate": 0.8666666666666667
+     "weakest_rate": 0.8666666666666667,
+     "record_n": 90,
+     "record_passes": 86,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Stockout prevention names node pools at risk",
      "scheduled": true,
      "subgroup": null,
      "status": "🟠 Partly",
-     "detail": "36 of 60 runs pass; lower bound 0.47; weakest test 4%",
+     "lapsed_since": null,
+     "detail": "36 of 60 runs pass; lower bound 0.47; weakest test 4%; record since 2026-10-20: 36 of 60",
      "note": "the collector misses the planted pool",
      "tests": 3,
      "tests_with_runs": 3,
@@ -260,13 +313,17 @@
      "n": 60,
      "min_window": 18,
      "lower": 0.47366053393698465,
-     "weakest_rate": 0.041666666666666664
+     "weakest_rate": 0.041666666666666664,
+     "record_n": 60,
+     "record_passes": 36,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Autoscaler stockout investigator",
      "scheduled": true,
      "subgroup": null,
      "status": "⬜ No test",
+     "lapsed_since": null,
      "detail": "no test exists",
      "note": "off by default",
      "tests": 0,
@@ -276,7 +333,10 @@
      "n": 0,
      "min_window": 0,
      "lower": 0.0,
-     "weakest_rate": null
+     "weakest_rate": null,
+     "record_n": 0,
+     "record_passes": 0,
+     "record_first": null
     }
    ]
   },
@@ -288,7 +348,8 @@
      "scheduled": true,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "60 of 65 runs pass; lower bound 0.83; weakest test 83%",
+     "lapsed_since": null,
+     "detail": "60 of 65 runs pass; lower bound 0.83; weakest test 83%; record since 2026-10-20: 60 of 65",
      "note": "",
      "tests": 4,
      "tests_with_runs": 4,
@@ -297,14 +358,18 @@
      "n": 65,
      "min_window": 12,
      "lower": 0.8322406663848038,
-     "weakest_rate": 0.8333333333333334
+     "weakest_rate": 0.8333333333333334,
+     "record_n": 65,
+     "record_passes": 60,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Consistency audit spots the cluster configured unlike its peers",
      "scheduled": true,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "50 of 62 runs pass; lower bound 0.69; weakest test 56%",
+     "lapsed_since": null,
+     "detail": "50 of 62 runs pass; lower bound 0.69; weakest test 56%; record since 2026-10-20: 50 of 62",
      "note": "",
      "tests": 3,
      "tests_with_runs": 3,
@@ -313,13 +378,17 @@
      "n": 62,
      "min_window": 18,
      "lower": 0.691482037200523,
-     "weakest_rate": 0.5555555555555556
+     "weakest_rate": 0.5555555555555556,
+     "record_n": 62,
+     "record_passes": 50,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Compute fleet audit",
      "scheduled": true,
      "subgroup": null,
      "status": "⬜ No test",
+     "lapsed_since": null,
      "detail": "no test exists",
      "note": "",
      "tests": 0,
@@ -329,7 +398,10 @@
      "n": 0,
      "min_window": 0,
      "lower": 0.0,
-     "weakest_rate": null
+     "weakest_rate": null,
+     "record_n": 0,
+     "record_passes": 0,
+     "record_first": null
     }
    ]
   },
@@ -341,7 +413,8 @@
      "scheduled": false,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "131 of 162 runs pass; lower bound 0.74; weakest test 7%",
+     "lapsed_since": null,
+     "detail": "131 of 162 runs pass; lower bound 0.74; weakest test 7%; record since 2026-10-20: 131 of 162",
      "note": "",
      "tests": 6,
      "tests_with_runs": 6,
@@ -350,14 +423,18 @@
      "n": 162,
      "min_window": 15,
      "lower": 0.7411982782936747,
-     "weakest_rate": 0.07407407407407407
+     "weakest_rate": 0.07407407407407407,
+     "record_n": 162,
+     "record_passes": 131,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Critical findings get a pull request, re-runs open no duplicate",
      "scheduled": true,
      "subgroup": null,
      "status": "✅ Can",
-     "detail": "81 of 81 runs pass; lower bound 0.95; weakest test 100%",
+     "lapsed_since": null,
+     "detail": "81 of 81 runs pass; lower bound 0.95; weakest test 100%; record since 2026-10-20: 81 of 81",
      "note": "the pull request is graded on request; the audit-opened one is not",
      "tests": 3,
      "tests_with_runs": 3,
@@ -366,14 +443,18 @@
      "n": 81,
      "min_window": 15,
      "lower": 0.9547219138856311,
-     "weakest_rate": 1.0
+     "weakest_rate": 1.0,
+     "record_n": 81,
+     "record_passes": 81,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Refuse an unsafe or direct change and name the safe path",
      "scheduled": false,
      "subgroup": null,
      "status": "🟠 Partly",
-     "detail": "106 of 153 runs pass; lower bound 0.62; weakest test 13%",
+     "lapsed_since": null,
+     "detail": "106 of 153 runs pass; lower bound 0.62; weakest test 13%; record since 2026-10-20: 106 of 153",
      "note": "",
      "tests": 8,
      "tests_with_runs": 8,
@@ -382,14 +463,18 @@
      "n": 153,
      "min_window": 15,
      "lower": 0.6157352576863069,
-     "weakest_rate": 0.13333333333333333
+     "weakest_rate": 0.13333333333333333,
+     "record_n": 153,
+     "record_passes": 106,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Repository work (review replies, branch reuse, issue triage, forge commands)",
      "scheduled": false,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "151 of 156 runs pass; lower bound 0.93; weakest test 67%",
+     "lapsed_since": null,
+     "detail": "151 of 156 runs pass; lower bound 0.93; weakest test 67%; record since 2026-10-20: 151 of 156",
      "note": "",
      "tests": 5,
      "tests_with_runs": 5,
@@ -398,14 +483,18 @@
      "n": 156,
      "min_window": 12,
      "lower": 0.9271716363804907,
-     "weakest_rate": 0.6666666666666666
+     "weakest_rate": 0.6666666666666666,
+     "record_n": 156,
+     "record_passes": 151,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Repository watcher triages new issues",
      "scheduled": true,
      "subgroup": null,
      "status": "✅ Can",
-     "detail": "27 of 27 runs pass; lower bound 0.88; weakest test 100%",
+     "lapsed_since": null,
+     "detail": "27 of 27 runs pass; lower bound 0.88; weakest test 100%; record since 2026-10-20: 27 of 27",
      "note": "",
      "tests": 1,
      "tests_with_runs": 1,
@@ -414,7 +503,10 @@
      "n": 27,
      "min_window": 27,
      "lower": 0.8754449685379289,
-     "weakest_rate": 1.0
+     "weakest_rate": 1.0,
+     "record_n": 27,
+     "record_passes": 27,
+     "record_first": "2026-10-20"
     }
    ]
   },
@@ -426,7 +518,8 @@
      "scheduled": false,
      "subgroup": null,
      "status": "❌ Not yet",
-     "detail": "29 of 63 runs pass; lower bound 0.34; weakest test 0%",
+     "lapsed_since": null,
+     "detail": "29 of 63 runs pass; lower bound 0.34; weakest test 0%; record since 2026-10-20: 29 of 63",
      "note": "",
      "tests": 5,
      "tests_with_runs": 5,
@@ -435,14 +528,18 @@
      "n": 63,
      "min_window": 12,
      "lower": 0.3430886449055384,
-     "weakest_rate": 0.0
+     "weakest_rate": 0.0,
+     "record_n": 63,
+     "record_passes": 29,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Record a person's decision on a finding (dismiss, snooze, accept)",
      "scheduled": false,
      "subgroup": null,
      "status": "❌ Not yet",
-     "detail": "9 of 33 runs pass; lower bound 0.15; weakest test 0%",
+     "lapsed_since": null,
+     "detail": "9 of 33 runs pass; lower bound 0.15; weakest test 0%; record since 2026-10-20: 9 of 33",
      "note": "",
      "tests": 3,
      "tests_with_runs": 3,
@@ -451,14 +548,18 @@
      "n": 33,
      "min_window": 9,
      "lower": 0.15067440813206437,
-     "weakest_rate": 0.0
+     "weakest_rate": 0.0,
+     "record_n": 33,
+     "record_passes": 9,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Run an audit now, or answer a fleet question from the collectors",
      "scheduled": false,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "159 of 175 runs pass; lower bound 0.86; weakest test 56%; 2 listed tests never ran on this model",
+     "lapsed_since": null,
+     "detail": "159 of 175 runs pass; lower bound 0.86; weakest test 56%; 2 listed tests never ran on this model; record since 2026-10-20: 159 of 175",
      "note": "",
      "tests": 12,
      "tests_with_runs": 10,
@@ -467,14 +568,18 @@
      "n": 175,
      "min_window": 12,
      "lower": 0.8566523939280246,
-     "weakest_rate": 0.5555555555555556
+     "weakest_rate": 0.5555555555555556,
+     "record_n": 175,
+     "record_passes": 159,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Answer GKE knowledge questions with sources",
      "scheduled": false,
      "subgroup": null,
      "status": "🟡 Mostly",
-     "detail": "90 of 111 runs pass; lower bound 0.73; weakest test 13%",
+     "lapsed_since": null,
+     "detail": "90 of 111 runs pass; lower bound 0.73; weakest test 13%; record since 2026-10-20: 90 of 111",
      "note": "",
      "tests": 7,
      "tests_with_runs": 7,
@@ -483,13 +588,17 @@
      "n": 111,
      "min_window": 15,
      "lower": 0.7280316712958923,
-     "weakest_rate": 0.13333333333333333
+     "weakest_rate": 0.13333333333333333,
+     "record_n": 111,
+     "record_passes": 90,
+     "record_first": "2026-10-20"
     },
     {
      "capability": "Chat posts (audit report, findings nudge, daily recap, fallback to the home channel)",
      "scheduled": true,
      "subgroup": null,
      "status": "⬜ No test",
+     "lapsed_since": null,
      "detail": "no test exists",
      "note": "no evaluation install has a chat platform",
      "tests": 0,
@@ -499,14 +608,18 @@
      "n": 0,
      "min_window": 0,
      "lower": 0.0,
-     "weakest_rate": null
+     "weakest_rate": null,
+     "record_n": 0,
+     "record_passes": 0,
+     "record_first": null
     },
     {
      "capability": "First-run audits start at onboarding",
      "scheduled": true,
      "subgroup": null,
      "status": "✅ Can",
-     "detail": "27 of 27 runs pass; lower bound 0.88; weakest test 100%",
+     "lapsed_since": null,
+     "detail": "27 of 27 runs pass; lower bound 0.88; weakest test 100%; record since 2026-10-20: 27 of 27",
      "note": "",
      "tests": 1,
      "tests_with_runs": 1,
@@ -515,7 +628,10 @@
      "n": 27,
      "min_window": 27,
      "lower": 0.8754449685379289,
-     "weakest_rate": 1.0
+     "weakest_rate": 1.0,
+     "record_n": 27,
+     "record_passes": 27,
+     "record_first": "2026-10-20"
     }
    ]
   }

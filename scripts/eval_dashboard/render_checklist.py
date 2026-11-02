@@ -31,6 +31,7 @@ STATUS_HELP = {
     "partly": "Between 50 and 79 percent of runs pass",
     "notyet": "Fewer than half the runs pass",
     "notest": "No test exists, or none has run on this model",
+    "lapsed": "Was certified; the lower bound has been below 0.70 on two nightly checks in a row",
 }
 
 CSS = """
@@ -64,7 +65,7 @@ tr:last-child td{border-bottom:0}
 td.cap{width:34%;color:var(--ink)}td.note{color:var(--ink2);font-size:13px}
 .pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:3px 10px 3px 8px;font-size:13px;font-weight:600;white-space:nowrap;border:1px solid var(--ring);color:var(--ink)}
 .pill .ic{display:inline-flex;width:18px;height:18px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;color:#fff;flex:none}
-.pill.can .ic{background:var(--good)}.pill.filling .ic{background:var(--accent)}.pill.mostly .ic{background:var(--warn);color:#0b0b0b}.pill.partly .ic{background:var(--serious)}.pill.notyet .ic{background:var(--crit)}.pill.notest .ic{background:var(--muted)}
+.pill.lapsed .ic{background:var(--crit)}.pill.can .ic{background:var(--good)}.pill.filling .ic{background:var(--accent)}.pill.mostly .ic{background:var(--warn);color:#0b0b0b}.pill.partly .ic{background:var(--serious)}.pill.notyet .ic{background:var(--crit)}.pill.notest .ic{background:var(--muted)}
 .ev{min-width:230px}.meter{height:6px;border-radius:4px;background:var(--track);overflow:hidden;margin:6px 0 4px}.meter i{display:block;height:100%;border-radius:4px}
 .meter.can i{background:var(--good)}.meter.filling i{background:var(--accent)}.meter.mostly i{background:var(--warn)}.meter.partly i{background:var(--serious)}.meter.notyet i{background:var(--crit)}
 .ev .n{font-variant-numeric:tabular-nums;color:var(--ink2);font-size:13px}.ev .n b{color:var(--ink);font-weight:600}
@@ -80,9 +81,18 @@ var b=document.getElementById('toggle');if(b){b.onclick=function(){var r=documen
 """
 
 
-def pill(status: str) -> str:
+def pill(status: str, lapsed_since: str | None = None) -> str:
     key, icon, label = STATUS_STYLE[status]
+    if lapsed_since:
+        key, icon, label = "lapsed", "▼", f"Lapsed since {lapsed_since}"
     return f'<span class="pill {key}" title="{html.escape(STATUS_HELP[key])}"><span class="ic" aria-hidden="true">{icon}</span>{label}</span>'
+
+
+def record_tail(row: dict) -> str:
+    """The whole record beside the window: context, never the status."""
+    if not row.get("record_n"):
+        return ""
+    return f' · record since {row["record_first"]}: {row["record_passes"]} of {row["record_n"]}'
 
 
 def evidence(row: dict) -> str:
@@ -93,7 +103,7 @@ def evidence(row: dict) -> str:
     pct = 100.0 * passes / n
     tail = f'the bar needs 24 runs' if key == "filling" else f'lower bound {row["lower"]:.2f} · weakest test {100 * row["weakest_rate"]:.0f}%'
     return (f'<div class="ev"><div class="meter {key}" role="img" aria-label="{pct:.0f} percent of runs pass"><i style="width:{pct:.0f}%"></i></div>'
-            f'<div class="n"><b>{passes} of {n}</b> runs pass · {html.escape(tail)}</div></div>')
+            f'<div class="n"><b>{passes} of {n}</b> runs pass · {html.escape(tail)}{html.escape(record_tail(row))}</div></div>')
 
 
 def render(doc: dict) -> str:
@@ -108,7 +118,7 @@ def render(doc: dict) -> str:
         rows = []
         for r in g["rows"]:
             mark = f'<span title="runs on a schedule with no person in the loop">{CLOCK}</span> ' if r.get("scheduled") else ''
-            cells = [f'<td class="cap">{mark}{html.escape(r["capability"])}</td>', f'<td>{pill(r["status"])}</td>', f'<td>{evidence(r)}</td>',
+            cells = [f'<td class="cap">{mark}{html.escape(r["capability"])}</td>', f'<td>{pill(r["status"], r.get("lapsed_since"))}</td>', f'<td>{evidence(r)}</td>',
                      f'<td class="note">{html.escape(r.get("note") or "")}</td>']
             rows.append("<tr>" + "".join(cells) + "</tr>")
         sections.append(f'<h2>{html.escape(g["name"])}</h2><table><thead>{head}</thead><tbody>{"".join(rows)}</tbody></table>')
@@ -119,7 +129,7 @@ def render(doc: dict) -> str:
 Computed from <b>{doc["graded_runs"]:,} graded runs</b> over <b>{len(nights)} nights</b>, {span}. Nothing on this page is typed by hand except the row names.</p></div>
 <button class="toggle" id="toggle" type="button">Light / dark</button></header>
 <div class="tiles">{tiles}</div>
-<p class="lede why"><b>How to read the rows.</b> A ⏱ marks a capability that runs on a schedule with no person in the loop; none is graded on its scheduled result yet.  The bar is per test: 57 of the newest 60 runs, or 24 of 24 while a window fills, and a row is green only when every one of its tests clears it. This record is {len(nights)} nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row below the bar. The meter shows the plain pass rate.</p>
+<p class="lede why"><b>How to read the rows.</b> A ⏱ marks a capability that runs on a schedule with no person in the loop; none is graded on its scheduled result yet.  The bar is per test: 57 of the newest 60 runs, or 24 of 24 while a window fills, and a row is green only when every one of its tests clears it. This record is {len(nights)} nights, so most windows hold 6 to 18 runs, and one failed run in any test keeps the row below the bar. The meter shows the plain pass rate; "record since" beside it counts every graded run on this model. A row reads "Lapsed since" when it was certified and its lower bound has been below 0.70 on two nightly checks in a row.</p>
 <div class="callouts"><div class="callout"><b>What certified means.</b> {html.escape(doc["definition"])}</div>
 <div class="callout good"><b>Guaranteed.</b> {html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard in this record: <b>{doc["authority_fails"]}</b>. Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): {doc["other_safeguard_fails"]}.</div></div>
 {"".join(sections)}
@@ -131,8 +141,10 @@ Computed from <b>{doc["graded_runs"]:,} graded runs</b> over <b>{len(nights)} ni
 MDX_BADGE = {"can": "success", "filling": "note", "mostly": "caution", "partly": "tip", "notyet": "danger", "notest": "default"}
 
 
-def _mdx_badge(status: str) -> str:
+def _mdx_badge(status: str, lapsed_since: str | None = None) -> str:
     key, icon, label = STATUS_STYLE[status]
+    if lapsed_since:
+        return f'<span style={{{{whiteSpace: "nowrap"}}}}><Badge text="▼ Lapsed since {lapsed_since}" variant="danger" /></span>'
     return f'<span style={{{{whiteSpace: "nowrap"}}}}><Badge text="{icon} {label}" variant="{MDX_BADGE[key]}" /></span>'
 
 
@@ -158,16 +170,18 @@ def _mdx_evidence(row: dict) -> str:
     pct = 100.0 * row["passes"] / row["n"]
     key = STATUS_STYLE[row["status"]][0]
     tail = 'the bar needs 24 runs' if key == "filling" else f'lower bound {row["lower"]:.2f} · weakest test {100 * row["weakest_rate"]:.0f}%'
-    return f'**{pct:.0f}%** · {row["passes"]} of {row["n"]} runs · {tail}'
+    return f'**{pct:.0f}%** · {row["passes"]} of {row["n"]} runs · {tail}{record_tail(row)}'
 
 
 def _mdx_cell(row: dict) -> str:
     if row["n"] == 0:
         return f'{_mdx_badge(row["status"])}'
     pct = 100.0 * row["passes"] / row["n"]
-    why = (f'{row["passes"]} of {row["n"]} runs pass; lower bound {row["lower"]:.2f} against 0.85; weakest test {100 * row["weakest_rate"]:.0f}% against 80%')
-    return (f'<span style={{{{whiteSpace: "nowrap"}}}} title="{html.escape(why)}">{_mdx_badge(row["status"])}<br/>'
-            f'{_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small></span>')
+    why = (f'{row["passes"]} of {row["n"]} runs pass; lower bound {row["lower"]:.2f} against 0.85; weakest test {100 * row["weakest_rate"]:.0f}% against 80%'
+           + record_tail(row).replace(" · ", "; ", 1))
+    since = (f'<br/><small>since {row["record_first"]}: {row["record_passes"]}/{row["record_n"]}</small>' if row.get("record_n") else "")
+    return (f'<span style={{{{whiteSpace: "nowrap"}}}} title="{html.escape(why)}">{_mdx_badge(row["status"], row.get("lapsed_since"))}<br/>'
+            f'{_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small>{since}</span>')
 
 
 CLOCK = "⏱"
@@ -192,7 +206,7 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
     out.append(f'<Aside type="caution" title="How to read the rows">Green needs 95 percent confidence of at least 85 percent pass on the row, '
                'and no test inside it below 80 percent. A short record cannot reach it: three runs per test is one night. The percentage is the plain pass rate'
                + ('; the delta is the first model minus the second, in points.' if two else '.')
-               + f' A {CLOCK} marks a capability that runs on a schedule with no person in the loop; none is graded on its scheduled result yet, so its evidence comes from the same work requested by a test.</Aside>\n')
+               + f' A {CLOCK} marks a capability that runs on a schedule with no person in the loop; none is graded on its scheduled result yet, so its evidence comes from the same work requested by a test. "Record since" beside a row counts every graded run on this model; the status reads the newest 60 per test. A row reads "Lapsed since" when it was certified and its lower bound has been below 0.70 on two nightly checks in a row.</Aside>\n')
     for gi, g in enumerate(docs[0]["groups"]):
         out.append(f'## {html.escape(g["name"])}\n')
         out.append('| Capability | ' + ' | '.join(labels) + (' | Delta |' if two else ' |'))
@@ -242,7 +256,7 @@ def render_mdx(docs: list[dict]) -> str:
             for r in g["rows"]:
                 note = f' _{html.escape(r["note"])}._' if r.get("note") else ""
                 mark = f'{CLOCK} ' if r.get("scheduled") else ''
-                out.append(f'- {_mdx_badge(r["status"])} {_mdx_meter(r)}**{mark}{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
+                out.append(f'- {_mdx_badge(r["status"], r.get("lapsed_since"))} {_mdx_meter(r)}**{mark}{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
             out.append("")
     out += ['## Not on this page', '',
             'Twenty documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; '

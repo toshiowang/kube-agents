@@ -19,9 +19,9 @@ import sys
 import yaml
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from certification_statement import (CERTIFIED_PASSES_FILLING, DEFINITION, GUARANTEE, MODEL_LABELS,  # noqa: E402
-                                     ROW_LOWER_BOUND, ROW_TEST_FLOOR, STATE_CERTIFIED, is_authority_violation,
-                                     load_rows, load_tasks, wilson_lower, window)
+from certification_statement import (CERTIFIED_PASSES_FILLING, DEFINITION, GRADED_OUTCOMES, GUARANTEE,  # noqa: E402
+                                     LAPSE_LOWER_BOUND, MODEL_LABELS, ROW_LOWER_BOUND, ROW_TEST_FLOOR, STATE_CERTIFIED,
+                                     is_authority_violation, load_rows, load_tasks, wilson_lower, window)
 
 CAN = "✅ Can"
 FILLING = "🕒 Filling"
@@ -29,8 +29,37 @@ MOSTLY = "🟡 Mostly"
 PARTLY = "🟠 Partly"
 NOT_YET = "❌ Not yet"
 NO_TEST = "⬜ No test"
+LAPSED = "🔻 Lapsed"
 PARTLY_MIN_RATE = 0.5
 MOSTLY_MIN_RATE = 0.8
+
+
+def record(rows_by_case: dict[str, list[dict]], ids: list[str]) -> dict:
+    """The whole record of a row's tests on this model, not the window: context beside the status."""
+    graded = [r for t in ids for r in rows_by_case.get(t, []) if r["outcome"] in GRADED_OUTCOMES]
+    return {"record_n": len(graded), "record_passes": sum(r["outcome"] == "pass" for r in graded),
+            "record_first": min((r["night"] for r in graded), default=None)}
+
+
+def row_as_of(rows_by_case: dict[str, list[dict]], ids: list[str], night: str) -> tuple[str, dict]:
+    """The row's status and numbers as the edition of ``night`` would have computed them."""
+    windows = [window([r for r in rows_by_case.get(t, []) if r["night"] <= night]) for t in ids]
+    st, _detail, numbers = status(windows)
+    return st, numbers
+
+
+def lapsed_since(rows_by_case: dict[str, list[dict]], ids: list[str], nights: list[str], numbers: dict) -> str | None:
+    """Decision D1: a row that was once certified and whose lower bound has been below the lapse bound on
+    the latest edition and on the previous graded night is lapsed since that previous night. Otherwise None."""
+    if len(nights) < 2 or numbers["n"] == 0 or numbers["lower"] >= LAPSE_LOWER_BOUND:
+        return None
+    previous = nights[-2]
+    _st, before = row_as_of(rows_by_case, ids, previous)
+    if before["n"] == 0 or before["lower"] >= LAPSE_LOWER_BOUND:
+        return None
+    if not any(row_as_of(rows_by_case, ids, night)[0] == CAN for night in nights[:-1]):
+        return None
+    return previous
 
 
 def status(windows: list[dict]) -> tuple[str, str, dict]:
@@ -85,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
     out = [f"# What kube-agents can and cannot do today, on {label}\n",
            f"Edition of {a.as_of}, computed from {len(graded)} graded runs over {len(nights)} nights "
            f"({nights[0] if nights else '–'} to {nights[-1] if nights else '–'}). Legend: {CAN} = certified: 95 percent confidence of at least 85 percent pass on the row, no test below 80 percent; "
-           f"{FILLING} = no failure yet, window still short of 24 runs; {MOSTLY} = at least 80 percent of runs pass, below the bar; {PARTLY} = between 50 and 79 percent of runs pass; {NOT_YET} = fewer than half the runs pass; {NO_TEST} = no test, or none run on this model.\n",
+           f"{FILLING} = no failure yet, window still short of 24 runs; {MOSTLY} = at least 80 percent of runs pass, below the bar; {PARTLY} = between 50 and 79 percent of runs pass; {NOT_YET} = fewer than half the runs pass; {NO_TEST} = no test, or none run on this model; {LAPSED} = was certified, and the lower bound has been below {LAPSE_LOWER_BOUND:.2f} on two nightly checks in a row. 'Record since' beside a row counts every graded run on this model; the status reads the newest 60 per test.\n",
            f"**Guaranteed.** {GUARANTEE} Cluster or repository writes caught by a safeguard in this record: {authority_fails}. "
            f"Other safeguard rules tripped (a card opened for an answer, a forbidden word, a sandbox tree check): {other_safeguard_fails}.\n",
            f"**What certified means.** {DEFINITION}\n"]
@@ -104,11 +133,17 @@ def main(argv: list[str] | None = None) -> int:
             windows = [window(by_case.get(t, [])) for t in ids]
             st, detail, numbers = status(windows)
             totals[st] += 1
+            rec = record(by_case, ids)
+            if rec["record_n"]:
+                detail += f"; record since {rec['record_first']}: {rec['record_passes']} of {rec['record_n']}"
+            lapse = lapsed_since(by_case, ids, nights, numbers)
+            shown = f"{LAPSED} since {lapse}" if lapse else st
             note = row.get("note", "")
             sched = bool(row.get("scheduled"))
             doc_group["rows"].append({"capability": row["capability"], "scheduled": sched, "subgroup": row.get("subgroup"),
-                                      "status": st, "detail": detail, "note": note, "tests": ids, **numbers})
-            out.append(f"| {row['capability']} | {'scheduled, no person in the loop' if sched else 'on request'} | {st} | {detail} | {note} |")
+                                      "status": st, "lapsed_since": lapse, "detail": detail, "note": note, "tests": ids,
+                                      **numbers, **rec})
+            out.append(f"| {row['capability']} | {'scheduled, no person in the loop' if sched else 'on request'} | {shown} | {detail} | {note} |")
         out.append("")
     out.insert(4, "| " + " | ".join(totals) + " |\n| :-- | :-- | :-- | :-- | :-- | :-- |\n| " + " | ".join(str(v) for v in totals.values()) + " |\n")
     out.append("## Not in this checklist\n")
