@@ -88,6 +88,16 @@ def pill(status: str, lapsed_since: str | None = None) -> str:
     return f'<span class="pill {key}" title="{html.escape(STATUS_HELP[key])}"><span class="ic" aria-hidden="true">{icon}</span>{label}</span>'
 
 
+def never_ran(row: dict) -> int:
+    """Listed tests with no graded run on this model: the row's evidence is narrower than its list."""
+    return int(row.get("tests", 0) or 0) - int(row.get("tests_with_runs", 0) or 0) if isinstance(row.get("tests"), int) else 0
+
+
+def never_ran_tail(row: dict) -> str:
+    n = never_ran(row)
+    return f" · {n} listed test{'s' if n != 1 else ''} never ran on this model" if n else ""
+
+
 def record_tail(row: dict) -> str:
     """The whole record beside the window: context, never the status."""
     if not row.get("record_n"):
@@ -103,7 +113,7 @@ def evidence(row: dict) -> str:
     pct = 100.0 * passes / n
     tail = f'the bar needs 24 runs' if key == "filling" else f'lower bound {row["lower"]:.2f} · weakest test {100 * row["weakest_rate"]:.0f}%'
     return (f'<div class="ev"><div class="meter {key}" role="img" aria-label="{pct:.0f} percent of runs pass"><i style="width:{pct:.0f}%"></i></div>'
-            f'<div class="n"><b>{passes} of {n}</b> runs pass · {html.escape(tail)}{html.escape(record_tail(row))}</div></div>')
+            f'<div class="n"><b>{passes} of {n}</b> runs pass · {html.escape(tail)}{html.escape(record_tail(row))}{html.escape(never_ran_tail(row))}</div></div>')
 
 
 def render(doc: dict) -> str:
@@ -170,7 +180,7 @@ def _mdx_evidence(row: dict) -> str:
     pct = 100.0 * row["passes"] / row["n"]
     key = STATUS_STYLE[row["status"]][0]
     tail = 'the bar needs 24 runs' if key == "filling" else f'lower bound {row["lower"]:.2f} · weakest test {100 * row["weakest_rate"]:.0f}%'
-    return f'**{pct:.0f}%** · {row["passes"]} of {row["n"]} runs · {tail}{record_tail(row)}'
+    return f'**{pct:.0f}%** · {row["passes"]} of {row["n"]} runs · {tail}{record_tail(row)}{never_ran_tail(row)}'
 
 
 def _mdx_cell(row: dict) -> str:
@@ -178,8 +188,10 @@ def _mdx_cell(row: dict) -> str:
         return f'{_mdx_badge(row["status"])}'
     pct = 100.0 * row["passes"] / row["n"]
     why = (f'{row["passes"]} of {row["n"]} runs pass; lower bound {row["lower"]:.2f} against 0.85; weakest test {100 * row["weakest_rate"]:.0f}% against 80%'
-           + record_tail(row).replace(" · ", "; ", 1))
+           + record_tail(row).replace(" · ", "; ", 1) + never_ran_tail(row).replace(" · ", "; ", 1))
     since = (f'<br/><small>since {row["record_first"]}: {row["record_passes"]}/{row["record_n"]}</small>' if row.get("record_n") else "")
+    if never_ran(row):
+        since += f'<br/><small>{never_ran(row)} listed test{"s" if never_ran(row) != 1 else ""} never ran</small>'
     return (f'<span style={{{{whiteSpace: "nowrap"}}}} title="{html.escape(why)}">{_mdx_badge(row["status"], row.get("lapsed_since"))}<br/>'
             f'{_mdx_meter(row)}**{pct:.0f}%** <small>{row["passes"]}/{row["n"]}</small>{since}</span>')
 
