@@ -135,7 +135,7 @@ def render(doc: dict) -> str:
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Certified capabilities · {html.escape(doc["label"])}</title><style>{CSS}</style></head><body><main>
 <header><div><p class="eyebrow">kube-agents · certified capabilities</p><h1>What kube-agents can and cannot do today</h1>
-<p class="sub"><span class="badge">{html.escape(doc["label"])}</span><span class="badge">Edition {html.escape(doc["as_of"])}</span>
+<p class="sub"><span class="badge">{html.escape(doc["label"])}</span><span class="badge">Record through {html.escape(nights[-1] if nights else "–")}</span>
 Computed from <b>{doc["graded_runs"]:,} graded runs</b> over <b>{len(nights)} nights</b>, {span}. Nothing on this page is typed by hand except the row names.</p></div>
 <button class="toggle" id="toggle" type="button">Light / dark</button></header>
 <div class="tiles">{tiles}</div>
@@ -206,8 +206,11 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
     out = ['<style>{`.sl-markdown-content table:where(:not(.not-content *)) td:first-child { white-space: normal; min-width: 11rem; }`}</style>', '',
            '## At a glance', '',
            '| | ' + ' | '.join(labels) + ' |', '| :-- | ' + ' | '.join('--:' for _ in labels) + ' |']
-    out.append('| Edition | ' + ' | '.join(d["as_of"] for d in docs) + ' |')
-    out.append('| Record | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} night{"s" if len(d["nights"]) != 1 else ""}' for d in docs) + ' |')
+    # The nightly runs one model at a time, so a column stops moving once the
+    # nightly leaves its model; the date a reader needs is the last night in
+    # that column's record, not the day the page was computed.
+    out.append('| Last night in the record | ' + ' | '.join(d["nights"][-1] if d["nights"] else "–" for d in docs) + ' |')
+    out.append('| Record | ' + ' | '.join(f'{d["graded_runs"]:,} runs, {len(d["nights"])} night{"s" if len(d["nights"]) != 1 else ""}, from {d["nights"][0] if d["nights"] else "–"}' for d in docs) + ' |')
     out.append('| Writes caught by a safeguard | ' + ' | '.join(f'**{d["authority_fails"]}**' for d in docs) + ' |')
     out.append(f'| {CLOCK} Rows that run with no person in the loop | ' + ' | '.join(f'{d["scheduled_rows"]} of {sum(len(g["rows"]) for g in d["groups"])}' for d in docs) + ' |')
     for st in docs[0]["totals"]:
@@ -256,7 +259,7 @@ def render_mdx(docs: list[dict]) -> str:
         doc = docs[0]
         nights = doc["nights"]
         span = f'{nights[0]} to {nights[-1]}' if nights else "–"
-        out.append(f'{doc["label"]}, edition {doc["as_of"]}: {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
+        out.append(f'{doc["label"]}, record through {nights[-1] if nights else "–"} (computed {doc["as_of"]}): {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
         out += ["| Status | Rows | Meaning |", "| :-- | --: | :-- |"]
         for st, v in doc["totals"].items():
             out.append(f'| {_mdx_badge(st)} | {v} | {STATUS_HELP[STATUS_STYLE[st][0]]} |')
