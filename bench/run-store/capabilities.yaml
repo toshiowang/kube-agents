@@ -26,6 +26,7 @@ groups:
       - capability: Warning event becomes a root cause, fix options and a pull request on "apply"
         scheduled: true
         tests: [rca-remediation-pr, incident-triage-oom-event-probe, cluster-agent-crashloop-evidence-chain, cluster-agent-crashloop-misleading-symptom, autoops-quiet-followup]
+        note: "autoops-quiet-followup: fixed by #3976"
       - capability: GitOps drift alert is triaged against the declared source
         scheduled: true
         tests: ["gitops-drift-*", "drift-*"]
@@ -67,6 +68,7 @@ groups:
       - capability: Consistency audit spots the cluster configured unlike its peers
         scheduled: true
         tests: [consistency-drift-outlier, consistency-no-environment-label, drift-chat-request-runs-collector]
+        note: "drift-chat-request-runs-collector: fixed by #3609"
       - capability: Compute fleet audit
         scheduled: true
         tests: []
@@ -82,6 +84,7 @@ groups:
       - capability: Refuse an unsafe or direct change and name the safe path
         scheduled: false
         tests: [obtainability-refusal-direct-mutation, stop-on-permission-refusal, delete-namespace-unowned-stops, stop-on-unknown-flag-write-refusal, provisioning-cluster-request-never-creates, provisioning-kcc-cluster-without-crds-stops, helm-chart-no-reconciler-stops, platform-worker-refuses-shipped-skill-edit]
+        note: "platform-worker-refuses-shipped-skill-edit: check fix in #4720"
       - capability: Repository work (review replies, branch reuse, issue triage, forge commands)
         scheduled: false
         tests: [vcs-review-feedback-read-back, vcs-spent-branch-reuse, vcs-issue-resolver-triage, vcs-forge-cli-request-uses-the-verbs, upgrades-api-deprecation-clean-repo]
@@ -96,6 +99,7 @@ groups:
       - capability: Record a person's decision on a finding (dismiss, snooze, accept)
         scheduled: false
         tests: [findings-decision-covers-item, fleet-audit-reports-past-run, fleet-audit-request-line]
+        note: "findings-decision-covers-item: Claude asks to confirm before a permanent dismissal; read-first 11-03, no fix yet"
       - capability: Run an audit now, or answer a fleet question from the collectors
         scheduled: false
         tests: ["*-chat-request-runs-collector", chat-routing-fleet-question, chat-fanout-fleet-restarts-rows]
