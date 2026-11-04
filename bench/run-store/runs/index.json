@@ -345,6 +345,14 @@
    "runs": 246
   },
   {
+   "build": "2117769042000351232",
+   "cases": 87,
+   "commit": "08a7cd84d507ed987577fcd75fea1d63ced6e675",
+   "job": "ci-kube-agents-eval-nightly",
+   "night": "2026-11-04",
+   "runs": 261
+  },
+  {
    "build": "2110551280941273088",
    "cases": 3,
    "commit": "0ec08289b48000dd8c835511a87aead793d46fe4",
@@ -801,7 +809,7 @@
    "runs": 33
   }
  ],
- "generated_at": "2026-11-04T11:34Z",
+ "generated_at": "2026-11-04T20:24Z",
  "nights": {
   "2026-09-17": {
    "ci-kube-agents-eval-nightly": {
@@ -1862,6 +1870,16 @@
    }
   },
   "2026-11-04": {
+   "ci-kube-agents-eval-nightly": {
+    "cases": 87,
+    "fail": 18,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 10,
+    "pass": 233,
+    "runs": 261
+   },
    "ci-kube-agents-eval-nightly-gitlab": {
     "cases": 3,
     "fail": 0,
@@ -1894,5 +1912,5 @@
    }
   }
  },
- "rows": 11595
+ "rows": 11856
 }
