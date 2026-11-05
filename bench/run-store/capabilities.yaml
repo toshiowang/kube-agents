@@ -99,7 +99,7 @@ groups:
       - capability: Record a person's decision on a finding (dismiss, snooze, accept)
         scheduled: false
         tests: [findings-decision-covers-item, fleet-audit-reports-past-run, fleet-audit-request-line]
-        note: "findings-decision-covers-item: read-first 11-03 on the frozen record (a confirm question before a permanent dismissal); no fix yet"
+        note: "findings-decision-covers-item: a confirm question before a permanent dismissal, seen on the frozen record; no fix yet"
       - capability: Run an audit now, or answer a fleet question from the collectors
         scheduled: false
         tests: ["*-chat-request-runs-collector", chat-routing-fleet-question, chat-fanout-fleet-restarts-rows]

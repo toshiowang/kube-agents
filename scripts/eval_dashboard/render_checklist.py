@@ -153,6 +153,8 @@ MDX_BADGE = {"can": "success", "filling": "note", "mostly": "caution", "partly":
 
 def _mdx_badge(status: str, lapsed_since: str | None = None) -> str:
     key, icon, label = STATUS_STYLE[status]
+    if lapsed_since == "lapsed":
+        return f'<span style={{{{whiteSpace: "nowrap"}}}}><Badge text="▼ Lapsed" variant="danger" /></span>'
     if lapsed_since:
         return f'<span style={{{{whiteSpace: "nowrap"}}}}><Badge text="▼ Lapsed since {lapsed_since}" variant="danger" /></span>'
     return f'<span style={{{{whiteSpace: "nowrap"}}}}><Badge text="{icon} {label}" variant="{MDX_BADGE[key]}" /></span>'
@@ -244,10 +246,21 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
     return out
 
 
+STATUS_PLAIN = {
+    "can": "Certified: the tests pass at the certification bar with confidence, no test far behind",
+    "filling": "No failure yet; too few runs to certify",
+    "mostly": "Most runs pass; below the certification bar",
+    "partly": "About half the runs pass",
+    "notyet": "Most runs fail",
+    "notest": "No test exists, or none has run in the record",
+}
+PLAIN_DEFINITION = ("A capability is certified when, over the recent nightly record, its tests pass at the certification bar with "
+                    "statistical confidence and no single test falls far behind; a regression shows within a few nights. "
+                    "The exact rule and its numbers live in the generators.")
 UNNAMED_PHRASES = (("by model, computed", "computed"), ("today, by model.", "today."), ("on this model", "in the record"), ("per test on the model;", "per test in the record;"))
 
 
-def render_mdx(docs: list[dict], unnamed: bool = False) -> str:
+def render_mdx(docs: list[dict], unnamed: bool = False, status_only: bool = False) -> str:
     """One Starlight page. Several models: one view with a column per model. One model: that model's page,
     or, with ``unnamed``, the same page with no model named anywhere (one status column, built from that record)."""
     out = ['---', 'title: Certified capabilities',
@@ -256,7 +269,7 @@ def render_mdx(docs: list[dict], unnamed: bool = False) -> str:
            'import { Aside, Badge } from "@astrojs/starlight/components";', '',
            '**What kube-agents can and cannot do today, by model.** A row is a capability in plain words; its status is computed from the tests '
            'that are its evidence, from the evaluation record. Nothing on this page is typed by hand except the row names.', '',
-           f'<Aside type="note" title="What certified means">{html.escape(docs[0]["definition"])}</Aside>', '']
+           f'<Aside type="note" title="What certified means">{html.escape(PLAIN_DEFINITION if status_only else docs[0]["definition"])}</Aside>', '']
     if len(docs) > 1:
         out += _mdx_compare(docs)
     else:
@@ -264,27 +277,45 @@ def render_mdx(docs: list[dict], unnamed: bool = False) -> str:
         nights = doc["nights"]
         span = f'{nights[0]} to {nights[-1]}' if nights else "–"
         head = 'Record' if unnamed else f'{doc["label"]}, record'
-        out.append(f'{head} through {nights[-1] if nights else "–"} (computed {doc["as_of"]}): {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
-        out += ["| Status | Rows | Meaning |", "| :-- | --: | :-- |"]
-        for st, v in doc["totals"].items():
-            out.append(f'| {_mdx_badge(st)} | {v} | {STATUS_HELP[STATUS_STYLE[st][0]]} |')
-        out.append("")
-        out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard '
-                   f'in this record: **{doc["authority_fails"]}**.</Aside>\n')
+        if status_only:
+            out += ["| Status | Meaning |", "| :-- | :-- |"]
+            for st in doc["totals"]:
+                out.append(f'| {_mdx_badge(st)} | {STATUS_PLAIN[STATUS_STYLE[st][0]]} |')
+            out.append("")
+            out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(doc["guarantee"])}</Aside>\n')
+        else:
+            out.append(f'{head} through {nights[-1] if nights else "–"} (computed {doc["as_of"]}): {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
+            out += ["| Status | Rows | Meaning |", "| :-- | --: | :-- |"]
+            for st, v in doc["totals"].items():
+                out.append(f'| {_mdx_badge(st)} | {v} | {STATUS_HELP[STATUS_STYLE[st][0]]} |')
+            out.append("")
+            out.append(f'<Aside type="tip" title="Guaranteed">{html.escape(doc["guarantee"])} Cluster or repository writes caught by a safeguard '
+                       f'in this record: **{doc["authority_fails"]}**.</Aside>\n')
         for g in doc["groups"]:
             out.append(f'## {html.escape(g["name"])}\n')
             for r in g["rows"]:
                 note = f' _{html.escape(r["note"])}._' if r.get("note") else ""
                 mark = f'{CLOCK} ' if r.get("scheduled") else ''
-                out.append(f'- {_mdx_badge(r["status"], r.get("lapsed_since"))} {_mdx_meter(r)}**{mark}{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
+                if status_only:
+                    out.append(f'- {_mdx_badge(r["status"], "lapsed" if r.get("lapsed_since") else None)} **{mark}{html.escape(r["capability"])}**{note}')
+                else:
+                    out.append(f'- {_mdx_badge(r["status"], r.get("lapsed_since"))} {_mdx_meter(r)}**{mark}{html.escape(r["capability"])}** — {_mdx_evidence(r)}.{note}')
             out.append("")
-    out += ['## Not on this page', '',
-            'Twenty documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; '
-            'any comparison against a plain model, which the first paired run adds as a column.', '',
-            '## Method', '',
-            'Rows: `bench/run-store/capabilities.yaml`. Numbers: `bench/run-store/runs/`, the newest 60 graded runs per test on the model; '
-            'runs marked not applicable are left out; the lower bound is the 95 percent Wilson bound. '
-            'Generators: `scripts/eval_dashboard/capability_checklist.py` and `render_checklist.py --mdx`.', '']
+    if status_only:
+        out += ['## Not on this page', '',
+                'The documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; '
+                'any comparison against a plain model.', '',
+                '## Method', '',
+                'Rows: `bench/run-store/capabilities.yaml`. Status: computed from `bench/run-store/runs/` by '
+                '`scripts/eval_dashboard/capability_checklist.py`; rendered by `render_checklist.py --mdx --status-only`.', '']
+    else:
+        out += ['## Not on this page', '',
+                'Twenty documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; '
+                'any comparison against a plain model, which the first paired run adds as a column.', '',
+                '## Method', '',
+                'Rows: `bench/run-store/capabilities.yaml`. Numbers: `bench/run-store/runs/`, the newest 60 graded runs per test on the model; '
+                'runs marked not applicable are left out; the lower bound is the 95 percent Wilson bound. '
+                'Generators: `scripts/eval_dashboard/capability_checklist.py` and `render_checklist.py --mdx`.', '']
     text = "\n".join(out)
     if unnamed:
         for old, new in UNNAMED_PHRASES:
@@ -298,11 +329,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", required=True, type=pathlib.Path)
     ap.add_argument("--mdx", action="store_true", help="write a Starlight MDX page for docs/site instead of standalone HTML")
     ap.add_argument("--no-model-name", action="store_true", help="MDX mode, one input: name no model anywhere on the page")
+    ap.add_argument("--status-only", action="store_true", help="MDX mode, one input: each capability with its status mark only; no pass rate, percentage, run count or date")
     a = ap.parse_args(argv)
     docs = [json.loads(p.read_text()) for p in a.src]
-    if a.no_model_name and (not a.mdx or len(docs) != 1):
-        ap.error("--no-model-name needs --mdx and exactly one --in")
-    a.out.write_text(render_mdx(docs, unnamed=a.no_model_name) if a.mdx else render(docs[0]))
+    if (a.no_model_name or a.status_only) and (not a.mdx or len(docs) != 1):
+        ap.error("--no-model-name and --status-only need --mdx and exactly one --in")
+    a.out.write_text(render_mdx(docs, unnamed=a.no_model_name, status_only=a.status_only) if a.mdx else render(docs[0]))
     print(f"wrote {a.out}")
     return 0
 

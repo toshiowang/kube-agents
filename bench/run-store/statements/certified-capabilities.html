@@ -348,244 +348,167 @@ if (document.readyState === 'loading') {
 		})();
 	</script></sl-sidebar-state-persist><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-7it4zgwh"><div class="social-icons astro-7it4zgwh"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div></div></div></div></sl-sidebar-pane></nav><div class="main-frame astro-euo27uub"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-axz53cfb"><aside class="right-sidebar-container print:hidden astro-axz53cfb"><div class="right-sidebar astro-axz53cfb"><div class="lg:sl-hidden astro-gl637vfx"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-kwxnrgy4"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-kwxnrgy4"><details id="starlight__mobile-toc" class="astro-kwxnrgy4"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-kwxnrgy4"><span class="toggle sl-flex astro-kwxnrgy4">On this page<svg aria-hidden="true" class="caret astro-kwxnrgy4 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-kwxnrgy4"></span></summary><div class="dropdown astro-kwxnrgy4"><ul class="isMobile astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#upgrades" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Upgrades</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#incidents-and-troubleshooting" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Incidents and troubleshooting</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#security-and-compliance" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Security and compliance</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#reliability-and-capacity" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Reliability and capacity</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#cost-and-consistency" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Cost and consistency</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#changes-and-fixes" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Changes and fixes</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#working-with-the-agent" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Working with the agent</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#not-on-this-page" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Not on this page</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#method" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Method</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module">import{t as e}from"./starlight-toc.D4UDIxQL.js";var t=class extends e{set current(e){super.current=e;let t=this.querySelector(`.display-current`);t&&(t.textContent=e.textContent)}constructor(){super();let e=this.querySelector(`details`);if(!e)return;let t=()=>{e.open=!1};e.querySelectorAll(`a`).forEach(e=>{e.addEventListener(`click`,t)}),window.addEventListener(`click`,n=>{e.contains(n.target)||t()}),window.addEventListener(`keydown`,n=>{if(n.key===`Escape`&&e.open){let n=e.contains(document.activeElement);if(t(),n){let t=e.querySelector(`summary`);t&&t.focus()}}})}};customElements.define(`mobile-starlight-toc`,t);</script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-gl637vfx"><div class="sl-container astro-gl637vfx"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#upgrades" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Upgrades</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#incidents-and-troubleshooting" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Incidents and troubleshooting</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#security-and-compliance" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Security and compliance</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#reliability-and-capacity" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Reliability and capacity</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#cost-and-consistency" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Cost and consistency</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#changes-and-fixes" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Changes and fixes</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#working-with-the-agent" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Working with the agent</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#not-on-this-page" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Not on this page</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#method" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Method</span></a></li></ul></nav></starlight-toc><script type="module">import"./starlight-toc.D4UDIxQL.js";</script></div></div></div></aside><div class="main-pane astro-axz53cfb"><main data-pagefind-body class="astro-ae72s45h" lang="en" dir="ltr"><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><h1 id="_top" class="astro-dfqzrgu7">Certified capabilities</h1></div></div><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><div class="sl-markdown-content">
 <p><strong>What kube-agents can and cannot do today.</strong> A row is a capability in plain words; its status is computed from the tests that are its evidence, from the evaluation record. Nothing on this page is typed by hand except the row names.</p>
-<aside aria-label="What certified means" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg aria-hidden="true" class="starlight-aside__icon astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"/></svg>What certified means</p><div class="starlight-aside__content"><p>A capability is certified when, over the last three weeks of nightly runs, its
-tests pass at least 85 percent of the time with 95 percent confidence, and no
-single test falls below 80 percent. A regression shows within two nights. The
-exact rule: evaluated on the published tests for that capability, on a named
-model; the newest 60 graded runs per test; a 95 percent Wilson lower bound of
-at least 0.85 on the row (57 of 60 for a single test); no single test below 80
-percent; the record published. Certified lapses when the lower bound sits
-below 0.70 on two nightly checks in a row.</p></div></aside>
-<p>Record through 2026-11-04 (computed 2026-11-04): 3,515 graded runs over 7 nights, 2026-10-29 to 2026-11-04.</p>
+<aside aria-label="What certified means" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg aria-hidden="true" class="starlight-aside__icon astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"/></svg>What certified means</p><div class="starlight-aside__content"><p>A capability is certified when, over the recent nightly record, its tests pass
+at the certification bar with statistical confidence and no single test falls
+far behind; a regression shows within a few nights. The exact rule and its
+numbers live in the generators.</p></div></aside>
 <table>
 <thead>
 <tr>
 <th style="text-align: left">Status</th>
-<th style="text-align: right">Rows</th>
 <th style="text-align: left">Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left"><span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span></td>
-<td style="text-align: right">8</td>
-<td style="text-align: left">Certified: 95 percent confidence of at least 85 percent pass, no test below 80 percent</td>
+<td style="text-align: left">Certified: the tests pass at the certification bar with confidence, no test far behind</td>
 </tr>
 <tr>
 <td style="text-align:left"><span style="white-space:nowrap"><span class="sl-badge note small astro-6yf3h5sn">◔ Filling</span></span></td>
-<td style="text-align: right">1</td>
-<td style="text-align: left">No failure yet; fewer than 24 runs</td>
+<td style="text-align: left">No failure yet; too few runs to certify</td>
 </tr>
 <tr>
 <td style="text-align:left"><span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span></td>
-<td style="text-align: right">10</td>
-<td style="text-align: left">At least 80 percent of runs pass; below the certification bar</td>
+<td style="text-align: left">Most runs pass; below the certification bar</td>
 </tr>
 <tr>
 <td style="text-align:left"><span style="white-space:nowrap"><span class="sl-badge tip small astro-6yf3h5sn">◑ Partly</span></span></td>
-<td style="text-align: right">4</td>
-<td style="text-align: left">Between 50 and 79 percent of runs pass</td>
+<td style="text-align: left">About half the runs pass</td>
 </tr>
 <tr>
 <td style="text-align:left"><span style="white-space:nowrap"><span class="sl-badge danger small astro-6yf3h5sn">✕ Not yet</span></span></td>
-<td style="text-align: right">2</td>
-<td style="text-align: left">Fewer than half the runs pass</td>
+<td style="text-align: left">Most runs fail</td>
 </tr>
 <tr>
 <td style="text-align:left"><span style="white-space:nowrap"><span class="sl-badge default small astro-6yf3h5sn">– No test</span></span></td>
-<td style="text-align: right">4</td>
 <td style="text-align: left">No test exists, or none has run in the record</td>
 </tr>
 </tbody>
 </table>
 <aside aria-label="Guaranteed" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg aria-hidden="true" class="starlight-aside__icon astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path fill-rule="evenodd" d="M1.44 8.855v-.001l3.527-3.516c.34-.344.802-.541 1.285-.548h6.649l.947-.947c3.07-3.07 6.207-3.072 7.62-2.868a1.821 1.821 0 0 1 1.557 1.557c.204 1.413.203 4.55-2.868 7.62l-.946.946v6.649a1.845 1.845 0 0 1-.549 1.286l-3.516 3.528a1.844 1.844 0 0 1-3.11-.944l-.858-4.275-4.52-4.52-2.31-.463-1.964-.394A1.847 1.847 0 0 1 .98 10.693a1.843 1.843 0 0 1 .46-1.838Zm5.379 2.017-3.873-.776L6.32 6.733h4.638l-4.14 4.14Zm8.403-5.655c2.459-2.46 4.856-2.463 5.89-2.33.134 1.035.13 3.432-2.329 5.891l-6.71 6.71-3.561-3.56 6.71-6.711Zm-1.318 15.837-.776-3.873 4.14-4.14v4.639l-3.364 3.374Z" clip-rule="evenodd"/><path d="M9.318 18.345a.972.972 0 0 0-1.86-.561c-.482 1.435-1.687 2.204-2.934 2.619a8.22 8.22 0 0 1-1.23.302c.062-.365.157-.79.303-1.229.415-1.247 1.184-2.452 2.62-2.935a.971.971 0 1 0-.62-1.842c-.12.04-.236.084-.35.13-2.02.828-3.012 2.588-3.493 4.033a10.383 10.383 0 0 0-.51 2.845l-.001.016v.063c0 .536.434.972.97.972H2.24a7.21 7.21 0 0 0 .878-.065c.527-.063 1.248-.19 2.02-.447 1.445-.48 3.205-1.472 4.033-3.494a5.828 5.828 0 0 0 .147-.407Z"/></svg>Guaranteed</p><div class="starlight-aside__content"><p>The agent can only propose a change, never apply one: read-only access rights
-and a gateway that blocks writes. Cluster or repository writes caught by a
-safeguard in this record: <strong>0</strong>.</p></div></aside>
+and a gateway that blocks writes.</p></div></aside>
 <div class="sl-heading-wrapper level-h2"><h2 id="upgrades">Upgrades</h2><a class="sl-anchor-link" href="#upgrades"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Upgrades”</span></a></div>
 <ul>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="94 percent of runs pass"><span style="display:block;height:100%;width:94%;background:var(--sl-color-orange)"></span></span>
-<strong>⏱ Upgrade readiness grades each cluster and names every blocker</strong> — <strong>94%</strong>
-· 435 of 465 runs · lower bound 0.91 · weakest test 10% · record since
-2026-10-29: 435 of 465 · 3 listed tests never ran in the record.</li>
+<strong>⏱ Upgrade readiness grades each cluster and names every blocker</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge danger small astro-6yf3h5sn">✕ Not yet</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="10 percent of runs pass"><span style="display:block;height:100%;width:10%;background:var(--sl-color-red)"></span></span>
-<strong>⏱ Patch readiness names the clusters behind on their version</strong> — <strong>10%</strong> · 4
-of 40 runs · lower bound 0.04 · weakest test 0% · record since 2026-10-29: 4
-of 40.</li>
+<strong>⏱ Patch readiness names the clusters behind on their version</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="100 percent of runs pass"><span style="display:block;height:100%;width:100%;background:var(--sl-color-green)"></span></span>
-<strong>⏱ Weekly readiness brief names the decisions a person owes</strong> — <strong>100%</strong> · 33
-of 33 runs · lower bound 0.90 · weakest test 100% · record since 2026-10-29:
-33 of 33.</li>
+<strong>⏱ Weekly readiness brief names the decisions a person owes</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge tip small astro-6yf3h5sn">◑ Partly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="55 percent of runs pass"><span style="display:block;height:100%;width:55%;background:var(--sl-color-purple)"></span></span>
 <strong>⏱ Upgrade retrospective explains a failed upgrade, stays quiet after a clean
-week</strong> — <strong>55%</strong> · 104 of 188 runs · lower bound 0.48 · weakest test 0% ·
-record since 2026-10-29: 104 of 188.</li>
+week</strong></li>
 </ul>
 <div class="sl-heading-wrapper level-h2"><h2 id="incidents-and-troubleshooting">Incidents and troubleshooting</h2><a class="sl-anchor-link" href="#incidents-and-troubleshooting"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Incidents and troubleshooting”</span></a></div>
 <ul>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge note small astro-6yf3h5sn">◔ Filling</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="100 percent of runs pass"><span style="display:block;height:100%;width:100%;background:var(--sl-color-blue)"></span></span>
 <strong>⏱ Stall watch notices a controller that stopped, stays quiet on a healthy
-fleet</strong> — <strong>100%</strong> · 21 of 21 runs · the bar needs 24 runs · record since
-2026-10-29: 21 of 21. <em>only the silence side has a fixture.</em></li>
+fleet</strong> <em>only the silence side has a fixture.</em></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="98 percent of runs pass"><span style="display:block;height:100%;width:98%;background:var(--sl-color-green)"></span></span>
 <strong>⏱ Warning event becomes a root cause, fix options and a pull request on
-"apply"</strong> — <strong>98%</strong> · 84 of 86 runs · lower bound 0.92 · weakest
-test 94% · record since 2026-10-29: 84 of 86. <em>autoops-quiet-followup: fixed
-by #3976.</em></li>
+"apply"</strong> <em>autoops-quiet-followup: fixed by #3976.</em></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="99 percent of runs pass"><span style="display:block;height:100%;width:99%;background:var(--sl-color-green)"></span></span>
-<strong>⏱ GitOps drift alert is triaged against the declared source</strong> — <strong>99%</strong> ·
-123 of 124 runs · lower bound 0.96 · weakest test 95% · record since
-2026-10-29: 123 of 124 · 1 listed test never ran in the record.</li>
+<strong>⏱ GitOps drift alert is triaged against the declared source</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="83 percent of runs pass"><span style="display:block;height:100%;width:83%;background:var(--sl-color-orange)"></span></span>
-<strong>Diagnose a broken workload without changing it</strong> — <strong>83%</strong> · 92 of 111 runs
-· lower bound 0.75 · weakest test 14% · record since 2026-10-29: 92 of 111.</li>
+<strong>Diagnose a broken workload without changing it</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="91 percent of runs pass"><span style="display:block;height:100%;width:91%;background:var(--sl-color-orange)"></span></span>
-<strong>Check observability wiring (metrics, traces, alerts)</strong> — <strong>91%</strong> · 52 of 57
-runs · lower bound 0.81 · weakest test 78% · record since 2026-10-29: 52 of
-57.</li>
+<strong>Check observability wiring (metrics, traces, alerts)</strong></li>
 </ul>
 <div class="sl-heading-wrapper level-h2"><h2 id="security-and-compliance">Security and compliance</h2><a class="sl-anchor-link" href="#security-and-compliance"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Security and compliance”</span></a></div>
 <ul>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge tip small astro-6yf3h5sn">◑ Partly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="70 percent of runs pass"><span style="display:block;height:100%;width:70%;background:var(--sl-color-purple)"></span></span>
-<strong>⏱ Compliance audit finds risky access and respects declared exceptions</strong> —
-<strong>70%</strong> · 57 of 81 runs · lower bound 0.60 · weakest test 0% · record since
-2026-10-29: 57 of 81.</li>
+<strong>⏱ Compliance audit finds risky access and respects declared exceptions</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="89 percent of runs pass"><span style="display:block;height:100%;width:89%;background:var(--sl-color-orange)"></span></span>
-<strong>⏱ AI security audit finds exposed model-serving workloads</strong> — <strong>89%</strong> · 56
-of 63 runs · lower bound 0.79 · weakest test 81% · record since 2026-10-29: 56
-of 63.</li>
+<strong>⏱ AI security audit finds exposed model-serving workloads</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge default small astro-6yf3h5sn">– No test</span></span>
-<strong>⏱ Networking fabric audit</strong> — no test exists.</li>
+<strong>⏱ Networking fabric audit</strong></li>
 </ul>
 <div class="sl-heading-wrapper level-h2"><h2 id="reliability-and-capacity">Reliability and capacity</h2><a class="sl-anchor-link" href="#reliability-and-capacity"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Reliability and capacity”</span></a></div>
 <ul>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="95 percent of runs pass"><span style="display:block;height:100%;width:95%;background:var(--sl-color-green)"></span></span>
 <strong>⏱ Reliability audit finds workloads that cannot survive maintenance, stays
-quiet on healthy ones</strong> — <strong>95%</strong> · 94 of 99 runs · lower bound 0.89 · weakest
-test 81% · record since 2026-10-29: 94 of 99.</li>
+quiet on healthy ones</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge tip small astro-6yf3h5sn">◑ Partly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="66 percent of runs pass"><span style="display:block;height:100%;width:66%;background:var(--sl-color-purple)"></span></span>
-<strong>⏱ Stockout prevention names node pools at risk</strong> — <strong>66%</strong> · 41 of 62 runs ·
-lower bound 0.54 · weakest test 0% · record since 2026-10-29: 41 of 62. <em>the
-collector misses the planted pool.</em></li>
+<strong>⏱ Stockout prevention names node pools at risk</strong> <em>the collector misses the
+planted pool.</em></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge default small astro-6yf3h5sn">– No test</span></span>
-<strong>⏱ Autoscaler stockout investigator</strong> — no test exists. <em>off by default.</em></li>
+<strong>⏱ Autoscaler stockout investigator</strong> <em>off by default.</em></li>
 </ul>
 <div class="sl-heading-wrapper level-h2"><h2 id="cost-and-consistency">Cost and consistency</h2><a class="sl-anchor-link" href="#cost-and-consistency"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Cost and consistency”</span></a></div>
 <ul>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="87 percent of runs pass"><span style="display:block;height:100%;width:87%;background:var(--sl-color-orange)"></span></span>
-<strong>⏱ Cost audit finds idle resources and respects declared exceptions</strong> —
-<strong>87%</strong> · 71 of 82 runs · lower bound 0.78 · weakest test 62% · record since
-2026-10-29: 71 of 82.</li>
+<strong>⏱ Cost audit finds idle resources and respects declared exceptions</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="87 percent of runs pass"><span style="display:block;height:100%;width:87%;background:var(--sl-color-orange)"></span></span>
-<strong>⏱ Consistency audit spots the cluster configured unlike its peers</strong> —
-<strong>87%</strong> · 55 of 63 runs · lower bound 0.77 · weakest test 71% · record since
-2026-10-29: 55 of 63. <em>drift-chat-request-runs-collector: fixed by #3609.</em></li>
+<strong>⏱ Consistency audit spots the cluster configured unlike its peers</strong>
+<em>drift-chat-request-runs-collector: fixed by #3609.</em></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge default small astro-6yf3h5sn">– No test</span></span>
-<strong>⏱ Compute fleet audit</strong> — no test exists.</li>
+<strong>⏱ Compute fleet audit</strong></li>
 </ul>
 <div class="sl-heading-wrapper level-h2"><h2 id="changes-and-fixes">Changes and fixes</h2><a class="sl-anchor-link" href="#changes-and-fixes"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Changes and fixes”</span></a></div>
 <ul>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="94 percent of runs pass"><span style="display:block;height:100%;width:94%;background:var(--sl-color-orange)"></span></span>
-<strong>Propose a change as a pull request, never apply it</strong> — <strong>94%</strong> · 94 of 100
-runs · lower bound 0.88 · weakest test 33% · record since 2026-10-29: 94 of
-100.</li>
+<strong>Propose a change as a pull request, never apply it</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="100 percent of runs pass"><span style="display:block;height:100%;width:100%;background:var(--sl-color-green)"></span></span>
-<strong>⏱ Critical findings get a pull request, re-runs open no duplicate</strong> —
-<strong>100%</strong> · 73 of 73 runs · lower bound 0.95 · weakest test 100% · record since
-2026-10-29: 73 of 73. <em>the pull request is graded on request; the audit-opened
-one is not.</em></li>
+<strong>⏱ Critical findings get a pull request, re-runs open no duplicate</strong> <em>the
+pull request is graded on request; the audit-opened one is not.</em></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="84 percent of runs pass"><span style="display:block;height:100%;width:84%;background:var(--sl-color-orange)"></span></span>
-<strong>Refuse an unsafe or direct change and name the safe path</strong> — <strong>84%</strong> · 118
-of 141 runs · lower bound 0.77 · weakest test 22% · record since 2026-10-29:
-118 of 141. <em>platform-worker-refuses-shipped-skill-edit: check fix in #4720.</em></li>
+<strong>Refuse an unsafe or direct change and name the safe path</strong>
+<em>platform-worker-refuses-shipped-skill-edit: check fix in #4720.</em></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="94 percent of runs pass"><span style="display:block;height:100%;width:94%;background:var(--sl-color-green)"></span></span>
 <strong>Repository work (review replies, branch reuse, issue triage, forge
-commands)</strong> — <strong>94%</strong> · 99 of 105 runs · lower bound 0.88 · weakest test 81% ·
-record since 2026-10-29: 99 of 105 · 1 listed test never ran in the record.</li>
+commands)</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="81 percent of runs pass"><span style="display:block;height:100%;width:81%;background:var(--sl-color-orange)"></span></span>
-<strong>⏱ Repository watcher triages new issues</strong> — <strong>81%</strong> · 17 of 21 runs · lower
-bound 0.60 · weakest test 81% · record since 2026-10-29: 17 of 21.</li>
+<strong>⏱ Repository watcher triages new issues</strong></li>
 </ul>
 <div class="sl-heading-wrapper level-h2"><h2 id="working-with-the-agent">Working with the agent</h2><a class="sl-anchor-link" href="#working-with-the-agent"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Working with the agent”</span></a></div>
 <ul>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge danger small astro-6yf3h5sn">✕ Not yet</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="24 percent of runs pass"><span style="display:block;height:100%;width:24%;background:var(--sl-color-red)"></span></span>
-<strong>Converse well (answer first, say the next step, back claims with evidence)</strong>
-— <strong>24%</strong> · 20 of 84 runs · lower bound 0.16 · weakest test 0% · record since
-2026-10-29: 20 of 84.</li>
+<strong>Converse well (answer first, say the next step, back claims with evidence)</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="100 percent of runs pass"><span style="display:block;height:100%;width:100%;background:var(--sl-color-green)"></span></span>
-<strong>Record a person's decision on a finding (dismiss, snooze, accept)</strong> —
-<strong>100%</strong> · 36 of 36 runs · lower bound 0.90 · weakest test 100% · record since
-2026-10-29: 36 of 36 · 1 listed test never ran in the record.
-<em>findings-decision-covers-item: read-first 11-03 on the frozen record (a
-confirm question before a permanent dismissal); no fix yet.</em></li>
+<strong>Record a person's decision on a finding (dismiss, snooze, accept)</strong>
+<em>findings-decision-covers-item: a confirm question before a permanent
+dismissal, seen on the frozen record; no fix yet.</em></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge success small astro-6yf3h5sn">✓ Can</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="100 percent of runs pass"><span style="display:block;height:100%;width:100%;background:var(--sl-color-green)"></span></span>
-<strong>Run an audit now, or answer a fleet question from the collectors</strong> —
-<strong>100%</strong> · 205 of 206 runs · lower bound 0.97 · weakest test 95% · record
-since 2026-10-29: 205 of 206 · 2 listed tests never ran in the record.</li>
+<strong>Run an audit now, or answer a fleet question from the collectors</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge caution small astro-6yf3h5sn">◕ Mostly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="80 percent of runs pass"><span style="display:block;height:100%;width:80%;background:var(--sl-color-orange)"></span></span>
-<strong>Answer GKE knowledge questions with sources</strong> — <strong>80%</strong> · 109 of 136 runs ·
-lower bound 0.73 · weakest test 0% · record since 2026-10-29: 109 of 136.</li>
+<strong>Answer GKE knowledge questions with sources</strong></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge default small astro-6yf3h5sn">– No test</span></span>
 <strong>⏱ Chat posts (audit report, findings nudge, daily recap, fallback to the
-home channel)</strong> — no test exists. <em>no evaluation install has a chat platform.</em></li>
+home channel)</strong> <em>no evaluation install has a chat platform.</em></li>
 <li>
 <span style="white-space:nowrap"><span class="sl-badge tip small astro-6yf3h5sn">◑ Partly</span></span>
-<span style="display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--sl-color-gray-5);vertical-align:middle;overflow:hidden;margin:0 6px 0 2px" role="img" aria-label="71 percent of runs pass"><span style="display:block;height:100%;width:71%;background:var(--sl-color-purple)"></span></span>
-<strong>⏱ First-run audits start at onboarding</strong> — <strong>71%</strong> · 10 of 14 runs · lower
-bound 0.45 · weakest test 71% · record since 2026-10-29: 10 of 14.</li>
+<strong>⏱ First-run audits start at onboarding</strong></li>
 </ul>
 <div class="sl-heading-wrapper level-h2"><h2 id="not-on-this-page">Not on this page</h2><a class="sl-anchor-link" href="#not-on-this-page"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Not on this page”</span></a></div>
-<p>Twenty documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; any comparison against a plain model, which the first paired run adds as a column.</p>
+<p>The documented promises with no test (see the journey inventory in the design documents); the dollar cost of a run; any comparison against a plain model.</p>
 <div class="sl-heading-wrapper level-h2"><h2 id="method">Method</h2><a class="sl-anchor-link" href="#method"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Method”</span></a></div>
-<p>Rows: <code dir="auto">bench/run-store/capabilities.yaml</code>. Numbers: <code dir="auto">bench/run-store/runs/</code>, the newest 60 graded runs per test in the record; runs marked not applicable are left out; the lower bound is the 95 percent Wilson bound. Generators: <code dir="auto">scripts/eval_dashboard/capability_checklist.py</code> and <code dir="auto">render_checklist.py --mdx</code>.</p></div><footer class="sl-flex astro-vcsylbkx"><div class="meta sl-flex astro-vcsylbkx"><a href="https://github.com/gke-labs/kube-agents/edit/main/docs/site/src/content/docs/reference/certified-capabilities.mdx" class="sl-flex print:hidden astro-7hm6odgq"><svg aria-hidden="true" class="astro-7hm6odgq astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a></div><div class="pagination-links print:hidden astro-bnkpfcrs" dir="ltr"><a href="/kube-agents/reference/admin-console/" rel="prev" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-bnkpfcrs">Previous<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Admin console</span></span></a><a href="/kube-agents/contributing/" rel="next" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-bnkpfcrs">Next<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Contributing</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>
+<p>Rows: <code dir="auto">bench/run-store/capabilities.yaml</code>. Status: computed from <code dir="auto">bench/run-store/runs/</code> by <code dir="auto">scripts/eval_dashboard/capability_checklist.py</code>; rendered by <code dir="auto">render_checklist.py --mdx --status-only</code>.</p></div><footer class="sl-flex astro-vcsylbkx"><div class="meta sl-flex astro-vcsylbkx"><a href="https://github.com/gke-labs/kube-agents/edit/main/docs/site/src/content/docs/reference/certified-capabilities.mdx" class="sl-flex print:hidden astro-7hm6odgq"><svg aria-hidden="true" class="astro-7hm6odgq astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a></div><div class="pagination-links print:hidden astro-bnkpfcrs" dir="ltr"><a href="/kube-agents/reference/admin-console/" rel="prev" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-bnkpfcrs">Previous<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Admin console</span></span></a><a href="/kube-agents/contributing/" rel="next" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-bnkpfcrs">Next<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">Contributing</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>

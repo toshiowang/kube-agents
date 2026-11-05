@@ -538,7 +538,7 @@
      "status": "✅ Can",
      "lapsed_since": null,
      "detail": "36 of 36 runs pass; lower bound 0.90; weakest test 100%; 1 listed test never ran on this model; record since 2026-10-29: 36 of 36",
-     "note": "findings-decision-covers-item: read-first 11-03 on the frozen record (a confirm question before a permanent dismissal); no fix yet",
+     "note": "findings-decision-covers-item: a confirm question before a permanent dismissal, seen on the frozen record; no fix yet",
      "tests": 3,
      "tests_with_runs": 2,
      "certified": 0,
