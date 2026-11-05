@@ -1,0 +1,1803 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-ae72s45h"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>PlatformAgent fields | kube-agents</title><link rel="canonical" href="https://gke-labs.github.io/kube-agents/operator/platformagent-fields/"/><link rel="sitemap" href="/kube-agents/sitemap-index.xml"/><script is:inline="true">document.documentElement.dataset.theme = 'dark';</script><script type="module" src="/kube-agents/mermaid-render.js"></script><link rel="shortcut icon" href="/kube-agents/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.3.8"/><meta name="generator" content="Starlight v0.42.6"/><meta property="og:title" content="PlatformAgent fields"/><meta property="og:type" content="article"/><meta property="og:url" content="https://gke-labs.github.io/kube-agents/operator/platformagent-fields/"/><meta property="og:locale" content="en"/><meta property="og:description" content="Every spec and status field of the PlatformAgent custom resource, generated from the operator's Go API types."/><meta property="og:site_name" content="kube-agents"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Every spec and status field of the PlatformAgent custom resource, generated from the operator's Go API types."/><script>
+  document.documentElement.dataset.theme = 'dark';
+</script><link rel="stylesheet" href="/kube-agents/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/kube-agents/_astro/common.OLJHAzsY.css"><style>@layer starlight.components{svg:where(.astro-havoivjf){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em;overflow:visible}}
+@layer starlight.components{:root{--sl-badge-default-border:var(--sl-color-accent);--sl-badge-default-bg:var(--sl-color-accent-low);--sl-badge-default-text:#fff;--sl-badge-note-border:var(--sl-color-blue);--sl-badge-note-bg:var(--sl-color-blue-low);--sl-badge-note-text:#fff;--sl-badge-danger-border:var(--sl-color-red);--sl-badge-danger-bg:var(--sl-color-red-low);--sl-badge-danger-text:#fff;--sl-badge-success-border:var(--sl-color-green);--sl-badge-success-bg:var(--sl-color-green-low);--sl-badge-success-text:#fff;--sl-badge-caution-border:var(--sl-color-orange);--sl-badge-caution-bg:var(--sl-color-orange-low);--sl-badge-caution-text:#fff;--sl-badge-tip-border:var(--sl-color-purple);--sl-badge-tip-bg:var(--sl-color-purple-low);--sl-badge-tip-text:#fff}[data-theme=light]:root{--sl-badge-default-bg:var(--sl-color-accent-high);--sl-badge-note-bg:var(--sl-color-blue-high);--sl-badge-danger-bg:var(--sl-color-red-high);--sl-badge-success-bg:var(--sl-color-green-high);--sl-badge-caution-bg:var(--sl-color-orange-high);--sl-badge-tip-bg:var(--sl-color-purple-high)}.sl-badge:where(.astro-6yf3h5sn){border:1px solid var(--sl-color-border-badge);font-family:var(--sl-font-system-mono);color:var(--sl-color-text-badge);background-color:var(--sl-color-bg-badge);overflow-wrap:anywhere;border-radius:.25rem;line-height:normal;display:inline-block}.sidebar-content .sl-badge:where(.astro-6yf3h5sn){line-height:1;font-size:var(--sl-text-xs);padding:.125rem .375rem}.sidebar-content a[aria-current=page]>.sl-badge:where(.astro-6yf3h5sn){--sl-color-bg-badge:transparent;--sl-color-border-badge:currentColor;color:inherit}.default:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-default-bg);--sl-color-border-badge:var(--sl-badge-default-border);--sl-color-text-badge:var(--sl-badge-default-text)}.note:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-note-bg);--sl-color-border-badge:var(--sl-badge-note-border);--sl-color-text-badge:var(--sl-badge-note-text)}.danger:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-danger-bg);--sl-color-border-badge:var(--sl-badge-danger-border);--sl-color-text-badge:var(--sl-badge-danger-text)}.success:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-success-bg);--sl-color-border-badge:var(--sl-badge-success-border);--sl-color-text-badge:var(--sl-badge-success-text)}.tip:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-tip-bg);--sl-color-border-badge:var(--sl-badge-tip-border);--sl-color-text-badge:var(--sl-badge-tip-text)}.caution:where(.astro-6yf3h5sn){--sl-color-bg-badge:var(--sl-badge-caution-bg);--sl-color-border-badge:var(--sl-badge-caution-border);--sl-color-text-badge:var(--sl-badge-caution-text)}.small:where(.astro-6yf3h5sn){font-size:var(--sl-text-xs);padding:.125rem .25rem}.medium:where(.astro-6yf3h5sn){font-size:var(--sl-text-sm);padding:.175rem .35rem}.large:where(.astro-6yf3h5sn){font-size:var(--sl-text-base);padding:.225rem .45rem}.sl-markdown-content :is(h1,h2,h3,h4,h5,h6) .sl-badge:where(.astro-6yf3h5sn){vertical-align:middle}}
+</style><script type="module" src="/kube-agents/_astro/page.cNngjUgL.js"></script></head><body class="astro-ae72s45h"><a class="sl-skip-link astro-t2grfou4" href="#_top">Skip to content</a><div class="page sl-flex astro-euo27uub"><header class="header astro-euo27uub"><div class="header astro-6k6kswk6"><div class="title-wrapper sl-flex astro-6k6kswk6"><a href="/kube-agents/" class="site-title sl-flex astro-iaj22pny"><span class="astro-iaj22pny" translate="no">kube-agents</span></a></div><div class="sl-flex print:hidden astro-6k6kswk6"><site-search class="astro-6k6kswk6 astro-ulwrr7k6" data-translations="{&quot;placeholder&quot;:&quot;Search&quot;}"><button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-ulwrr7k6"><svg aria-hidden="true" class="astro-ulwrr7k6 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-ulwrr7k6" aria-hidden="true">Search</span><kbd class="sl-hidden md:sl-flex astro-ulwrr7k6" style="display: none;"><kbd class="astro-ulwrr7k6">Ctrl</kbd><kbd class="astro-ulwrr7k6">K</kbd></kbd></button><dialog style="padding:0" aria-label="Search" class="astro-ulwrr7k6"><div class="dialog-frame sl-flex astro-ulwrr7k6"><button data-close-modal class="sl-flex md:sl-hidden astro-ulwrr7k6">Cancel</button><div class="search-container astro-ulwrr7k6"><div id="starlight__search" class="astro-ulwrr7k6"></div></div></div></dialog></site-search><script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script><script type="module" src="/kube-agents/_astro/Search.astro_astro_type_script_index_0_lang.DzR8jAgX.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-6k6kswk6"><div class="sl-flex social-icons astro-6k6kswk6"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></header><nav class="sidebar print:hidden astro-euo27uub" aria-label="Main"><button popovertarget="starlight__sidebar" class="sl-menu-button sl-flex md:sl-hidden print:hidden astro-5zlzgk4i"><svg aria-hidden="true" class="open-menu astro-5zlzgk4i astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-5zlzgk4i astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg><span class="sr-only astro-5zlzgk4i">Menu</span></button><script type="module">var e=class extends HTMLElement{constructor(){super();let e=matchMedia(`(min-width: 50em)`),t=()=>{this.popover=e.matches?null:`auto`};t(),e.addEventListener(`change`,()=>t()),this.addEventListener(`toggle`,({newState:e})=>this.trapFocus(e===`open`))}trapFocus(e){document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}};customElements.define(`sl-sidebar-pane`,e);</script><sl-sidebar-pane popover id="starlight__sidebar" class="sidebar-pane astro-euo27uub"><div class="sidebar-content sl-flex astro-euo27uub"><sl-sidebar-state-persist data-hash="0jji1z4" class="astro-vnnkyq4l"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><ul class="top-level astro-4c2piv4z"><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Overview</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Introduction</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/what-is-kube-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">What is kube-agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/proactive-autonomy/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Proactive autonomy</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/day-in-the-life/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">A day with kube-agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/overview/architecture/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Architecture</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Install</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/install/prerequisites/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Prerequisites</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/quickstart-gke/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Quick start (GKE)</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/first-prompts/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">First prompts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/slack-app/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Slack app setup</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/manual/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Manual install</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/helm-and-kind/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Helm and Kind</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/gitlab/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">GitLab as the GitOps forge</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/gitea/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Gitea as the GitOps forge</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/upgrade/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Upgrade</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/install/uninstall/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Uninstall</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Concepts</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Concepts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/platform-agent/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Platform Agent</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/cluster-agents/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Cluster Agents</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/chatops/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">ChatOps</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/skills/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Skills</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/governance-sops/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Governance SOPs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/autonomous-watchdogs/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Autonomous watchdogs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/declarative-workflow/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Declarative workflow</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/inference-gateway/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Inference gateway</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/concepts/observability/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Observability</span></a></li></ul></details></li><li class="astro-4c2piv4z"><a href="/kube-agents/skills/" class="large astro-4c2piv4z"><span class="astro-4c2piv4z">Skill catalog</span></a></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Operator</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/operator/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Operator overview</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/platformagent-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">PlatformAgent CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentplugin-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentPlugin CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentprofile-crd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentProfile CRD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/platformagent-fields/" aria-current="page" class="astro-4c2piv4z"><span class="astro-4c2piv4z">PlatformAgent fields</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentplugin-fields/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentPlugin fields</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/operator/agentprofile-fields/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">AgentProfile fields</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Deploy</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Deploy overview</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/kustomize/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Network policies and Service</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/docker-images/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Docker images</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/token-minter/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Token minter (Minty)</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/release-versioning/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Release versioning &amp; artifacts</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/telemetry/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Telemetry</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/gitops-argocd/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">GitOps with ArgoCD</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/rollback/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Rolling back a release</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/multi-project/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Multiple GCP projects</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/deploy/web-console/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Web Console</span></a></li></ul></details></li><li class="astro-4c2piv4z"><details open class="astro-4c2piv4z"><summary class="astro-4c2piv4z"><span class="group-label astro-4c2piv4z"><span class="large astro-4c2piv4z">Reference</span></span><svg aria-hidden="true" class="caret astro-4c2piv4z astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-4c2piv4z"><li class="astro-4c2piv4z"><a href="/kube-agents/reference/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Reference</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/config/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Config reference</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/cron-jobs/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Cron jobs</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/examples/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Examples</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/glossary/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Glossary</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/attribution/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">User attribution</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/security-and-iam/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Security &amp; IAM</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/credential-isolation/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Credential isolation</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/resource-labels/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Resource labels</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/admin-console/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Admin console</span></a></li><li class="astro-4c2piv4z"><a href="/kube-agents/reference/certified-capabilities/" class="astro-4c2piv4z"><span class="astro-4c2piv4z">Certified capabilities</span></a></li></ul></details></li><li class="astro-4c2piv4z"><a href="/kube-agents/contributing/" class="large astro-4c2piv4z"><span class="astro-4c2piv4z">Contributing</span></a></li></ul><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-7it4zgwh"><div class="social-icons astro-7it4zgwh"><a href="https://github.com/gke-labs/kube-agents" rel="me" class="sl-flex astro-t5eb2foo"><span class="sr-only astro-t5eb2foo">GitHub</span><svg aria-hidden="true" class="astro-t5eb2foo astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div></div></div></div></sl-sidebar-pane></nav><div class="main-frame astro-euo27uub"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-axz53cfb"><aside class="right-sidebar-container print:hidden astro-axz53cfb"><div class="right-sidebar astro-axz53cfb"><div class="lg:sl-hidden astro-gl637vfx"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-kwxnrgy4"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-kwxnrgy4"><details id="starlight__mobile-toc" class="astro-kwxnrgy4"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-kwxnrgy4"><span class="toggle sl-flex astro-kwxnrgy4">On this page<svg aria-hidden="true" class="caret astro-kwxnrgy4 astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-kwxnrgy4"></span></summary><div class="dropdown astro-kwxnrgy4"><ul class="isMobile astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#spec" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Spec</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#status" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Status</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module" src="/kube-agents/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C3fM4Kra.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-gl637vfx"><div class="sl-container astro-gl637vfx"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-oai5hpdy" style="--depth: 0;"><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#_top" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Overview</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#spec" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Spec</span></a></li><li style="--depth: 0;" class="astro-oai5hpdy"><a href="#status" style="--depth: 0;" class="astro-oai5hpdy"><span style="--depth: 0;" class="astro-oai5hpdy">Status</span></a></li></ul></nav></starlight-toc><script type="module" src="/kube-agents/_astro/TableOfContents.astro_astro_type_script_index_0_lang.BpJaGz7G.js"></script></div></div></div></aside><div class="main-pane astro-axz53cfb"><main data-pagefind-body class="astro-ae72s45h" lang="en" dir="ltr"><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><h1 id="_top" class="astro-dfqzrgu7">PlatformAgent fields</h1></div></div><div class="content-panel astro-nyl2ejxc"><div class="sl-container astro-nyl2ejxc"><div class="sl-markdown-content"><!-- BEGIN GENERATED: crd-fields-platformagent -->
+<!-- Regenerate with: make docs-generate -- do not edit by hand. -->
+<!-- prettier-ignore-start -->
+<p>Every field of the <code dir="auto">PlatformAgent</code> resource’s <code dir="auto">spec</code> and <code dir="auto">status</code>, generated from the operator’s Go API types. The standard Kubernetes <code dir="auto">apiVersion</code>, <code dir="auto">kind</code> and <code dir="auto">metadata</code> are not listed. A field whose type comes from the Kubernetes API (<code dir="auto">corev1</code>, <code dir="auto">metav1</code>, <code dir="auto">networkingv1</code>, <code dir="auto">resource.Quantity</code>) names that type and is not expanded; the Kubernetes API reference describes it. Paths read <code dir="auto">parent.child</code>, with <code dir="auto">[]</code> for each item of a list and <code dir="auto">{}</code> for each value of a map. Each description is the opening paragraph of the field’s documentation, plus its deprecation notice when it has one, and names other fields in their Go spelling (<code dir="auto">MaxSessions</code> for <code dir="auto">maxSessions</code>); <code dir="auto">kubectl explain platformagent.spec.&lt;field&gt;</code> (<code dir="auto">platformagent.status.&lt;field&gt;</code> for a row of the Status table) prints the whole text. The Constraints column lists the schema bounds on a field: allowed values, ranges, lengths and patterns. The API server also enforces CEL rules on these fields and on whole sections, which the column does not show; <code dir="auto">kubectl get crd platformagents.kubeagents.x-k8s.io -o yaml</code> lists them under <code dir="auto">x-kubernetes-validations</code>, each with the message the API server returns when a value breaks it. For what the fields do together, read the <a href="/kube-agents/operator/platformagent-crd/">PlatformAgent CRD</a> guide.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="spec">Spec</h2><a class="sl-anchor-link" href="#spec"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Spec”</span></a></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">deployment</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Deployment abstracts the Kubernetes Pod/Deployment configuration.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.image</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Image specifies the container image repository.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.tag</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Tag specifies the container image tag. It applies only when Image is set without a tag or digest, and falls back to “latest” there. When Image is omitted entirely, the operator’s default platform-agent version applies instead, so no “latest” default is persisted on the CR.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.imagePullPolicy</code></td>
+<td><code dir="auto">corev1.PullPolicy</code></td>
+<td>no</td>
+<td><code dir="auto">IfNotPresent</code></td>
+<td>one of <code dir="auto">Always</code>, <code dir="auto">Never</code>, <code dir="auto">IfNotPresent</code></td>
+<td>ImagePullPolicy specifies if the image should be pulled.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.imagePullSecrets</code></td>
+<td><code dir="auto">[]corev1.LocalObjectReference</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ImagePullSecrets references Secrets in the agent’s namespace holding registry credentials, for installs whose mirror needs authenticating to (Harbor, Artifactory) rather than being readable with the nodes’ own credentials. The Secrets are referenced, not created: each must already exist in the agent’s namespace when the pod is scheduled.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.browserArgs</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>BrowserArgs specifies custom command-line arguments to pass to the agent’s browser (e.g. –no-sandbox).</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.env</code></td>
+<td><code dir="auto">[]corev1.EnvVar</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Env is a list of environment variables to set in the container</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.initContainers</code></td>
+<td><code dir="auto">[]corev1.Container</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>InitContainers specifies standard Kubernetes initContainers to run before the agent starts. A volumeMounts entry naming a reserved volume is refused at admission, and dropped from the render on an install running the A2A surface.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.sidecars</code></td>
+<td><code dir="auto">[]corev1.Container</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Sidecars specifies standard Kubernetes sidecar/application containers to run alongside the agent. A volumeMounts entry naming a reserved volume is refused at admission, and dropped from the render on an install running the A2A surface.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.sidecarVolumes</code></td>
+<td><code dir="auto">[]corev1.Volume</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>SidecarVolumes specifies custom volumes to mount for the sidecar containers. An entry is refused at admission if it takes a reserved volume name, or if its source is one of the routes to the agent’s A2A bus credentials: a ServiceAccount token projection for the “a2a-bus” audience, or a reference to one of the Secrets the operator renders bus credentials into (&lt;agent&gt;-a2a-nats-creds, &lt;agent&gt;-a2a-nats-config, &lt;agent&gt;-a2a-callout-keys, &lt;agent&gt;-a2a-nats-tls, &lt;agent&gt;-a2a-nats-ca), as either a secret volume or a projected secret source. The refusal is on the name and the shape of the source, not on what a given Secret happens to hold at the time. Reading those Secrets through env is not refused here. On an install running the A2A surface the same entries are dropped from the render as well, which is the half that holds when admission does not run: a default chart install does not register the webhooks at all (operator.webhooks.enabled=false), and one that does registers them at failurePolicy Ignore by default.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.extraVolumes</code></td>
+<td><code dir="auto">[]corev1.Volume</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ExtraVolumes specifies custom volumes to mount for the main container. The same reserved names and reserved sources as SidecarVolumes are refused at admission – a ServiceAccount token projection for the “a2a-bus” audience, or a reference to &lt;agent&gt;-a2a-nats-creds, &lt;agent&gt;-a2a-nats-config, &lt;agent&gt;-a2a-callout-keys, &lt;agent&gt;-a2a-nats-tls or &lt;agent&gt;-a2a-nats-ca – and dropped from the render on an install running the A2A surface.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.extraVolumeMounts</code></td>
+<td><code dir="auto">[]corev1.VolumeMount</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ExtraVolumeMounts specifies custom volume mounts for the main container. Appended to platform-agent and platform-agent-dashboard both, so an entry naming a reserved volume is refused at admission, and dropped from the render on an install running the A2A surface. The render drops one more shape admission does not: an entry naming a user volume that was itself dropped for the credential its source carries.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.podAnnotations</code></td>
+<td><code dir="auto">map[string]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>PodAnnotations specifies custom annotations to apply to the generated Pod template.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.scaleToZero</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ScaleToZero scales the deployment replicas to 0 when true (useful for saving costs during idle periods).</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.availability</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Availability configures high availability and scheduling settings for the agent pod.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.availability.replicas</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">0</code></td>
+<td>Replicas specifies the desired number of gateway pod replicas. If omitted, defaults to 1. The operator runs the gateway as a single replica: a value above 1 is rendered as 1, and the ReplicasLimited status condition says so. A multi-replica gateway does not start yet, because its leader election has no in-cluster ServiceAccount token to use and the data volumes an install creates at one replica are ReadWriteOnce.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.availability.nodeSelector</code></td>
+<td><code dir="auto">map[string]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>NodeSelector is a selector which must match a node’s labels for the pod to be scheduled</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.availability.tolerations</code></td>
+<td><code dir="auto">[]corev1.Toleration</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Tolerations are tolerations for pod scheduling</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.availability.affinity</code></td>
+<td><code dir="auto">corev1.Affinity</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Affinity specifies affinity scheduling rules</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.availability.runtimeClassName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>RuntimeClassName refers to a RuntimeClass object in the cluster. When set, the operator also pins <code dir="auto">database.journal_mode: delete</code> in the agent pod’s managed config and the entrypoint converts Hermes’ existing databases (state.db, kanban.db and the stores Hermes opens the same way) out of WAL once, because a sandboxed runtime such as gVisor serves the data volume over a gofer mount that corrupts SQLite’s WAL mode. The session KV store this repository runs beside Hermes is not covered by the pin.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.resources</code></td>
+<td><code dir="auto">corev1.ResourceRequirements</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Resources specifies resource requests and limits for the main container.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.credentialProxy</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>CredentialProxy configures the credential-proxy container, the broker that runs every credentialed command on the agent’s behalf in a pod of its own.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.credentialProxy.resources</code></td>
+<td><code dir="auto">corev1.ResourceRequirements</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Resources overrides the credential-proxy container’s requests and limits. Each key set here replaces the operator’s default for that key and the rest keep their defaults, unlike spec.deployment.resources, which replaces the agent container’s block wholesale: a CR that sets only limits.memory keeps the default 500m CPU request, 1 CPU limit and 2Gi ephemeral-storage limit. The broker sizes how many commands it admits at once from the memory limit, so raising the limit is the one knob for an install whose fleet outgrows the default; the ephemeral-storage limit bounds the content workspace the broker clones into; the proxy’s state and /tmp emptyDirs (sizeLimits 5Gi and 2Gi) follow it when it is raised above their defaults, so the kubelet does not evict the pod at the smaller figure. Only cpu, memory and ephemeral-storage are accepted, the quantities the container declares. The operator refuses a memory limit below what admits two commands at once, a limits entry set alone below the default request it would cross, a request above its limit, a negative quantity and a zero limit; <code dir="auto">claims</code> is refused, because the proxy pod declares no resourceClaims. A refused override, including an edit of one that was valid, renders the proxy Deployment at the operator’s defaults, not at the last accepted override, until it is corrected, which on the proxy’s Recreate Deployment restarts the proxy once; the operator reports Degraded with reason InvalidCredentialProxyResources when no higher-ranked Degraded cause is present, the agent staying Ready, whether or not the validating webhook is enabled. Where the webhook is on, it refuses the edit at apply and the running proxy is untouched. The webhook warns when memory per CPU on the requests pair leaves the band GKE Autopilot admits unchanged, because Autopilot then raises the smaller request into the band; it applies the band to requests only. It also warns for each of cpu and memory set under limits without the same key under requests, unless the limit equals the request it would be replaced by: Autopilot without bursting sets the limits equal to the requests, so there the proxy runs at the request and the limit has no effect. With bursting the declared limits stand.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.agentAPIAuth</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>AgentAPIAuth configures the agent-api-auth sidecar in the gateway pod, the native container that authenticates the agent’s API-server calls and also runs the event watcher and the drift detector.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.agentAPIAuth.resources</code></td>
+<td><code dir="auto">corev1.ResourceRequirements</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Resources overrides the agent-api-auth container’s requests and limits. Each key set here replaces the operator’s default for that key and the rest keep their defaults, unlike spec.deployment.resources, which replaces the agent container’s block wholesale: a CR that sets only limits.memory keeps the default 150m CPU request, 384Mi memory request, 1 CPU limit and 2Gi ephemeral-storage limit. The container runs the event watcher, the drift detector and the API authenticator together; the event watcher reads the memory limit through the Downward API and sets its Go soft memory limit to half of it, so raising the memory limit is the knob for an install whose fleet of watched clusters outgrows the 2Gi default. Only cpu, memory and ephemeral-storage are accepted, the quantities the container declares. The operator refuses a request above its limit, a negative quantity, a zero limit, an unrepresentable byte or CPU count and claims, because the gateway pod declares no resourceClaims. A refused override, including an edit of one that was valid, renders the sidecar at the operator’s defaults until it is corrected, and the operator reports Degraded with reason InvalidAgentAPIAuthResources when no higher-ranked Degraded cause is present, the agent staying Ready, whether or not the validating webhook is enabled. Where the webhook is on, it refuses the edit at apply. The webhook warns when memory per CPU on the requests pair leaves the band GKE Autopilot admits unchanged, and when a cpu or memory limit is set without the same key under requests, for the reasons the credential-proxy field documents.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.defaultStorageClassName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>DefaultStorageClassName specifies the default storage class to use for the system and data PVCs.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.storages</code></td>
+<td><code dir="auto">[]object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Storages specifies extra custom PersistentVolumeClaims to provision and mount for the agent pod.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.storages[].name</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td></td>
+<td>Name specifies the PersistentVolumeClaim name.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.storages[].storageClassName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>StorageClassName specifies the storage class name for this volume claim.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.storages[].accessModes</code></td>
+<td><code dir="auto">[]corev1.PersistentVolumeAccessMode</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>AccessModes specifies the requested access modes (e.g. ReadWriteOnce, ReadWriteMany).</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.storages[].storageSize</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td><code dir="auto">5Gi</code></td>
+<td></td>
+<td>StorageSize specifies the requested storage capacity (e.g. 5Gi, 20Gi).</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.storages[].mountPath</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>MountPath specifies the container mount directory path for this volume claim.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.storages[].subPath</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>SubPath specifies a sub-path within the volume to mount.</td>
+</tr>
+<tr>
+<td><code dir="auto">deployment.storages[].readOnly</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ReadOnly specifies if the volume should be mounted as read-only.</td>
+</tr>
+<tr>
+<td><code dir="auto">security</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Security configures RBAC, Pod Security, and Workload Identity.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.serviceAccountName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ServiceAccountName is the Kubernetes Service Account bound to the Deployment.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.serviceAccountAnnotations</code></td>
+<td><code dir="auto">map[string]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ServiceAccountAnnotations specifies custom annotations to apply to the generated ServiceAccount.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.scopedServiceAccountPool</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ScopedServiceAccountPool maps each GCP project the agent may read to the Google service account that reads it. The credential broker mints a short-lived token for the account a request’s project maps to, instead of using the agent’s own identity — which, holding a project-level roles/container.viewer, can read objects in every cluster in the project.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.scopedServiceAccountPool.enabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>Enabled arms the credential broker: with it true, every cluster read is made as the account its project maps to, and a project with no entry is refused. Default false, and it should stay false until the pool’s accounts hold authority.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.scopedServiceAccountPool.serviceAccounts</code></td>
+<td><code dir="auto">[]object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ServiceAccounts is the mapping, one entry per project.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.scopedServiceAccountPool.serviceAccounts[].projectId</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>pattern <code dir="auto">^[a-z0-9][a-z0-9-]*$</code>; max length <code dir="auto">63</code></td>
+<td>ProjectID is the project whose clusters this account reads, which need not be the project the agent runs in.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.scopedServiceAccountPool.serviceAccounts[].serviceAccountEmail</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>pattern <code dir="auto">^[a-z][a-z0-9-]{4,28}[a-z0-9]@[a-z0-9-]{6,30}\.iam\.gserviceaccount\.com$</code></td>
+<td>ServiceAccountEmail is the account scoped to this project. It lives in the host project, whatever project it reads; Terraform’s <code dir="auto">scoped_service_accounts</code> output is the source of these values.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.workloadIdentityFederation</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>WorkloadIdentityFederation gives the credential proxy a GCP identity that does not come from the metadata server.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.workloadIdentityFederation.audience</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">512</code>; pattern <code dir="auto">^//iam\.googleapis\.com/projects/[0-9]+/locations/global/workloadIdentityPools/[^/]+/providers/[^/]+$</code></td>
+<td>Audience is the provider’s full resource name, in the form STS expects as the <code dir="auto">aud</code> claim.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.workloadIdentityFederation.serviceAccountEmail</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">256</code></td>
+<td>ServiceAccountEmail is the GSA the federated principal impersonates.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.egressPolicy</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>one of <code dir="auto">None</code>, <code dir="auto">Allowlist</code></td>
+<td>EgressPolicy selects the NetworkPolicy the operator renders for the agent Pod. “None” (the default) renders nothing.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.egressAllowlist</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>EgressAllowlist tunes the destinations egressPolicy: Allowlist permits. Ignored for any other egressPolicy value.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.egressAllowlist.controlPlaneCIDRs</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ControlPlaneCIDRs are the address ranges of the Kubernetes API server, permitted on port 443.</td>
+</tr>
+<tr>
+<td><code dir="auto">security.egressAllowlist.extraRules</code></td>
+<td><code dir="auto">[]networkingv1.NetworkPolicyEgressRule</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ExtraRules are appended verbatim to the rendered policy, for destinations a plugin or a custom sidecar needs.</td>
+</tr>
+<tr>
+<td><code dir="auto">telemetry</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Telemetry configures OpenTelemetry export for this agent.</td>
+</tr>
+<tr>
+<td><code dir="auto">telemetry.otlpEndpoint</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">2048</code>; pattern <code dir="auto">^$|^https?://[^\s]+$</code></td>
+<td>OTLPEndpoint is the base URL of an OTLP/HTTP collector, for example “<a href="http://otel-collector.otel-collector.svc.cluster.local:4318">http://otel-collector.otel-collector.svc.cluster.local:4318</a>”. Give the base URL only — the per-signal path (“/v1/traces”) is appended by the exporter.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>NetworkPolicy configures the operator-generated egress NetworkPolicy.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.enabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Enabled turns operator-managed NetworkPolicy generation off entirely, for installs that manage network policy through their own tooling. Unset means on.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.dnsClusterIPs</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">8</code>; items max length <code dir="auto">45</code>; items pattern <code dir="auto">^((((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]))|(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}))$</code></td>
+<td>DNSClusterIPs pins the cluster DNS Service ClusterIPs. Setting it disables discovery, like spec.telemetry.otlpEndpoint. Each entry is a bare IP with no prefix; the operator writes it into rule 1 as a /32 or /128.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.metadataDaemon</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>MetadataDaemon describes the node-local cloud metadata daemon. Leave nil to let the operator discover the container port from the kube-system/gke-metadata-server DaemonSet (falling back to port 988 and 169.254.169.252). Overriding the endpoint via annotation, spec, or operator flag opts out of discovery and uses port 988. Present with Endpoint “” emits no post-NAT rule at all, for datapaths that evaluate pre-NAT or clouds without one.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.metadataDaemon.endpoint</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>pattern <code dir="auto">^($|(((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]))|(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}))$</code>; max length <code dir="auto">45</code></td>
+<td>Endpoint is the daemon IP. “” (explicitly set) suppresses that rule entirely; the empty alternative in the pattern is required because the API server validates an explicitly-set “”, which omitempty does not suppress.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.additionalEgress</code></td>
+<td><code dir="auto">[]object</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">32</code></td>
+<td>AdditionalEgress appends CIDR-and-port egress rules to the generated policy. Entries are not passed through untouched: every peer CIDR is canonicalised, and three things the schema below cannot express are dropped by the operator instead – an IPv4-mapped IPv6 peer, which clears the IPv6 prefix floor and then fails the IPv4 one once collapsed to the block it means; an except that is not a strict subset of its peer, which the API server would reject the whole policy for; and a rule left with no usable peer, which would otherwise permit egress to every destination. Each drop is logged and costs only the entry it names. Everything else is rejected at admission – except an entry with no ports, which is admitted and opens every port to its peers. See EgressRule.ports.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.additionalEgress[].to</code></td>
+<td><code dir="auto">[]object</code></td>
+<td>yes</td>
+<td></td>
+<td>min items <code dir="auto">1</code>; max items <code dir="auto">16</code></td>
+<td>EgressPeer defines a CIDR block and optional exclusions.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.additionalEgress[].to[].cidr</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>min length <code dir="auto">1</code>; max length <code dir="auto">49</code>; pattern <code dir="auto">^((((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(/(1[2-9]|2[0-9]|3[0-2]))?)|(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}(/(4[89]|[5-9][0-9]|1[01][0-9]|12[0-8]))?))$</code></td>
+<td>CIDR is an IPv4/IPv6 block or host IP, e.g. 10.0.0.0/24 or 10.0.0.1.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.additionalEgress[].to[].except</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">16</code>; items max length <code dir="auto">49</code>; items pattern <code dir="auto">^((((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(/([0-9]|[12][0-9]|3[0-2]))?)|(([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}(/([0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?))$</code></td>
+<td>Except carves ranges out of CIDR. Each entry must be a strict subset of CIDR – contained by it and narrower than it – because ValidateIPBlock rejects the whole NetworkPolicy otherwise, which would freeze every other egress rule at its previous revision. The resolver applies the same test and drops an except that fails it rather than forwarding it.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.additionalEgress[].ports</code></td>
+<td><code dir="auto">[]object</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">16</code></td>
+<td>Ports restricts the rule to these destination ports. Omitting it emits a rule with peers and no ports, which in NetworkPolicy semantics permits EVERY port to those peers – the mirror of the case the operator refuses to emit, a rule with ports and no surviving peer. That is standard NetworkPolicy behaviour and a legitimate thing to ask for, so it is admitted rather than blocked and nothing is logged; list the ports if you did not mean it.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.additionalEgress[].ports[].protocol</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>one of <code dir="auto">TCP</code>, <code dir="auto">UDP</code>, <code dir="auto">SCTP</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.additionalEgress[].ports[].port</code></td>
+<td><code dir="auto">integer</code></td>
+<td>yes</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">65535</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code dir="auto">harness</code></td>
+<td><code dir="auto">object</code></td>
+<td>yes</td>
+<td></td>
+<td></td>
+<td>Harness configures the core execution environment and framework-level settings.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.clusterName</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td></td>
+<td>ClusterName is the logical name of the cluster (either where the agent is running or the target cluster).</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.location</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td></td>
+<td>Location is the geographical location or cloud region.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.projectId</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td></td>
+<td>ProjectID is the GCP Project ID of the cluster. Required alongside ClusterName and Location: the credential proxy only renders its bootstrap (the <code dir="auto">gcloud container clusters get-credentials</code> that gives the agent a usable kubectl context) when all three are set. Omitting it leaves every kubectl call in the sidecar pointed at localhost:8080. See buildCredentialProxyEnv.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.hermes</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Hermes configures the internal event-routing or agent framework.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.hermes.dashboardEnabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">true</code></td>
+<td></td>
+<td>DashboardEnabled toggles the AGENT_DASHBOARD environment variable.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.hermes.pluginsDebug</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>PluginsDebug toggles the AGENT_PLUGINS_DEBUG environment variable.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.hermes.agentHome</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td><code dir="auto">/opt/data</code></td>
+<td></td>
+<td>AgentHome is the path to the AGENT_HOME directory.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.hermes.apiServerSecretRef</code></td>
+<td><code dir="auto">corev1.SecretKeySelector</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ApiServerSecretRef references the Secret key holding API_SERVER_EXTERNAL_KEY, the credential outside callers present to the credential-proxy sidecar. It does not set API_SERVER_KEY: the value the Hermes API server itself validates is the non-secret loopback sentinel <code dir="auto">cluster-internal-trusted</code>, a compile-time constant the sidecar swaps in once it has authenticated the caller.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.hermes.sessionKVApiKeySecretRef</code></td>
+<td><code dir="auto">corev1.SecretKeySelector</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>SessionKVApiKeySecretRef references the Secret key holding the bearer token for the pod-local Session KV server on port 8699. Distinct from API_SERVER_KEY, which is that loopback sentinel and would authenticate nothing here.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.hermes.sessionKVSaltSecretRef</code></td>
+<td><code dir="auto">corev1.SecretKeySelector</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>SessionKVSaltSecretRef references the Secret key holding the HMAC salt used to pseudonymise chat identities before they reach session metadata, audit logs, or OTel spans. When absent the agent generates a per-pod salt and logs a warning: hashes then stop correlating across restarts.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.memory</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Memory configures agent memory settings.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.memory.memoryEnabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>MemoryEnabled toggles framework memory persistence.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.memory.provider</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td><code dir="auto">multiuser_memory</code></td>
+<td></td>
+<td>Provider selects the memory provider plugin. Two ship in the agent image: “multiuser_memory” — the default, for small or personal deployments — keeps a per-user Markdown file inside the pod and needs nothing else running, at the price of loading the whole store into the model’s context on every turn, and “kube_agents_memory” — for enterprise deployments — gives ranked recall backed by the in-cluster Hindsight service and its Postgres database. Any other plugin Hermes ships may be named here too.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.memory.userProfileEnabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>UserProfileEnabled toggles per-user memory profiling.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.eventWatcher</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>EventWatcher configures cluster event ingestion — the k8s-event-watcher that turns cluster warnings into autonomous triage sessions. Its <code dir="auto">enabled: false</code> is the emergency stop for an event storm.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.eventWatcher.enabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">true</code></td>
+<td></td>
+<td>Enabled controls whether the watcher is started at all. Absent means started: the watcher is how a fleet notices its own incidents, so only an explicit false turns it off.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.driftDetector</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>DriftDetector configures out-of-band change detection — the drift-detector that reads GKE admin-activity audit records from a Pub/Sub subscription and turns the ones a person made outside git into triage cards. Off unless asked for, unlike EventWatcher above.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.driftDetector.enabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>Enabled controls whether the detector is started. Absent means not started, the opposite of EventWatcher, and the reason is a dependency rather than caution: the detector reads a Pub/Sub subscription that exists only where the drift-pubsub Terraform module was applied. An install without one that started the detector anyway would get a process that never exits and never reports a change — the subscription is not checked at startup, and a pull that fails because it does not exist is retried for the life of the pod. The pod stays Ready, so an install left on by accident is indistinguishable from a fleet nobody has touched.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.driftDetector.subscription</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Subscription is the Pub/Sub subscription carrying the audit records. Empty takes the detector’s own default, which is the name the drift-pubsub module creates; set it only for a subscription made by hand or renamed.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.driftDetector.gitopsManagers</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>GitopsManagers names the managedFields managers that are the GitOps controller — <code dir="auto">argocd-controller</code>, <code dir="auto">flux</code>. Comma-separated and matched exactly.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.stallWatch</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>StallWatch tunes the controller stall watch — the stall-watch cron job on the Platform Agent’s roster that sweeps the fleet for controllers that stopped making progress and raises an alert for each new stall. Absent keeps the watch’s built-in behaviour.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.stallWatch.excludeNamespaces</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">100</code>; items max length <code dir="auto">63</code>; items pattern <code dir="auto">^[a-z0-9]([-a-z0-9]*[a-z0-9])?$</code></td>
+<td>ExcludeNamespaces names namespaces the watch never reads, on every cluster, in addition to the system namespaces it always skips. Matched exactly. An open alert in a namespace added here is closed with a note that the namespace was excluded.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.stallWatch.minStallAgeMinutes</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">0</code>; max <code dir="auto">1440</code></td>
+<td>MinStallAgeMinutes holds a new alert until one of the namespace’s stalls has lasted at least this long. The age is the longer of what stall_report.py measures on the object and how long the watch has seen it. A stall that is younger stays in the watch’s ledger and is checked again on each run; an object that joins a namespace with an open alert is not held. Absent or 0 alerts on the first run that sees the stall.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.stallWatch.kinds</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">20</code>; items max length <code dir="auto">253</code>; items pattern <code dir="auto">^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$</code></td>
+<td>Kinds replaces the watch’s default list of resources to scan (Deployments, StatefulSets, DaemonSets, Jobs, Gateway API Gateways and HTTPRoutes, and cert-manager Certificates). Each item is a kubectl resource name such as <code dir="auto">deployments</code> or <code dir="auto">gateways.gateway.networking.k8s.io</code>. The single item <code dir="auto">all</code> scans every namespaced kind the cluster serves, one read per kind per namespace, which is slow on a large fleet. Absent or empty keeps the default list. Secrets, ConfigMaps, Events, Endpoints, EndpointSlices, ControllerRevisions and Leases are refused: the scan reports nothing from them, and a Secret listing would carry every body.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Tuning sets per-persona execution limits. Unset values keep the defaults baked into the agent image.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.default</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Default applies to the <code dir="auto">default</code> profile — the Chat Agent front door. Delivered as a config overlay merged into that profile at pod startup, like the others.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.default.apiMaxRetries</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">100</code></td>
+<td>APIMaxRetries is how many times a failed model call is retried before the run gives up. Hermes defaults to 3, which suits an interactive session where a human can retry; a background worker has nobody to retry it, so a transient burst of upstream 429s or 503s ends the run.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.default.maxTurns</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">1000</code></td>
+<td>MaxTurns is how many iterations (model calls) a single turn may take. Hermes defaults to 90. A long multi-step task can exhaust it while still mid-flight, and a run that does cannot even produce a closing summary. Repository exploration is the main consumer, so size this against how much the agent has to read, not against how complex the request is.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.platform</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Platform applies to the <code dir="auto">platform</code> profile (the Platform Agent). Delivered as a config overlay merged into that profile at pod startup.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.platform.apiMaxRetries</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">100</code></td>
+<td>APIMaxRetries is how many times a failed model call is retried before the run gives up. Hermes defaults to 3, which suits an interactive session where a human can retry; a background worker has nobody to retry it, so a transient burst of upstream 429s or 503s ends the run.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.platform.maxTurns</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">1000</code></td>
+<td>MaxTurns is how many iterations (model calls) a single turn may take. Hermes defaults to 90. A long multi-step task can exhaust it while still mid-flight, and a run that does cannot even produce a closing summary. Repository exploration is the main consumer, so size this against how much the agent has to read, not against how complex the request is.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.cluster</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Cluster applies to every <code dir="auto">cluster-*</code> profile (the Cluster Agents). Delivered as a single class overlay, merged into each existing cluster profile at pod startup and into a new one when it is scaffolded — onboarding a cluster does not roll the pod, so a profile created between two starts has to pick the overlay up itself.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.cluster.apiMaxRetries</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">100</code></td>
+<td>APIMaxRetries is how many times a failed model call is retried before the run gives up. Hermes defaults to 3, which suits an interactive session where a human can retry; a background worker has nobody to retry it, so a transient burst of upstream 429s or 503s ends the run.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.cluster.maxTurns</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">1000</code></td>
+<td>MaxTurns is how many iterations (model calls) a single turn may take. Hermes defaults to 90. A long multi-step task can exhaust it while still mid-flight, and a run that does cannot even produce a closing summary. Repository exploration is the main consumer, so size this against how much the agent has to read, not against how complex the request is.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.maxInProgress</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code></td>
+<td>MaxInProgress caps how many kanban workers run concurrently across the whole board. It is board-wide rather than per-persona: there is one dispatcher, and every worker it spawns — platform and cluster alike — draws on the same model quota. Setting it to 1 serialises all delegated work.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.maxSessions</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">10000</code></td>
+<td>MaxSessions caps how many A2A session pods run concurrently, install-wide. It only means something under mode: next - a today install renders neither the gateway that spawns session pods nor this bound. “Delegate:” makes pod creation user-triggerable from chat and threads are free, so the principal map bounds WHO can spawn and this bounds HOW MANY.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.profiles</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Profiles sizes AgentProfile work: the install-wide ceiling on concurrent profile tasks and the warm workers kept per interactive (profile, tier). Until the sizing budget exists these are fixed, conservative defaults.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.profiles.ceiling</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">1000</code></td>
+<td>Ceiling is the most profile tasks running at once across every profile on the install. The dispatcher enforces it, reserving max(1, ceil(Ceiling/3)) of it for interactive tiers so unattended work can’t starve people, and the profile namespace’s pod quota is derived from it. Absent means DefaultProfileCeiling.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.tuning.profiles.warmReplicas</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">0</code>; max <code dir="auto">100</code></td>
+<td>WarmReplicas is how many warm worker pods each interactive (profile, tier) keeps running. Absent means DefaultProfileWarmReplicas.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.experimental</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Experimental holds opt-in behaviour that is not supported and may change or disappear in any release.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.experimental.platformFrontDoor</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>PlatformFrontDoor makes the Platform Agent the profile the Hermes gateway runs as, so chat messages are handled by it directly instead of arriving at the Chat Agent, which delegates through the router and the kanban board.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.experimental.shellSandbox</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ShellSandbox tunes the agent’s shell sandbox — the separate pod it reaches over SSH, where every command it runs executes. The sandbox itself is not optional; this block sets its image and its container runtime. See docs/designs/agent-shell-sandboxing.md.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.experimental.shellSandbox.enabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Enabled is retained so that an install carrying <code dir="auto">enabled: true</code> still applies, and so that <code dir="auto">enabled: false</code> is refused rather than silently ignored. The sandbox is not optional: the agent image ships no kubectl, gcloud, gh or git, so an agent without a sandbox has no shell tools at all, and running them back in the gateway pod is the arrangement this design exists to end. Setting it false parks the agent Degraded with reason ShellSandboxCannotBeDisabled and changes nothing about the running workload.</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.experimental.shellSandbox.image</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Image overrides the sandbox image. Empty takes the operator’s own default, which the install surfaces set from the same tag inventory as every other image (AGENT_SANDBOX_IMAGE).</td>
+</tr>
+<tr>
+<td><code dir="auto">harness.experimental.shellSandbox.runtimeClassName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>RuntimeClassName runs the sandbox pod under a sandboxed container runtime, <code dir="auto">gvisor</code> being the one GKE offers. This is a second boundary and not the one the sandbox is built on: unbinding the ServiceAccount is what takes the cloud credential away, and a shell running as a different pod is what takes the agent’s filesystem away. What this adds is protection of the node from the code the model runs, by putting a user-space kernel between that code and the host’s syscall surface.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Integration configures platform-specific external connections.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges</code></td>
+<td><code dir="auto">[]object</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">16</code></td>
+<td>Forges declares the forges this agent works with: which provider each one is, where it is, and which organisation it acts for. Repositories name a forge from this list.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].name</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>min length <code dir="auto">1</code>; max length <code dir="auto">63</code>; pattern <code dir="auto">^[a-z0-9]([a-z0-9-]*[a-z0-9])?$</code></td>
+<td>Name identifies the forge within this PlatformAgent. Repositories refer to it by this name. The deprecated GitHub alias is the forge “github”.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].provider</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>one of <code dir="auto">github</code>, <code dir="auto">gitlab</code>, <code dir="auto">gitea</code></td>
+<td>Provider names the forge’s kind. It is the discriminator the operator writes into the gitops-state ConfigMap as each repository’s <code dir="auto">type</code>, so the agent reads which forge was declared rather than guessing from the URL’s text.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].host</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">253</code>; pattern <code dir="auto">^$|^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*$</code></td>
+<td>Host is the forge hostname. Omit it for the provider’s default (“github.com” for GitHub, “gitlab.com” for GitLab). A host the declared provider does not serve is rejected, and an alternative spelling of one it does serve resolves to the provider’s canonical host. It may also be a self-managed instance’s hostname: a GitLab instance, a Gitea instance, or a GitHub Enterprise Server instance. Every repository on the forge must then name that host or leave it implied. A self-managed provider such as “gitea” has no default, so the host is required there. A host another provider serves is rejected, and so is a host under a domain where the provider runs its own services (for GitHub: github.com, githubusercontent.com, ghe.com and others).</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].namespace</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">255</code>; pattern <code dir="auto">^$|^[A-Za-z0-9][A-Za-z0-9._/-]*$</code></td>
+<td>Namespace is the organisation, user, or group path the agent acts for on this forge — the GitHub org that GitHubSpec called Org. A repository given as a bare name is qualified by it, so without it every repository on this forge must name its namespace. If omitted, the organisation the token minter and GITHUB_ORG use is read from the first accepted repository the agent writes to on this forge, the GitOps one first; bare repository names are not qualified by it.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].scheme</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>one of <code dir="auto">https</code>, <code dir="auto">http</code></td>
+<td>Scheme is how the forge is reached: “https”, the default, or “http”. Only a provider that allows plain http accepts it, and only when it is written out; GitHub is https only. Over http the token and repository contents cross the network unencrypted, so admission warns, and it is meant for a forge inside the cluster.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].port</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">65535</code></td>
+<td>Port is the forge’s port, for a forge not on the scheme’s default port. Only provider “gitea” accepts it; it is refused for every other provider, a self-managed GitLab included, whose broker client does not compose one.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].credentialsRef</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>CredentialsRef names a Secret in the PlatformAgent’s namespace holding the credentials for this forge. It is for providers whose credentials an administrator supplies, and it is required for them. GitHub’s come from the install’s GitHub App through the token minter, so it is ignored for provider “github”, and admission warns when it is set there.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].credentialsRef.name</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>min length <code dir="auto">1</code>; max length <code dir="auto">253</code>; pattern <code dir="auto">^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$</code></td>
+<td>Name is the Secret’s name: a lowercase DNS subdomain.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].caBundleRef</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>CABundleRef names a Secret in the PlatformAgent’s namespace that holds the PEM CA certificates that signed this forge’s TLS certificate: a self-managed instance behind a private CA. The broker trusts these certificates for this forge’s host only, beside the system bundle, in its API client and in git. On a GitHub Enterprise Server forge, the chart also gives them to the token minter, which trusts them for all of its outbound calls. It is for a forge at a self-managed host, GitLab or GitHub Enterprise Server: it is refused when host is empty, gitlab.com or github.com, whose certificates the public CAs sign.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].caBundleRef.name</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>min length <code dir="auto">1</code>; max length <code dir="auto">253</code>; pattern <code dir="auto">^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$</code></td>
+<td>Name is the Secret’s name: a lowercase DNS subdomain.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.forges[].caBundleRef.key</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td><code dir="auto">ca.crt</code></td>
+<td>max length <code dir="auto">253</code>; pattern <code dir="auto">^[-._a-zA-Z0-9]+$</code></td>
+<td>Key is the Secret key that holds the PEM certificates. Defaults to “ca.crt”.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.repositories</code></td>
+<td><code dir="auto">[]object</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">64</code></td>
+<td>Repositories declares the repositories this agent works with, each on one of Forges, and what the agent does with it. The operator seeds them into the gitops-state ConfigMap: the GitOps repository and the managed ones into managed_repos, in that order, and the context ones into context_repos. Seeding only adds; an entry removed here stays in the ConfigMap until an administrator removes it there too.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.repositories[].forge</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>min length <code dir="auto">1</code>; max length <code dir="auto">63</code></td>
+<td>Forge is the name of the entry in Forges this repository lives on.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.repositories[].repository</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>min length <code dir="auto">1</code>; max length <code dir="auto">2048</code></td>
+<td>Repository is a clone URL, an scp-style remote, a namespace-qualified path, or a bare name to be qualified by Namespace. A URL or remote must name one of the forge’s own hosts.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.repositories[].namespace</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">255</code>; pattern <code dir="auto">^$|^[A-Za-z0-9][A-Za-z0-9._/-]*$</code></td>
+<td>Namespace qualifies a bare repository name, overriding the forge’s namespace for this repository only.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.repositories[].role</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>one of <code dir="auto">gitops</code>, <code dir="auto">managed</code>, <code dir="auto">context</code></td>
+<td>Role is what the agent does with the repository: “gitops” for the repository its GitOps work lands in, “managed” for a further repository it writes to, “context” for one it only reads.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.repositories[].baseBranch</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">200</code>; pattern <code dir="auto">^$|^[A-Za-z0-9][A-Za-z0-9._/-]*$</code></td>
+<td>BaseBranch is the branch every pull request onto this repository must target. The credential broker enforces it: it refuses a proposal onto any other branch, and a clone that names no branch checks it out. Empty means the repository’s own default branch. It may be set on a “gitops” or a “managed” repository, not on a “context” one, which is never written and whose branch pin is the ref in the gitops-state ConfigMap. The deprecated GitHub alias has no place for it: pinning the GitOps repository’s base takes Forges and Repositories.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.github</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>GitHub configures the GitHub integration. Deprecated: use Forges and Repositories, which name their forge. This field is kept as an alias: it means one forge named “github” with provider “github” and namespace Org, and, when GitRepo is set, one repository on it with role “gitops”. It will be removed in a future API version.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.github.org</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">39</code>; pattern <code dir="auto">^$|^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$</code></td>
+<td>Org is the target GitHub organization or user account for the agent environment. If omitted and GitRepo is provided, the organization is inferred from the repository owner.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.github.gitRepo</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>max length <code dir="auto">2048</code></td>
+<td>GitRepo is the optional target GitOps repository URL or owner/repo shorthand for the agent environment. When omitted or empty, no repository is initially configured, and repositories can be registered in the gitops-state ConfigMap by a cluster administrator.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.googleChat</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>GoogleChat configures the Google Chat integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.googleChat.enabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>Enabled toggles the Google Chat integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.googleChat.projectId</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ProjectID is the target GCP Project ID for Pub/Sub.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.googleChat.topicName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>TopicName is the GCP Chat Topic Name.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.googleChat.subscriptionName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>SubscriptionName is the GCP Chat Subscription Name.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.googleChat.allowedUsers</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>AllowedUsers is a list of allowed users. If not present, all users will be allowed.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.googleChat.homeChannel</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>HomeChannel is the home channel Chat address.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.googleChat.mode</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td><code dir="auto">default</code></td>
+<td>one of <code dir="auto">default</code>, <code dir="auto">debug</code></td>
+<td>Mode controls output verbosity in Google Chat (“default” or “debug”). “default”: Quiet mode (silences memory reviews, approval cards, and tool progress). “debug”: Full verbosity (surfaces tool progress, memory reviews, interim messages, and approval cards).</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Slack configures the Slack integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack.enabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>Enabled toggles the Slack integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack.botTokenSecretRef</code></td>
+<td><code dir="auto">corev1.SecretKeySelector</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>BotTokenSecretRef securely references a Secret containing the SLACK_BOT_TOKEN.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack.appTokenSecretRef</code></td>
+<td><code dir="auto">corev1.SecretKeySelector</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>AppTokenSecretRef securely references a Secret containing the SLACK_APP_TOKEN.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack.allowedUsers</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>AllowedUsers is a list of allowed member IDs. If not present, all users will be allowed. A plain ID (U…) is a member of the install’s own workspace. Under mode next, an entry T…:U… (a workspace ID, a colon, a member ID) admits that member of another workspace in a Slack Connect channel; nothing else admits one, an absent list included.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack.homeChannel</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>HomeChannel is the default channel ID for scheduled messages.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack.homeChannelName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>HomeChannelName is the human-readable name for the home channel.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack.answerFeedback</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">true</code></td>
+<td></td>
+<td>AnswerFeedback draws Slack’s thumbs-up and thumbs-down buttons under each final answer under spec.mode next, and keeps each rating with its question and answer (a thumbs-down with its note) on the install for the feedback bucket’s max age (30 days as provisioned). False hides the buttons and keeps nothing.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.slack.homeChannelPolicy</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>one of <code dir="auto">auto</code>, <code dir="auto">manual</code></td>
+<td>HomeChannelPolicy (“auto”, also absent, or “manual”) is accepted and recorded in this release but has no effect yet: the A2A gateway does not learn a home channel, so HomeChannel alone decides. It is rendered to the gateway as A2A_SLACK_HOME_POLICY for a gateway that learns the channel of the first admitted mention under “auto”. No schema default: the API server would apply one to every stored object it reads, so absent is read as “auto” by the operator instead.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Teams configures the Microsoft Teams integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.enabled</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>Enabled toggles the Microsoft Teams integration.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.appIdSecretRef</code></td>
+<td><code dir="auto">corev1.SecretKeySelector</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>AppIdSecretRef securely references a Secret containing the Microsoft App (Client) ID.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.appPasswordSecretRef</code></td>
+<td><code dir="auto">corev1.SecretKeySelector</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>AppPasswordSecretRef securely references a Secret containing the Microsoft App Client Secret.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.tenantId</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>TenantId is the Microsoft Entra ID Tenant ID for single-tenant enterprise lock-down.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.allowedUsers</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>AllowedUsers is a list of allowed Entra ID Object IDs or User Principal Names. When empty and allowAllUsers is false (default), interactions are rejected.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.allowAllUsers</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">false</code></td>
+<td></td>
+<td>AllowAllUsers allows any authenticated tenant user to interact with the bot. When false (default), users not listed in allowedUsers are rejected.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.homeChannel</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>HomeChannel is the default channel ID for scheduled messages.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.homeChannelName</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>HomeChannelName is the human-readable name for the home channel.</td>
+</tr>
+<tr>
+<td><code dir="auto">integration.teams.adaptiveCards</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td><code dir="auto">true</code></td>
+<td></td>
+<td>AdaptiveCards toggles rich Adaptive Card rendering for reports and updates.</td>
+</tr>
+<tr>
+<td><code dir="auto">mode</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td>one of <code dir="auto">today</code>, <code dir="auto">next</code></td>
+<td>Mode selects which component stack the operator renders. “today” is the current architecture. “next” additionally renders the NATS and A2A gateway components, which are otherwise dark. Absent means “today”.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Scope declares which GCP projects, beyond the one the agent runs in, the Cluster Agent reconcile enumerates for GKE clusters, and which projects and clusters it leaves unmanaged. Absent, the reconcile lists the management project alone, keeps the last declaration’s exclusions and retires nothing; an empty projects list in a present block drops the projects an earlier block declared. The management project is always in scope and cannot be excluded. The design is docs/designs/multi-project-scope.md; this is its phases 1 to 3: explicit projects, folders and organisations, and the sharedVpcHosts and metricsScopes selectors, which resolve to explicit projects.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.projects</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">100</code>; items pattern <code dir="auto">^[a-z][a-z0-9-]{4,28}[a-z0-9]$</code></td>
+<td>Projects lists GCP project IDs whose GKE clusters get Cluster Agent profiles, in addition to the management project. The agent’s service account needs the read roles in each: the install’s Terraform binds them from the same scope input that renders this block, and a CR edited by hand needs the same grants made by hand; a project it cannot list is reported with the reason (denied, api-disabled, unreachable) and its existing profiles are kept.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.folders</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">100</code>; items pattern <code dir="auto">^[0-9]{1,20}$</code></td>
+<td>Folders lists GCP folder IDs (numeric) whose every project, at any depth, contributes its GKE clusters, resolved through Cloud Asset Inventory on each run. The agent’s service account needs roles/cloudasset.viewer and the read roles on the folder: the install’s Terraform binds them from the same scope input that renders this block, and a CR edited by hand needs the same grants made by hand; a folder it cannot read freezes its previous members and is reported with the reason.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.organizations</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">100</code>; items pattern <code dir="auto">^[0-9]{1,20}$</code></td>
+<td>Organizations lists GCP organisation IDs (numeric), resolved the way Folders are.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.sharedVpcHosts</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">100</code>; items pattern <code dir="auto">^[a-z][a-z0-9-]{4,28}[a-z0-9]$</code></td>
+<td>SharedVpcHosts lists Shared VPC host project IDs; every service project attached to the host contributes its GKE clusters, resolved on each run from the Compute API (gcloud compute shared-vpc list-associated-resources). The host project itself is not included: name it in projects if its clusters are wanted. A project that is not a Shared VPC host resolves to no members: the API answers HTTP 400 for it, which the reconcile reads as an empty membership rather than a failed lookup, so a misdeclared host cannot hold the scope prune. Nothing is inherited through a Shared VPC, so the agent’s service account needs the read roles in each resolved project, and compute.projects.get in the host project (roles/compute.viewer carries it): the install’s Terraform resolves the host at plan time and binds both (the design’s §10 step 3), so a service project attached after the last apply reads denied until the next one; a CR edited by hand needs the grants made by hand. A lookup that fails freezes the selector’s previous members and holds the scope prune, and is reported in the snapshot’s containers array under sharedVpcHosts/&lt;host&gt;.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.metricsScopes</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">100</code>; items pattern <code dir="auto">^[a-z][a-z0-9-]{4,28}[a-z0-9]$</code></td>
+<td>MetricsScopes lists Cloud Monitoring Metrics Scope scoping-project IDs; every monitored project of the scope contributes its GKE clusters, resolved on each run from the Monitoring API (gcloud beta monitoring metrics-scopes describe). The API names monitored projects by number, so each is mapped to its ID with gcloud projects describe, and a monitored project the agent cannot read is reported by number under the naming call’s outcome (denied for a 403). Nothing is inherited through a Metrics Scope, so the agent’s service account needs the read roles in each resolved project: the install’s Terraform resolves the scope at plan time and binds them (the design’s §10 step 3), so a project linked after the last apply reads denied until the next one; a CR edited by hand needs the grants made by hand. The lookup itself needs to read the scope in the scoping project: roles/monitoring.metricsScopesViewer (resourcemanager.projects.get and resourcemanager.projects.list) is the narrowest role that grants it, and the read roles the scope binds carry both between them. The Monitoring API has to be enabled in the scoping project. A lookup that fails freezes the selector’s previous members and holds the scope prune, and is reported in the snapshot’s containers array under metricsScopes/&lt;scope&gt;.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.maxProjects</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td><code dir="auto">100</code></td>
+<td>min <code dir="auto">1</code>; max <code dir="auto">5000</code></td>
+<td>MaxProjects caps the resolved set the reconcile lists on each run, the management project included: explicit projects, selector members and container members fill it in a fixed order, and a project past it reads over-cap (profiles kept, nothing created). The reconcile sizes its listing workers and budget from it, and the bootstrap gate its ceiling, so an estate of a few hundred projects declares the number it has rather than reading half of itself over-cap. The MaxItems=100 cap on each declared list is unchanged: a hand-written list past a hundred entries is the shape folders exist for. The install’s Terraform refuses a plan whose explicit projects and selector members exceed it (while a selector is declared or the cap is below its default), and renders the same value here from its scope input.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.exclude</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Exclude subtracts projects and clusters after every selector has contributed.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.exclude.projects</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">100</code>; items pattern <code dir="auto">^[a-z0-9*?\[\]!-]{1,63}$</code></td>
+<td>Projects are project IDs or shell-style globs (<code dir="auto">*-sandbox</code>) matched against each resolved project ID. A match on the management project is ignored and recorded in the scope snapshot, never applied.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.exclude.clusters</code></td>
+<td><code dir="auto">[]object</code></td>
+<td>no</td>
+<td></td>
+<td>max items <code dir="auto">100</code></td>
+<td>Clusters names single clusters by the full triple, because cluster names are unique only within a project and location. This replaces the RECONCILE_EXCLUDE environment variable, which matched bare names across every project. An excluded cluster gets no Cluster Agent, and fleet answers, the onboarding sweep and the fleet-audit collectors that list clusters leave it out. Still covering it: the daily upgrade-readiness watch, the networking audit’s subnet usage, the GCE audit’s instance listing, and the third-party gke MCP server’s list_clusters.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.exclude.clusters[].projectId</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>pattern <code dir="auto">^[a-z0-9][a-z0-9-]*$</code>; max length <code dir="auto">63</code></td>
+<td>ProjectID is the project the cluster lives in.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.exclude.clusters[].location</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>pattern <code dir="auto">^[a-z0-9][a-z0-9-]*$</code>; max length <code dir="auto">63</code></td>
+<td>Location is the cluster’s region or zone.</td>
+</tr>
+<tr>
+<td><code dir="auto">scope.exclude.clusters[].clusterName</code></td>
+<td><code dir="auto">string</code></td>
+<td>yes</td>
+<td></td>
+<td>pattern <code dir="auto">^[a-z0-9][a-z0-9-]*$</code>; max length <code dir="auto">63</code></td>
+<td>ClusterName is the GKE cluster’s name.</td>
+</tr>
+<tr>
+<td><code dir="auto">storage</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Storage sizes the agent’s /opt/data volume and the shell sandbox’s matching data volume.</td>
+</tr>
+<tr>
+<td><code dir="auto">storage.size</code></td>
+<td><code dir="auto">resource.Quantity</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Size is the request of the &lt;name&gt;-data claim and of the shell sandbox’s data claim. The operator requests the same size for both claims and grows the sandbox’s claim first, so the sandbox mirror fits. A StorageClass or a quota that refuses the growth of one claim can leave the two claims at different sizes. Absent, the operator default applies (50Gi). Raising it expands both existing claims online where the StorageClass sets allowVolumeExpansion; where it does not, the claims keep their size and the DataVolumeNotExpanded condition says so. The admission webhook refuses a lower value and a value of zero or less, because a claim cannot shrink. Removing the field never shrinks a claim.</td>
+</tr>
+</tbody>
+</table>
+<div class="sl-heading-wrapper level-h2"><h2 id="status">Status</h2><a class="sl-anchor-link" href="#status"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Status”</span></a></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code dir="auto">phase</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Phase is the overall state (Pending, Provisioning, Ready, Failed).</td>
+</tr>
+<tr>
+<td><code dir="auto">observedGeneration</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ObservedGeneration is the .metadata.generation the status was last computed from.</td>
+</tr>
+<tr>
+<td><code dir="auto">address</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Address is the fully qualified domain name (FQDN) of the agent service.</td>
+</tr>
+<tr>
+<td><code dir="auto">lastReconcileTime</code></td>
+<td><code dir="auto">metav1.Time</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>LastReconcileTime is the timestamp when the operator last updated this status.</td>
+</tr>
+<tr>
+<td><code dir="auto">conditions</code></td>
+<td><code dir="auto">[]metav1.Condition</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Conditions represent the latest available observations of the instance’s state.</td>
+</tr>
+<tr>
+<td><code dir="auto">deploymentStatus</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>DeploymentStatus tracks the state of the underlying compute.</td>
+</tr>
+<tr>
+<td><code dir="auto">deploymentStatus.name</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Name is the exact name of the underlying Kubernetes Deployment.</td>
+</tr>
+<tr>
+<td><code dir="auto">deploymentStatus.readyReplicas</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ReadyReplicas indicates how many replicas are fully ready.</td>
+</tr>
+<tr>
+<td><code dir="auto">serviceStatus</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ServiceStatus holds internal/external endpoints.</td>
+</tr>
+<tr>
+<td><code dir="auto">serviceStatus.endpoint</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Endpoint is the primary URL or IP (including protocol and port) to reach the agent.</td>
+</tr>
+<tr>
+<td><code dir="auto">storageStatus</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>StorageStatus tracks PVC binding state.</td>
+</tr>
+<tr>
+<td><code dir="auto">storageStatus.bound</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Bound indicates if the primary PVC has been successfully provisioned.</td>
+</tr>
+<tr>
+<td><code dir="auto">telemetry</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Telemetry reports the resolved OpenTelemetry export configuration.</td>
+</tr>
+<tr>
+<td><code dir="auto">telemetry.otlpEndpoint</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>OTLPEndpoint is the collector endpoint written into the agent pod. Empty when the source is None, which is the one case where the pod is given no endpoint at all.</td>
+</tr>
+<tr>
+<td><code dir="auto">telemetry.otlpEndpointSource</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>OTLPEndpointSource is how the endpoint was chosen: DeploymentEnv, Spec, OperatorEnv, Discovered, Default, or None. None means discovery completed and this cluster has no collector, so the agent runs with OTEL_SDK_DISABLED=true and exports nothing; Default still means the GKE managed collector, and is what an install gets when discovery is switched off or could not complete.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>NetworkPolicy reports the resolved egress NetworkPolicy configuration.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.generated</code></td>
+<td><code dir="auto">boolean</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Generated reports whether the operator is managing a NetworkPolicy for this agent: true once a reconcile has generated one, false when spec.networkPolicy.enabled is false. It is written only by the Ready status update, so read it alongside the Ready condition — a CR that went Degraded before its first successful reconcile reports false because nothing has resolved the field yet, not because generation is off.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.dnsClusterIPs</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>DNSClusterIPs are the ClusterIPs written into rule 1.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.dnsClusterIPsSource</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>DNSClusterIPsSource reports which rung answered the DNS ClusterIP (Annotation, Spec, OperatorEnv, Discovered, or Default).</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.metadataDaemonIP</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>MetadataDaemonIP is the post-NAT daemon IP in the LiteLLM policy’s metadata rule, empty when suppressed.</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.metadataDaemonPort</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>MetadataDaemonPort is the post-NAT daemon port in the LiteLLM policy’s metadata rule, resolved from the live DaemonSet when metadataDaemonIPSource is Discovered, else the documented default (988).</td>
+</tr>
+<tr>
+<td><code dir="auto">networkPolicy.metadataDaemonIPSource</code></td>
+<td><code dir="auto">string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>MetadataDaemonIPSource reports which rung answered the metadata daemon IP (Annotation, Spec, OperatorEnv, Discovered, Default, or Suppressed).</td>
+</tr>
+<tr>
+<td><code dir="auto">usage</code></td>
+<td><code dir="auto">object</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>Usage summarises the agent’s activity: the interfaces its spec enables and aggregate counters of what it has done.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.sessionsTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>SessionsTotal is the cumulative count of sessions the agent opened: the triage sessions the event watcher opened for events the daemon delivered (its k8s_event_watcher_triage_sessions_total; a session whose inject was filtered, suppressed or failed is not counted) plus the chat conversations the gateway opened a session for (the session_store plugin’s kubeagents_chat_sessions_total on a today install, the A2A gateway’s kubeagents_a2a_gateway_sessions_total on a next install). A chat conversation that resumes after the session store’s retention window (seven days by default) counts again. Read every five minutes and kept monotonic across restarts, like toolExecutionsTotal.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.eventsIngestedTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>EventsIngestedTotal is the cumulative count of cluster events the event watcher accepted for triage: past its reason filter and its dedup window, and not turned away by the agent. Read from the watcher’s k8s_event_watcher_events_injected_total every five minutes, kept monotonic across pod, process and operator restarts, and across gateway replicas counted once rather than once per replica; it under-counts rather than over-counts when a listener cannot be read. Events the watcher merely observed are not counted.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.toolExecutionsTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ToolExecutionsTotal is the cumulative count of CLI and diagnostic tool invocations the credential broker ran, successful or not, plus requests it rejected or failed on before running: its success and error outcomes. Read from the broker’s kubeagents_tool_invocations_total every five minutes and kept monotonic the same way; commands refused by policy, busy and abandoned are not counted here but in ToolExecutionsBlockedTotal.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.remediationsProposedTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>RemediationsProposedTotal is the cumulative count of proposals the credential broker’s version-control route opened: proposal-create requests the forge accepted. Read from the broker’s kubeagents_vcs_requests_total under verb proposal-create and status success, summed over its provider label, every five minutes and kept monotonic the same way as ToolExecutionsTotal; a proposal the forge refused or that failed is not counted. Moves LastActiveTime.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.remediationsAppliedTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>RemediationsAppliedTotal is the cumulative count of remediations approved and applied. Nothing writes it yet.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.remediationsMergedTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>RemediationsMergedTotal is the cumulative count of proposals this install opened that the forge reported merged. The agent never merges, so the credential broker learns of a merge when one of its own reads of the proposal, proposal-list or proposal-view, shows the merged state; it counts each such proposal once per broker process, only when its author is the broker’s own login and it merged no earlier than the broker process started, so a restart cannot count a merge twice, to within the forge’s and the pod’s clocks agreeing. Read from the broker’s kubeagents_vcs_proposals_merged_total every five minutes and kept monotonic the same way as ToolExecutionsTotal. A merge no read of the broker’s ever shows is not counted, and a credential whose login the broker cannot name counts nothing (the broker logs that once), so this under-counts rather than over-counts and stays absent on such an install; it is the forge’s word, where RemediationsAppliedTotal is the install’s. Moves LastActiveTime.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.chatMessagesInboundTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ChatMessagesInboundTotal is the cumulative count of chat messages that reached the gateway, from every platform it serves: Google Chat, Slack, Teams and its own API port alike. Counted at the gateway’s dispatch hook, which Hermes runs after dropping its own internal events and before it checks the sender against the allowlist, so an unlisted user’s message counts and nothing the gateway never hands to the hook does. Read every five minutes from the chat_metrics plugin’s kubeagents_chat_messages_inbound_total on the platform-agent container of the gateway pod that runs Hermes (above one replica, the leader alone), summed across the pods that have led, and, on a next-mode install, from the A2A gateway’s kubeagents_a2a_gateway_messages_inbound_total as well, since Chat ingress is that gateway’s there; kept monotonic the same way as ToolExecutionsTotal. Moves LastActiveTime, so a chat turn that runs no brokered command is activity, and LastHumanActiveTime, which nothing else moves.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.toolExecutionsBlockedTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ToolExecutionsBlockedTotal is the cumulative count of requests the credential broker did not run to an exit: its blocked outcome (a policy refusal), its busy outcome (the broker’s command slots or its child memory budget held the request for the whole wait) and its abandoned outcome (the caller hung up while the request was queued or running). Read from the same kubeagents_tool_invocations_total as ToolExecutionsTotal, over the other three statuses, every five minutes and kept monotonic the same way; the two together are every request the broker’s exec route took as far as its policy; a request it rejected as malformed before that reaches neither. A rising share of this against ToolExecutionsTotal says the agent keeps asking for what its mode or policy refuses, or that the broker is saturated. Moves LastActiveTime: a refused command is still the agent at work.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.brokerFailuresTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>BrokerFailuresTotal is the cumulative count of brokered work the credential broker took on and could not carry out for a reason that is its own or its upstream’s: a command that ran past its deadline (exit 124), a broker fault on the exec route (a 500), a git failure on the version-control route (a 500 or 502), a failed forge token mint (a 502), or any 5xx on the Cloud API, MCP and watcher relays, whose upstream status passes through. A command’s own non-zero exit is not one (that is ToolExecutionsTotal’s error outcome), nor is a policy refusal or the broker’s own busy (a 403 or 503; the version-control route’s 503 for an unreadable managed-repository list is a fault and does count), nor a chat or Slack post the forge refused for the caller’s channel or scope; the broker’s own chat event pull failing, its Pub/Sub subscription or its credential to it, does count. Read from the broker’s kubeagents_broker_execution_failures_total, summed over its kind and tool labels, every five minutes and kept monotonic the same way as ToolExecutionsTotal; a timed-out command counts here and as an error there. A rising share of this against ToolExecutionsTotal says the broker, its credentials or its upstreams are failing, where a policy refusal is the tool counter’s blocked outcome in Prometheus. Does not move LastActiveTime: a watcher retrying an unreachable fleet cluster through the relay is not the agent at work.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.chatTurnsErroredTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ChatTurnsErroredTotal is the cumulative count of synchronous chat turns the gateway failed to complete: on the Hermes gateway, an exception out of the turn, a result the agent marked failed (a provider 429 or 5xx, a connection error, the gateway timeout) or a provider authentication failure, counted by the chat_metrics plugin’s kubeagents_chat_turns_errored_total on the gateway pod that runs Hermes; and on a next-mode install, an A2A task that ended failed or rejected, read from the A2A gateway’s kubeagents_a2a_gateway_task_terminals_total under those two states. That family carries no platform, so on next it counts every A2A task’s terminal, a door’s program-to-program task included, not chat alone; rejected is a task the executor refused, counted as the design asks. Read every five minutes and kept monotonic the same way as ToolExecutionsTotal. Does not move LastActiveTime: the message that started the turn already did.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.backgroundTasksGaveUpTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>BackgroundTasksGaveUpTotal is the cumulative count of background cards on the agent’s board whose breaker tripped: cards that exhausted their attempts and gave up, whether a cluster event or a chat ask started them. Hermes parks such a card as blocked and records a gave_up event against it, and that event is what is counted, once per card. Read every five minutes from the chat_metrics plugin’s kubeagents_kanban_tasks_gave_up_total on the gateway pod that runs Hermes, which reads the board at scrape time and counts the cards that gave up since its listener started (the ones that had already given up are its baseline, so a restart adds nothing twice; a card that gives up while the gateway restarts is missed, an under-count); kept monotonic the same way as ToolExecutionsTotal. Does not move LastActiveTime: a card giving up is not the agent at work.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.negativeFeedbackTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>NegativeFeedbackTotal is the cumulative count of thumbs-down reactions put on one of the bot’s Slack messages: the chat_feedback_reactions hook on the Hermes gateway counts a -1 or thumbsdown reaction, skin tone or not, whose reactor is not the bot and whose message is the bot’s, once per reactor and message within one gateway process (a thumbs-down taken off and put back is one; after a restart the same one counts again, and a reaction before the first inbound message after a start is not counted), into the chat_metrics plugin’s kubeagents_chat_feedback_negative_total, which is read every five minutes and kept monotonic the same way as ToolExecutionsTotal. Slack through the Hermes gateway only: Google Chat delivers no reaction events, and the A2A gateway’s Slack adapter does not subscribe to them, so on a next-mode install with Slack through A2A this stays at 0. Does not move LastActiveTime: the message the person reacted to already did.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.remediationsClosedUnmergedTotal</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>RemediationsClosedUnmergedTotal is the cumulative count of proposals this install opened that the forge reported closed without a merge, by a person, a forge rule or a bot; a close the broker made itself, the fleet audit tidying a stale proposal, is not counted. The broker counts each once per broker process when one of its own reads, proposal-list or proposal-view, shows it closed, under the rules RemediationsMergedTotal uses: the author is the credential’s login, the close is not before the process started, each proposal once. Read from the broker’s kubeagents_vcs_proposals_closed_unmerged_total every five minutes and kept monotonic the same way as ToolExecutionsTotal. A close no read shows is not counted, so it under-counts; a proposal closed, reopened and merged counts here and in RemediationsMergedTotal once each. A high share of this against RemediationsMergedTotal says the agent’s proposals are being rejected. Does not move LastActiveTime: a close is not the agent at work.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.clustersRegistered</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ClustersRegistered is the number of clusters the event watcher built a client for at its last start: the management cluster and the Cluster Agent profiles the GKE API would describe, the management cluster counted once even where a profile also covers it. Read every five minutes as the number of k8s_event_watcher_cluster_up series the watcher exports, the largest reading across gateway replicas. The watcher discovers its fleet once per process, so a cluster that joins or leaves is counted after the gateway pod restarts, not before. A gauge, not a counter: it falls after such a restart. Absent when the operator has no current reading: before the first poll, while the event watcher is disabled, and after two polls in a row in which no gateway replica could be read, whether its listener failed, its pod was not running, or the operator could not reach it; the CR’s events and the gateway pod’s state say which. A 0 is a reading: the watcher answered and exports no series.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.clustersMonitored</code></td>
+<td><code dir="auto">integer</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ClustersMonitored is how many of ClustersRegistered are delivering events: the k8s_event_watcher_cluster_up series at 1, whose informer has completed its initial list. The difference from ClustersRegistered is the number of clusters silently unwatched, a stuck informer, a 403 on the events list, or a stopped one. A 0 is a reading, and the normal one while the watcher starts, so read a fall alongside the pod’s age. Absent on the same terms as ClustersRegistered: one poll in which no gateway replica could be read leaves both where they were, and a second in a row clears both, because the operator then has no current reading and an absent field says so.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.activeInterfaces</code></td>
+<td><code dir="auto">[]string</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>ActiveInterfaces lists the communication channels the spec enables, sorted: “dashboard” unless spec.harness.hermes.dashboardEnabled is false, and “googlechat”, “slack” and “teams” for each spec.integration entry whose enabled is true. Resolved on every reconcile and written by the Ready status update when it changes; a pass that parks the CR Degraded leaves the previous value, so read it alongside the Ready condition, as networkPolicy.generated is read. Absent while the served CRD predates it.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.lastActiveTime</code></td>
+<td><code dir="auto">metav1.Time</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>LastActiveTime is the time of the last poll in which a counter above moved: a brokered command ran or was refused, a proposal was opened or merged, a chat message reached the gateway, or an event was accepted for triage; BrokerFailuresTotal, ChatTurnsErroredTotal, BackgroundTasksGaveUpTotal, NegativeFeedbackTotal and RemediationsClosedUnmergedTotal alone leave it where it was. Scheduled maintenance jobs that run brokered commands move it too – the Controller Stall Watch cron runs some every 30 minutes by default – so it marks agent activity of any origin, not human or operator use alone; LastHumanActiveTime is the one that does. Advances at most once per five minutes.</td>
+</tr>
+<tr>
+<td><code dir="auto">usage.lastHumanActiveTime</code></td>
+<td><code dir="auto">metav1.Time</code></td>
+<td>no</td>
+<td></td>
+<td></td>
+<td>LastHumanActiveTime is the time of the last poll in which the one counter only a person moves advanced: ChatMessagesInboundTotal, a chat message that reached the gateway, counted before the sender allowlist, so an unlisted sender is still a person. Nothing else moves it. Brokered commands and accepted events come from the stall-watch cron and the event watcher on their own, proposals from the fleet audits, which open them with nobody asking, and a merge or a close can be a forge rule or a bot; all of those move LastActiveTime and leave this alone, so an install nobody has talked to in a month shows it. Absent until a person has sent a message since the operator that writes it started. Advances at most once per five minutes.</td>
+</tr>
+</tbody>
+</table>
+<!-- prettier-ignore-end -->
+<!-- END GENERATED: crd-fields-platformagent -->
+</div><footer class="sl-flex astro-vcsylbkx"><div class="meta sl-flex astro-vcsylbkx"><a href="https://github.com/gke-labs/kube-agents/edit/main/docs/site/src/content/docs/operator/platformagent-fields.md" class="sl-flex print:hidden astro-7hm6odgq"><svg aria-hidden="true" class="astro-7hm6odgq astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a></div><div class="pagination-links print:hidden astro-bnkpfcrs" dir="ltr"><a href="/kube-agents/operator/agentprofile-crd/" rel="prev" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-bnkpfcrs">Previous<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">AgentProfile CRD</span></span></a><a href="/kube-agents/operator/agentplugin-fields/" rel="next" class="astro-bnkpfcrs"><svg aria-hidden="true" class="astro-bnkpfcrs astro-havoivjf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-bnkpfcrs">Next<br class="astro-bnkpfcrs"><span class="link-title astro-bnkpfcrs">AgentPlugin fields</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>
