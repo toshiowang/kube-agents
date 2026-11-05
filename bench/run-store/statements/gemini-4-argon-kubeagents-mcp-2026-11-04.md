@@ -68,7 +68,7 @@ Edition of 2026-11-04, computed from 3515 graded runs over 7 nights (2026-10-29 
 | Capability | Runs | Status | Evidence | Note |
 | :-- | :-- | :-- | :-- | :-- |
 | Converse well (answer first, say the next step, back claims with evidence) | on request | ❌ Not yet | 20 of 84 runs pass; lower bound 0.16; weakest test 0%; record since 2026-10-29: 20 of 84 |  |
-| Record a person's decision on a finding (dismiss, snooze, accept) | on request | ✅ Can | 36 of 36 runs pass; lower bound 0.90; weakest test 100%; 1 listed test never ran on this model; record since 2026-10-29: 36 of 36 | findings-decision-covers-item: Claude asks to confirm before a permanent dismissal; read-first 11-03, no fix yet |
+| Record a person's decision on a finding (dismiss, snooze, accept) | on request | ✅ Can | 36 of 36 runs pass; lower bound 0.90; weakest test 100%; 1 listed test never ran on this model; record since 2026-10-29: 36 of 36 | findings-decision-covers-item: read-first 11-03 on the frozen record (a confirm question before a permanent dismissal); no fix yet |
 | Run an audit now, or answer a fleet question from the collectors | on request | ✅ Can | 205 of 206 runs pass; lower bound 0.97; weakest test 95%; 2 listed tests never ran on this model; record since 2026-10-29: 205 of 206 |  |
 | Answer GKE knowledge questions with sources | on request | 🟡 Mostly | 109 of 136 runs pass; lower bound 0.73; weakest test 0%; record since 2026-10-29: 109 of 136 |  |
 | Chat posts (audit report, findings nudge, daily recap, fallback to the home channel) | scheduled, no person in the loop | ⬜ No test | no test exists | no evaluation install has a chat platform |

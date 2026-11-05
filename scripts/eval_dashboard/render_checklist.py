@@ -244,8 +244,12 @@ def _mdx_compare(docs: list[dict]) -> list[str]:
     return out
 
 
-def render_mdx(docs: list[dict]) -> str:
-    """One Starlight page. Several models: one view with a column per model. One model: that model's page."""
+UNNAMED_PHRASES = (("by model, computed", "computed"), ("today, by model.", "today."), ("on this model", "in the record"), ("per test on the model;", "per test in the record;"))
+
+
+def render_mdx(docs: list[dict], unnamed: bool = False) -> str:
+    """One Starlight page. Several models: one view with a column per model. One model: that model's page,
+    or, with ``unnamed``, the same page with no model named anywhere (one status column, built from that record)."""
     out = ['---', 'title: Certified capabilities',
            'description: What kube-agents can and cannot do today, by model, computed from the nightly evaluation record.',
            '---', '',
@@ -259,7 +263,8 @@ def render_mdx(docs: list[dict]) -> str:
         doc = docs[0]
         nights = doc["nights"]
         span = f'{nights[0]} to {nights[-1]}' if nights else "–"
-        out.append(f'{doc["label"]}, record through {nights[-1] if nights else "–"} (computed {doc["as_of"]}): {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
+        head = 'Record' if unnamed else f'{doc["label"]}, record'
+        out.append(f'{head} through {nights[-1] if nights else "–"} (computed {doc["as_of"]}): {doc["graded_runs"]:,} graded runs over {len(nights)} nights, {span}.\n')
         out += ["| Status | Rows | Meaning |", "| :-- | --: | :-- |"]
         for st, v in doc["totals"].items():
             out.append(f'| {_mdx_badge(st)} | {v} | {STATUS_HELP[STATUS_STYLE[st][0]]} |')
@@ -280,7 +285,11 @@ def render_mdx(docs: list[dict]) -> str:
             'Rows: `bench/run-store/capabilities.yaml`. Numbers: `bench/run-store/runs/`, the newest 60 graded runs per test on the model; '
             'runs marked not applicable are left out; the lower bound is the 95 percent Wilson bound. '
             'Generators: `scripts/eval_dashboard/capability_checklist.py` and `render_checklist.py --mdx`.', '']
-    return "\n".join(out)
+    text = "\n".join(out)
+    if unnamed:
+        for old, new in UNNAMED_PHRASES:
+            text = text.replace(old, new)
+    return text
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -288,9 +297,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--in", dest="src", required=True, type=pathlib.Path, nargs="+", help="one JSON per model; the HTML mode renders the first, the MDX mode one tab each")
     ap.add_argument("--out", required=True, type=pathlib.Path)
     ap.add_argument("--mdx", action="store_true", help="write a Starlight MDX page for docs/site instead of standalone HTML")
+    ap.add_argument("--no-model-name", action="store_true", help="MDX mode, one input: name no model anywhere on the page")
     a = ap.parse_args(argv)
     docs = [json.loads(p.read_text()) for p in a.src]
-    a.out.write_text(render_mdx(docs) if a.mdx else render(docs[0]))
+    if a.no_model_name and (not a.mdx or len(docs) != 1):
+        ap.error("--no-model-name needs --mdx and exactly one --in")
+    a.out.write_text(render_mdx(docs, unnamed=a.no_model_name) if a.mdx else render(docs[0]))
     print(f"wrote {a.out}")
     return 0
 
