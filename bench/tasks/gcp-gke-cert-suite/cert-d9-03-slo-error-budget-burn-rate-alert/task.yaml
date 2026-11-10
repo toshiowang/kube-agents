@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCDE) — D9. Logging (FluentBit) & Managed Prometheus
+# Target skill: gke-alert-configuration
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d9-03-slo-error-budget-burn-rate-alert
+name: "Multi-window SLO error-budget burn-rate alerting design in Cloud Monitoring"
+domain: observability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Our GKE service has a 99.9% 30-day availability SLO (43.2 minutes monthly error budget). Alerting directly on raw 5xx rate over 1 minute causes pager fatigue on brief blips, while alerting over a 24-hour window reacts too slowly to a total outage. According to Google SRE and Cloud Monitoring SLO best practices, how do you structure error-budget burn-rate alerts using fast-burn and slow-burn lookback windows? Start your answer with `VERDICT: MULTI-WINDOW-FAST-BURN-PAGE-AND-SLOW-BURN-TICKET`. Do not apply anything.
+expected_output: >-
+  VERDICT: MULTI-WINDOW-FAST-BURN-PAGE-AND-SLOW-BURN-TICKET. Configure multi-window error-budget `burn rate` alerts (`select_slo_burn_rate`): a high burn-rate threshold over a short lookback window (for example `1h` + `5m` confirmation at `14.4x` burn rate) to page on-call immediately during severe outages, paired with a lower burn-rate threshold over a longer window (`24h`/`72h` at `1x`–`3x` burn rate) to open a ticket for slow budget leaks.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: MULTI-WINDOW-FAST-BURN-PAGE-AND-SLOW-BURN-TICKET",
+          "burn rate",
+          "error budget",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

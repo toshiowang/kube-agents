@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCA / PCNE) — D10. Fleet, Config Sync & Config Connector
+# Target skill: gke-service-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d10-01-multi-cluster-services-export-import
+name: "Exposing cross-cluster services on a GKE Fleet with ServiceExport and clusterset.local DNS"
+domain: consistency
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Two GKE clusters (`gke-east` and `gke-west`) are registered to the same GKE Fleet with Multi-Cluster Services (MCS) enabled. How do you expose `Service/ledger-svc` in namespace `finance` on `gke-east` so pods in `gke-west` can discover it across clusters, and what is the exact cross-cluster DNS name pods query? Start your answer with `VERDICT: CREATE-SERVICEEXPORT-AND-QUERY-CLUSTERSET-LOCAL`. Do not apply anything.
+expected_output: >-
+  VERDICT: CREATE-SERVICEEXPORT-AND-QUERY-CLUSTERSET-LOCAL. Create a `ServiceExport` (`apiVersion: net.gke.io/v1`) named `ledger-svc` in namespace `finance` on `gke-east`; GKE MCS automatically creates a `ServiceImport` in member clusters and exposes the service at `ledger-svc.finance.svc.clusterset.local`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: CREATE-SERVICEEXPORT-AND-QUERY-CLUSTERSET-LOCAL",
+          "ServiceExport",
+          "ServiceImport",
+          "ledger-svc.finance.svc.clusterset.local",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

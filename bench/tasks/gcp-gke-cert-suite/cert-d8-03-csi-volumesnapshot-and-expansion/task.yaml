@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (CNCF CKA) — D8. Storage, CSI Drivers & PVCs
+# Target skill: gke-storage
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d8-03-csi-volumesnapshot-and-expansion
+name: "Online PVC volume expansion and CSI VolumeSnapshot prerequisites on GKE"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  An operator edits a bound `PersistentVolumeClaim` to increase `spec.resources.requests.storage` from `100Gi` to `500Gi` and also wants to take a point-in-time CSI snapshot before a schema migration. Which boolean field must be set on the `StorageClass` for PVC expansion to succeed, and which two CSI snapshot API resources (`snapshot.storage.k8s.io/v1`) are used to take the snapshot? Start your answer with `VERDICT: ALLOWVOLUMEEXPANSION-TRUE-AND-VOLUMESNAPSHOT`. Do not apply anything.
+expected_output: >-
+  VERDICT: ALLOWVOLUMEEXPANSION-TRUE-AND-VOLUMESNAPSHOT. Set `allowVolumeExpansion: true` on the `StorageClass` to permit PVC resize, and create a `VolumeSnapshot` referencing a `VolumeSnapshotClass` (`driver: pd.csi.storage.gke.io`, `snapshot.storage.k8s.io/v1`).
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ALLOWVOLUMEEXPANSION-TRUE-AND-VOLUMESNAPSHOT",
+          "allowVolumeExpansion: true",
+          "VolumeSnapshot",
+          "VolumeSnapshotClass",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCNE / PCA) — D6. Networking, CNI, LBs & DNS
+# Target skill: gke-service-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d6-06-container-native-lb-neg-client-ip
+name: "Container-Native Load Balancing (NEGs) and externalTrafficPolicy Local for client IP preservation"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Our GKE Service behind an external Application Load Balancer sees node internal IPs instead of client source IPs and suffers extra latency from double-hop `kube-proxy` iptables routing across nodes. Which Service annotation enables direct pod-IP routing via Network Endpoint Groups (NEGs) on GKE, and which `Service.spec` field preserves client source IP on NodePort / LoadBalancer Services? Start your answer with `VERDICT: USE-CLOUD-GOOGLE-COM-NEG-AND-LOCAL-TRAFFIC-POLICY`. Do not apply anything.
+expected_output: >-
+  VERDICT: USE-CLOUD-GOOGLE-COM-NEG-AND-LOCAL-TRAFFIC-POLICY. Annotate the Service with `cloud.google.com/neg: '{"ingress": true}'` so the load balancer routes directly to Pod IPs via standalone/ingress `NetworkEndpointGroup` backends, or set `externalTrafficPolicy: Local` for passthrough LoadBalancer/NodePort Services.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: USE-CLOUD-GOOGLE-COM-NEG-AND-LOCAL-TRAFFIC-POLICY",
+          "cloud.google.com/neg",
+          "externalTrafficPolicy: Local",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

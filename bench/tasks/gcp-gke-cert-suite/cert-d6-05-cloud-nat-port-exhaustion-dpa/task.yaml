@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCNE) — D6. Networking, CNI, LBs & DNS
+# Target skill: gke-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d6-05-cloud-nat-port-exhaustion-dpa
+name: "Resolving Cloud NAT ephemeral port exhaustion on GKE with Dynamic Port Allocation"
+domain: capacity
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Private GKE nodes making thousands of concurrent outbound HTTPS connections to a partner API experience intermittent connection timeouts, and Cloud NAT logs report `OUT_OF_RESOURCES` port allocation drops even though most nodes in the cluster are idle. Give the exact `gcloud compute routers nats update` flags to enable Dynamic Port Allocation and disable Endpoint-Independent Mapping. Start your answer with `VERDICT: ENABLE-DYNAMIC-PORT-ALLOCATION-ON-CLOUD-NAT`. Do not apply anything.
+expected_output: >-
+  VERDICT: ENABLE-DYNAMIC-PORT-ALLOCATION-ON-CLOUD-NAT. Run `gcloud compute routers nats update <nat-name> --router=<router> --region=<region> --enable-dynamic-port-allocation --min-ports-per-vm=<min> --max-ports-per-vm=<max> --enable-endpoint-independent-mapping=false`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ENABLE-DYNAMIC-PORT-ALLOCATION-ON-CLOUD-NAT",
+          "--enable-dynamic-port-allocation",
+          "--max-ports-per-vm",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

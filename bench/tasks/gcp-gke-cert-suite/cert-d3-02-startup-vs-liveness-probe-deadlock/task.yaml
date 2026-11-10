@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (CNCF CKAD / GCP PCDE) — D3. Workloads, OOM, Probes & HPA
+# Target skill: gke-reliability
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d3-02-startup-vs-liveness-probe-deadlock
+name: "Preventing livenessProbe restart loops on slow-starting containers with startupProbe"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  A legacy Java service on GKE takes up to 120 seconds to warm caches on cold start, but once started it must be restarted within 15 seconds if its `/healthz` endpoint deadlocks. Right now `livenessProbe` (`periodSeconds: 5, failureThreshold: 3`) kills the container every 15 seconds before startup finishes. Give the exact Kubernetes probe configuration that allows up to 120s for startup while keeping fast 15s deadlock detection afterward. Start your answer with `VERDICT: ADD-STARTUPPROBE-GUARDING-LIVENESSPROBE`. Do not apply anything.
+expected_output: >-
+  VERDICT: ADD-STARTUPPROBE-GUARDING-LIVENESSPROBE. Add a `startupProbe` on `/healthz` with `periodSeconds: 5` and `failureThreshold: 24` (5s * 24 = 120s startup budget); Kubernetes disables `livenessProbe` until `startupProbe` succeeds once, preserving the 15s (`periodSeconds: 5, failureThreshold: 3`) `livenessProbe` afterward.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ADD-STARTUPPROBE-GUARDING-LIVENESSPROBE",
+          "startupProbe",
+          "livenessProbe",
+          "failureThreshold",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

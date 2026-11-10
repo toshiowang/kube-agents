@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCNE / PCA) — D6. Networking, CNI, LBs & DNS
+# Target skill: gke-service-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d6-02-gateway-api-cross-namespace-refgrant
+name: "GKE Gateway API cross-namespace HTTPRoute to Service ReferenceGrant"
+domain: cluster-debugging
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  An `HTTPRoute` in namespace `edge-routing` references `Service/billing-api` in namespace `billing-prod`, and `kubectl describe httproute` shows `ResolvedRefs: False` with reason `RefNotPermitted`. Which Gateway API resource must be created, in which namespace (`edge-routing` or `billing-prod`), and what `from` / `to` kinds must it declare? Start your answer with `VERDICT: CREATE-REFERENCEGRANT-IN-TARGET-NAMESPACE-BILLING-PROD`. Do not apply anything.
+expected_output: >-
+  VERDICT: CREATE-REFERENCEGRANT-IN-TARGET-NAMESPACE-BILLING-PROD. Create a `ReferenceGrant` (`gateway.networking.k8s.io/v1beta1`) in the target namespace `billing-prod` allowing `from: [{group: gateway.networking.k8s.io, kind: HTTPRoute, namespace: edge-routing}]` and `to: [{group: "", kind: Service, name: billing-api}]`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: CREATE-REFERENCEGRANT-IN-TARGET-NAMESPACE-BILLING-PROD",
+          "ReferenceGrant",
+          "gateway.networking.k8s.io",
+          "billing-prod",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

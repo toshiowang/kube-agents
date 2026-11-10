@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCSE) — D7. Security, WI IAM, RBAC & CVEs
+# Target skill: gke-platform-security
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d7-02-vpc-service-controls-egress-block
+name: "Diagnosing and resolving VPC Service Controls perimeter blocks on GKE image pulls"
+domain: security
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Pods in our GKE cluster inside VPC Service Controls perimeter `prod-perimeter` fail to pull container images from a shared Artifact Registry in project `shared-artifacts-proj` (outside `prod-perimeter`), and Cloud Audit Logs show `violationReason: RESOURCES_NOT_IN_SAME_SERVICE_PERIMETER` on `artifactregistry.googleapis.com`. What VPC Service Controls configuration on `prod-perimeter` permits the GKE node/workload service account to pull from `shared-artifacts-proj` without disabling the perimeter? Start your answer with `VERDICT: CONFIGURE-VPCSC-EGRESS-RULE-OR-PERIMETER-BRIDGE`. Do not apply anything.
+expected_output: >-
+  VERDICT: CONFIGURE-VPCSC-EGRESS-RULE-OR-PERIMETER-BRIDGE. Add a VPC Service Controls egress rule on `prod-perimeter` allowing the GKE node/Workload Identity principal to access `artifactregistry.googleapis.com` and `storage.googleapis.com` in `shared-artifacts-proj` (or create a Perimeter Bridge if both projects belong to perimeters under the same organization).
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: CONFIGURE-VPCSC-EGRESS-RULE-OR-PERIMETER-BRIDGE",
+          "artifactregistry.googleapis.com",
+          "egress",
+          "VPC Service Controls",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

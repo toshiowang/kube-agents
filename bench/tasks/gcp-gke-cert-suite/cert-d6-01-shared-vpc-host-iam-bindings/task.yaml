@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCNE / PCA) — D6. Networking, CNI, LBs & DNS
+# Target skill: gke-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d6-01-shared-vpc-host-iam-bindings
+name: "Shared VPC host project subnet IAM bindings for GKE service project agents"
+domain: capacity
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Provisioning a VPC-native GKE cluster in service project `app-svc-proj` (project number `111122223333`) attached to a subnet in Shared VPC host project `net-host-proj` fails with a permission error on the host subnet. Which IAM role on the host project/subnet must be granted to the service project's GKE service agent (`service-111122223333@container-engine-robot.iam.gserviceaccount.com`) and Google APIs service agent (`111122223333@cloudservices.gserviceaccount.com`)? Start your answer with `VERDICT: GRANT-COMPUTE-NETWORKUSER-ON-HOST-SUBNET`. Do not apply anything.
+expected_output: >-
+  VERDICT: GRANT-COMPUTE-NETWORKUSER-ON-HOST-SUBNET. Grant `roles/compute.networkUser` on the Shared VPC host project subnet (and secondary Pod/Service ranges) to both `service-111122223333@container-engine-robot.iam.gserviceaccount.com` and `111122223333@cloudservices.gserviceaccount.com` (plus `roles/container.hostServiceAgentUser` at the host project level for the GKE robot account).
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: GRANT-COMPUTE-NETWORKUSER-ON-HOST-SUBNET",
+          "roles/compute.networkUser",
+          "container-engine-robot.iam.gserviceaccount.com",
+          "roles/container.hostServiceAgentUser",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

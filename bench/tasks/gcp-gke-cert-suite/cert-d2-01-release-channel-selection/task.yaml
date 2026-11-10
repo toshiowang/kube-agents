@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCA / ACE) — D2. Cluster & Node Upgrades & APIs
+# Target skill: gke-upgrades
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d2-01-release-channel-selection
+name: "GKE Release Channel selection and maintenance exclusion window flags"
+domain: upgrades
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  A regulated payments cluster needs conservative, battle-tested Kubernetes versions while temporarily blocking automatic node and control-plane minor upgrades during a 14-day peak retail freeze. Which GKE `--release-channel` value should it use (`rapid`, `regular`, or `stable`), and which `gcloud container clusters update` flags register a maintenance exclusion with scope `no_minor_or_node_upgrades`? Start your answer with `VERDICT: STABLE-CHANNEL-WITH-MAINTENANCE-EXCLUSION`. Do not apply anything.
+expected_output: >-
+  VERDICT: STABLE-CHANNEL-WITH-MAINTENANCE-EXCLUSION. Use `--release-channel=stable` and register an exclusion with `gcloud container clusters update <cluster> --add-maintenance-exclusion-name=<name> --add-maintenance-exclusion-start=<timestamp> --add-maintenance-exclusion-end=<timestamp> --add-maintenance-exclusion-scope=no_minor_or_node_upgrades`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: STABLE-CHANNEL-WITH-MAINTENANCE-EXCLUSION",
+          "--add-maintenance-exclusion-end",
+          "no_minor_or_node_upgrades",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

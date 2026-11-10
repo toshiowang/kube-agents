@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCNE) — D6. Networking, CNI, LBs & DNS
+# Target skill: gke-service-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d6-03-gateway-healthcheckpolicy-port
+name: "Resolving GKE Gateway 502 Bad Gateway errors with a HealthCheckPolicy CRD"
+domain: cluster-debugging
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Traffic through our GKE Gateway (`gke-l7-regional-external-managed`) to `Service/catalog-svc` (Service port `80` -> container `targetPort: 8080`) returns `502 Bad Gateway` because the application exposes its health probe at `/actuator/health` on management port `8081` rather than `/` on `8080`. Which GKE Gateway API policy CRD (`networking.gke.io/v1`) overrides the load balancer health check path and port for `Service/catalog-svc`? Start your answer with `VERDICT: ATTACH-HEALTHCHECKPOLICY-TO-CATALOG-SVC`. Do not apply anything.
+expected_output: >-
+  VERDICT: ATTACH-HEALTHCHECKPOLICY-TO-CATALOG-SVC. Create a `HealthCheckPolicy` (`apiVersion: networking.gke.io/v1`) with `spec.targetRef` pointing to `Service/catalog-svc` and `spec.default.config` configuring `port: 8081` and `httpHealthCheck.requestPath: /actuator/health`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ATTACH-HEALTHCHECKPOLICY-TO-CATALOG-SVC",
+          "HealthCheckPolicy",
+          "networking.gke.io/v1",
+          "targetRef",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

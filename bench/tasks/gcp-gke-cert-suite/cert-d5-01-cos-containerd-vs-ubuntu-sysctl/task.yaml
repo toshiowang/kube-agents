@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCA / PCSE) — D5. Node OS, Kubelet & Auto-Repair
+# Target skill: gke-workload-troubleshooting
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d5-01-cos-containerd-vs-ubuntu-sysctl
+name: "Applying Linux kernel sysctls and kubelet config on COS_CONTAINERD node pools"
+domain: cluster-debugging
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  High-throughput proxy pods on our `COS_CONTAINERD` GKE node pool need node-level Linux kernel `sysctl` tuning (`net.core.somaxconn` and `net.ipv4.tcp_tw_reuse`) without privileged init containers. Which `gcloud container node-pools update` flag and YAML top-level section apply managed node `sysctls` on GKE? Start your answer with `VERDICT: SYSTEM-CONFIG-FROM-FILE-LINUXCONFIG-SYSCTLS`. Do not apply anything.
+expected_output: >-
+  VERDICT: SYSTEM-CONFIG-FROM-FILE-LINUXCONFIG-SYSCTLS. Pass `--system-config-from-file=<config.yaml>` to `gcloud container node-pools create` or `update` with a `linuxConfig.sysctls` map defining `net.core.somaxconn` and `net.ipv4.tcp_tw_reuse`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: SYSTEM-CONFIG-FROM-FILE-LINUXCONFIG-SYSCTLS",
+          "--system-config-from-file",
+          "linuxConfig",
+          "sysctls",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

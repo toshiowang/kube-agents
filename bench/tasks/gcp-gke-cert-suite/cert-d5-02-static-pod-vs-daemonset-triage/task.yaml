@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (CNCF CKA) — D5. Node OS, Kubelet & Auto-Repair
+# Target skill: gke-workload-troubleshooting
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d5-02-static-pod-vs-daemonset-triage
+name: "Identifying kubelet static mirror pods vs DaemonSet pods during node debugging"
+domain: cluster-debugging
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  An operator deletes a rogue pod named `rogue-agent-gke-pool-1-node-a` with `kubectl delete pod`, but it immediately reappears even though `kubectl get deploy,ds,rs,sts,job -A` shows zero controllers managing it and its `ownerReferences.kind` is `Node`. Explain what kind of pod this is, why the API server cannot stop it, and which kubelet directory on the node holds its manifest. Start your answer with `VERDICT: KUBELET-STATIC-MIRROR-POD-IN-ETC-KUBERNETES-MANIFESTS`. Do not apply anything.
+expected_output: >-
+  VERDICT: KUBELET-STATIC-MIRROR-POD-IN-ETC-KUBERNETES-MANIFESTS. A pod with `ownerReferences.kind: Node` and the node name suffixed is a static mirror pod managed directly by the node's `kubelet` process from `staticPodPath` (`/etc/kubernetes/manifests`), so deleting the mirror object in the API server causes `kubelet` to recreate it until the file is removed from the node.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: KUBELET-STATIC-MIRROR-POD-IN-ETC-KUBERNETES-MANIFESTS",
+          "/etc/kubernetes/manifests",
+          "staticPodPath",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

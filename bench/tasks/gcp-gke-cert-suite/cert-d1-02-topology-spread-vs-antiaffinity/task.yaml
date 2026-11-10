@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (CNCF CKA / GCP PCA) — D1. Autoscaling, ComputeClass & Accelerators
+# Target skill: gke-workload-scaling
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d1-02-topology-spread-vs-antiaffinity
+name: "Zonal pod skew prevention using topologySpreadConstraints with DoNotSchedule"
+domain: capacity
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Our 6-replica Deployment `checkout-api` (labelled `app: checkout-api`) on a 3-zone regional GKE cluster in `us-central1` piled 5 of its 6 replicas into `us-central1-a` because the manifest used `whenUnsatisfiable: ScheduleAnyway`. Give the exact `topologySpreadConstraints` YAML block to enforce a strict maximum zonal difference of 1 pod across zones and block scheduling if violated. Start your answer with `VERDICT: USE-DONOTSCHEDULE-MAXSKEW-1`. Do not apply anything.
+expected_output: >-
+  VERDICT: USE-DONOTSCHEDULE-MAXSKEW-1. Configure `topologySpreadConstraints` with `maxSkew: 1`, `topologyKey: topology.kubernetes.io/zone`, `whenUnsatisfiable: DoNotSchedule`, and `labelSelector.matchLabels.app: checkout-api`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: USE-DONOTSCHEDULE-MAXSKEW-1",
+          "topology.kubernetes.io/zone",
+          "DoNotSchedule",
+          "maxSkew",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

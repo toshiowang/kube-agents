@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCDE) — D4. Control Plane, Setup, Cost & CLI
+# Target skill: gke-cluster-autoscaler
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d4-04-cluster-autoscaler-scale-down-blockers
+name: "Diagnosing and remediating Cluster Autoscaler node scale-down blockers"
+domain: cost
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Ten nodes in our GKE node pool sit at 8% CPU utilization for hours, but Cluster Autoscaler reports `no.scale.down.node.pod.not.backed.by.controller` and `no.scale.down.node.pod.kube.system.unmovable`. Name the three most common pod-level configurations that block Cluster Autoscaler from draining a node and how to allow safe eviction of pods using `emptyDir` scratch volumes. Start your answer with `VERDICT: SAFE-TO-EVICT-TRUE-AND-PDB-FOR-SYSTEM-PODS`. Do not apply anything.
+expected_output: >-
+  VERDICT: SAFE-TO-EVICT-TRUE-AND-PDB-FOR-SYSTEM-PODS. Scale-down is blocked by standalone pods not managed by a controller, `kube-system` pods lacking a `PodDisruptionBudget` (or restricted by `maxUnavailable: 0`), pods with `cluster-autoscaler.kubernetes.io/safe-to-evict: "false"`, and pods with local `emptyDir` storage unless annotated with `cluster-autoscaler.kubernetes.io/safe-to-evict: "true"`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: SAFE-TO-EVICT-TRUE-AND-PDB-FOR-SYSTEM-PODS",
+          "cluster-autoscaler.kubernetes.io/safe-to-evict",
+          "PodDisruptionBudget",
+          "emptyDir",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

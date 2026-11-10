@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCA / PCDE) — D4. Control Plane, Setup, Cost & CLI
+# Target skill: gke-cost-analysis
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d4-01-gke-cost-allocation-bigquery
+name: "Enabling GKE Cost Allocation for namespace and label chargeback in BigQuery"
+domain: cost
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Finance wants to break down GKE cluster spend by Kubernetes namespace and pod `env` / `team` labels inside our Cloud Billing detailed usage cost export in BigQuery. Give the exact `gcloud container clusters update` flag to enable this feature on an existing cluster. Start your answer with `VERDICT: ENABLE-GKE-COST-ALLOCATION`. Do not apply anything.
+expected_output: >-
+  VERDICT: ENABLE-GKE-COST-ALLOCATION. Run `gcloud container clusters update <cluster> --location=<location> --enable-cost-allocation` so GKE exports namespace and Kubernetes label (`k8s-namespace`, `kube_labels`) resource consumption to the Cloud Billing BigQuery table.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ENABLE-GKE-COST-ALLOCATION",
+          "--enable-cost-allocation",
+          "BigQuery",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

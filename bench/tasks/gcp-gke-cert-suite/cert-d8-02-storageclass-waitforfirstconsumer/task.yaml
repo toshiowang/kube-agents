@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (CNCF CKA / GCP PCA) — D8. Storage, CSI Drivers & PVCs
+# Target skill: gke-storage
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d8-02-storageclass-waitforfirstconsumer
+name: "Preventing cross-zone PVC scheduling deadlocks with volumeBindingMode WaitForFirstConsumer"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  On a regional GKE cluster (`us-central1-a`, `b`, `c`), a GPU pod in `us-central1-b` (the only zone with available L4 GPUs) is stuck `Pending` with `0/12 nodes available: 4 node(s) had volume node affinity conflict` because its zonal Persistent Disk PVC was automatically created in `us-central1-a` the moment the `PersistentVolumeClaim` was applied. Which `StorageClass` field prevents provisioning the disk until the scheduler picks the pod's node? Start your answer with `VERDICT: SET-VOLUMEBINDINGMODE-WAITFORFIRSTCONSUMER`. Do not apply anything.
+expected_output: >-
+  VERDICT: SET-VOLUMEBINDINGMODE-WAITFORFIRSTCONSUMER. Set `volumeBindingMode: WaitForFirstConsumer` on the `StorageClass` (instead of `Immediate`) so `pd.csi.storage.gke.io` delays provisioning the zonal Persistent Disk until a node satisfying all pod constraints (including GPU availability) is selected.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: SET-VOLUMEBINDINGMODE-WAITFORFIRSTCONSUMER",
+          "volumeBindingMode",
+          "WaitForFirstConsumer",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

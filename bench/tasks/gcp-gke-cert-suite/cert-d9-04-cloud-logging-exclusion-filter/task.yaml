@@ -1,0 +1,39 @@
+# Certification Exam Domain Probe (GCP PCDE / PCA) — D9. Logging (FluentBit) & Managed Prometheus
+# Target skill: gke-observability
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d9-04-cloud-logging-exclusion-filter
+name: "Reducing GKE Cloud Logging ingestion volume with a _Default sink exclusion filter"
+domain: observability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Debug and info container logs from namespace `load-test` on our GKE cluster are driving excessive Cloud Logging ingestion charges, but we must retain all `ERROR` and `CRITICAL` logs from that namespace in the `_Default` log bucket. Give the Cloud Logging exclusion filter expression (`resource.type="k8s_container"`) and the `gcloud logging sinks update _Default` flag to add the exclusion. Start your answer with `VERDICT: ADD-EXCLUSION-FILTER-ON-DEFAULT-LOG-SINK`. Do not apply anything.
+expected_output: >-
+  VERDICT: ADD-EXCLUSION-FILTER-ON-DEFAULT-LOG-SINK. Update the `_Default` sink with `gcloud logging sinks update _Default --add-exclusion=name=drop-loadtest-low-severity,filter='resource.type="k8s_container" AND resource.labels.namespace_name="load-test" AND severity<ERROR'`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ADD-EXCLUSION-FILTER-ON-DEFAULT-LOG-SINK",
+          "_Default",
+          "--add-exclusion",
+          "k8s_container",
+          "severity<ERROR",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

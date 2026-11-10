@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCDE) — D3. Workloads, OOM, Probes & HPA
+# Target skill: gke-ai-troubleshooting-jobset-interruption
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d3-06-jobset-gang-scheduling-recovery
+name: "JobSet coordinated startup order and failure recovery for distributed AI workloads"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Our distributed training `JobSet` on GKE has a `leader` `replicatedJob` and a `workers` `replicatedJob`. Right now workers start before the leader is ready, and when a node preempts one worker pod with exit code `137`, the JobSet restarts beyond our max retry budget. Which `JobSet` spec fields enforce in-order replicatedJob startup and controlled failure restarts? Start your answer with `VERDICT: CONFIGURE-STARTUPPOLICY-INORDER-AND-FAILUREPOLICY`. Do not apply anything.
+expected_output: >-
+  VERDICT: CONFIGURE-STARTUPPOLICY-INORDER-AND-FAILUREPOLICY. Configure `startupPolicy.startupPolicyOrder: InOrder` on the `JobSet` spec so the first `replicatedJob` (`leader`) reaches ready before `workers` start, and define `failurePolicy.maxRestarts` and `failurePolicy.rules` (`RecreateJobSet`).
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: CONFIGURE-STARTUPPOLICY-INORDER-AND-FAILUREPOLICY",
+          "startupPolicy",
+          "InOrder",
+          "failurePolicy",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

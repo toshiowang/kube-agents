@@ -1,0 +1,39 @@
+# Certification Exam Domain Probe (GCP PCA / PCDE) — D8. Storage, CSI Drivers & PVCs
+# Target skill: gke-backup-dr
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d8-04-backup-for-gke-conflict-restore
+name: "Backup for GKE RestorePlan conflict handling and volume data restore policies"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  We need a `gcloud beta container backup-restore restore-plans create` command that restores namespaces from a Backup for GKE backup into an existing target cluster, replaces any conflicting namespaced resources cleanly, and provisions new persistent volumes from the volume backups in the backup artifact. Which two `restore-plans create` flags and enum values control namespaced conflict behavior and volume data restoration? Start your answer with `VERDICT: DELETE-AND-RESTORE-WITH-RESTORE-VOLUME-DATA-FROM-BACKUP`. Do not apply anything.
+expected_output: >-
+  VERDICT: DELETE-AND-RESTORE-WITH-RESTORE-VOLUME-DATA-FROM-BACKUP. Pass `--namespaced-resource-restore-mode=DELETE_AND_RESTORE` (or `FAIL_ON_CONFLICT` / `MERGE_SKIP_ON_CONFLICT`) and `--volume-data-restore-policy=RESTORE_VOLUME_DATA_FROM_BACKUP` to `gcloud beta container backup-restore restore-plans create`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: DELETE-AND-RESTORE-WITH-RESTORE-VOLUME-DATA-FROM-BACKUP",
+          "--namespaced-resource-restore-mode",
+          "DELETE_AND_RESTORE",
+          "--volume-data-restore-policy",
+          "RESTORE_VOLUME_DATA_FROM_BACKUP",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

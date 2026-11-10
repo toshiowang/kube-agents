@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCDE) — D3. Workloads, OOM, Probes & HPA
+# Target skill: gke-workload-scaling
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d3-01-vpa-hpa-cpu-conflict
+name: "Resolving VPA Auto mode and HPA CPU co-management replica thrashing"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  A Deployment on GKE has both a `HorizontalPodAutoscaler` scaling on average CPU utilization and a `VerticalPodAutoscaler` with `updateMode: Auto` adjusting CPU requests, causing continuous pod restarts and replica count oscillation. Explain why VPA and HPA conflict on CPU/memory and how to configure `updateMode` or HPA metric types according to GKE best practices. Start your answer with `VERDICT: DO-NOT-COMANAGE-CPU-WITH-VPA-AUTO-AND-HPA`. Do not apply anything.
+expected_output: >-
+  VERDICT: DO-NOT-COMANAGE-CPU-WITH-VPA-AUTO-AND-HPA. VPA `updateMode: Auto` mutates pod CPU requests and evicts pods while HPA calculates replica counts from CPU utilization against those same requests. Fix by setting VPA `updateMode: Off` (recommendation-only) when HPA scales on CPU/memory, or use HPA with custom/external request-rate metrics only.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: DO-NOT-COMANAGE-CPU-WITH-VPA-AUTO-AND-HPA",
+          "updateMode",
+          "HorizontalPodAutoscaler",
+          "VerticalPodAutoscaler",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

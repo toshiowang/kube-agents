@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCDE) — D3. Workloads, OOM, Probes & HPA
+# Target skill: gke-service-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d3-04-native-service-canary-split
+name: "Native Kubernetes canary traffic splitting across two Deployments behind one Service"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Without installing a service mesh or spinning up a second GKE cluster, how do you route approximately 10% of intra-cluster traffic to `v2` of a microservice (`orders-canary`) and 90% to `v1` (`orders-stable`) using only native Kubernetes `Deployment` and `Service` objects? Start your answer with `VERDICT: SHARED-SERVICE-SELECTOR-ACROSS-TWO-DEPLOYMENTS`. Do not apply anything.
+expected_output: >-
+  VERDICT: SHARED-SERVICE-SELECTOR-ACROSS-TWO-DEPLOYMENTS. Run two Deployments (`orders-stable` with 9 replicas and `orders-canary` with 1 replica) whose Pod templates share a common label (for example `app: orders`) matched by the single Kubernetes `Service` `spec.selector`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: SHARED-SERVICE-SELECTOR-ACROSS-TWO-DEPLOYMENTS",
+          "orders-stable",
+          "orders-canary",
+          "selector",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

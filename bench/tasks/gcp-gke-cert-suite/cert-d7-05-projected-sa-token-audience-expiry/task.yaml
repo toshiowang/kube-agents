@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (CNCF CKS) — D7. Security, WI IAM, RBAC & CVEs
+# Target skill: gke-workload-security
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d7-05-projected-sa-token-audience-expiry
+name: "Hardening ServiceAccount token mounts with automountServiceAccountToken and projected tokens"
+domain: security
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Our security audit requires that pods in `ServiceAccount/vault-client` do not mount the default Kubernetes API token unless explicitly needed, and when mounted for an external Vault authenticator, the token must be scoped to audience `https://vault.example.internal` and expire after 600 seconds (`10m`). Which field disables automatic mounting, and which volume source mounts the audience-scoped short-lived token? Start your answer with `VERDICT: AUTOMOUNTSERVICEACCOUNTTOKEN-FALSE-WITH-PROJECTED-SERVICEACCOUNTTOKEN`. Do not apply anything.
+expected_output: >-
+  VERDICT: AUTOMOUNTSERVICEACCOUNTTOKEN-FALSE-WITH-PROJECTED-SERVICEACCOUNTTOKEN. Set `automountServiceAccountToken: false` on the ServiceAccount/Pod and mount a `projected` volume containing a `serviceAccountToken` source with `audience: https://vault.example.internal` and `expirationSeconds: 600`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: AUTOMOUNTSERVICEACCOUNTTOKEN-FALSE-WITH-PROJECTED-SERVICEACCOUNTTOKEN",
+          "automountServiceAccountToken: false",
+          "serviceAccountToken",
+          "expirationSeconds",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

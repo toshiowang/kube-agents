@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCNE / PCDE) — D6. Networking, CNI, LBs & DNS
+# Target skill: gke-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d6-08-nodelocal-dnscache-enablement
+name: "Enabling GKE NodeLocal DNSCache add-on to prevent DNS conntrack races and 5s timeouts"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  High-QPS microservices on our GKE Standard cluster experience intermittent 5-second DNS lookup delays and `nf_conntrack` table spikes from UDP DNS queries to `kube-dns`. Give the exact `gcloud container clusters update` flag to enable the managed local DNS caching DaemonSet on the cluster. Start your answer with `VERDICT: UPDATE-ADDONS-NODELOCALDNS-ENABLED`. Do not apply anything.
+expected_output: >-
+  VERDICT: UPDATE-ADDONS-NODELOCALDNS-ENABLED. Run `gcloud container clusters update <cluster> --location=<location> --update-addons=NodeLocalDNS=ENABLED` to deploy the `node-local-dns` DaemonSet (`NodeLocal DNSCache`), which caches DNS responses locally on each node and upgrades upstream cache misses to TCP.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: UPDATE-ADDONS-NODELOCALDNS-ENABLED",
+          "--update-addons=NodeLocalDNS=ENABLED",
+          "node-local-dns",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

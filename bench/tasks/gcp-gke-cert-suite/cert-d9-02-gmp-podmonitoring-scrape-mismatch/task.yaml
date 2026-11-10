@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCDE) — D9. Logging (FluentBit) & Managed Prometheus
+# Target skill: gke-observability
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d9-02-gmp-podmonitoring-scrape-mismatch
+name: "Troubleshooting Google Cloud Managed Service for Prometheus PodMonitoring zero targets scraped"
+domain: observability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  We deployed a `PodMonitoring` (`monitoring.googleapis.com/v1`) resource in namespace `payments`, but no metrics appear in Cloud Monitoring and `PodMonitoring` status shows `0` active targets even though the payment pods are `Running` and expose `/metrics` on port `9090`. What two `PodMonitoring.spec` fields must match the target Pod manifest (`metadata.labels` and `containers[].ports[].name`), and why does specifying a numeric port in `endpoints[].port` often fail if the container port is unnamed? Start your answer with `VERDICT: MATCH-SELECTOR-LABELS-AND-NAMED-CONTAINER-PORT`. Do not apply anything.
+expected_output: >-
+  VERDICT: MATCH-SELECTOR-LABELS-AND-NAMED-CONTAINER-PORT. `PodMonitoring.spec.selector.matchLabels` must match the Pod's labels in the same namespace, and `spec.endpoints[].port` must reference the named port declared in the Pod's `containers[].ports[].name`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: MATCH-SELECTOR-LABELS-AND-NAMED-CONTAINER-PORT",
+          "PodMonitoring",
+          "monitoring.googleapis.com/v1",
+          "matchLabels",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

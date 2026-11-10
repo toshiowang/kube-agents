@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCNE / PCA) — D4. Control Plane, Setup, Cost & CLI
+# Target skill: gke-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d4-02-private-cluster-vpn-custom-routes
+name: "Reaching a private GKE control plane from on-premises over Cloud VPN and BGP custom routes"
+domain: capacity
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  An on-premises CI runner in `192.0.2.0/24` connects to our GCP VPC in `us-east1` through a Cloud VPN tunnel in `us-west1`, but `kubectl` times out reaching the private endpoint of our private GKE cluster in `us-east1` (master CIDR `198.51.100.0/28`). Which two settings (one on the GKE cluster and one on the Cloud Router BGP session) are required in addition to `masterAuthorizedNetworks`? Start your answer with `VERDICT: ENABLE-MASTER-GLOBAL-ACCESS-AND-CUSTOM-ROUTE-ADVERTISEMENT`. Do not apply anything.
+expected_output: >-
+  VERDICT: ENABLE-MASTER-GLOBAL-ACCESS-AND-CUSTOM-ROUTE-ADVERTISEMENT. Enable master global access on the cluster (`--enable-master-global-access`) so the private control plane is reachable across regions, and advertise the GKE control-plane `/28` range (`198.51.100.0/28`) as a custom advertised route on the Cloud Router BGP session (`--advertisement-mode=CUSTOM`).
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ENABLE-MASTER-GLOBAL-ACCESS-AND-CUSTOM-ROUTE-ADVERTISEMENT",
+          "--enable-master-global-access",
+          "Cloud Router",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

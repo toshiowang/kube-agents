@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCA / PCDE) — D1. Autoscaling, ComputeClass & Accelerators
+# Target skill: gke-batch-hpc
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d1-05-gpu-time-sharing-vs-mig
+name: "Multi-Instance GPU (MIG) vs time-sharing for hardware fault and memory isolation"
+domain: capacity
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Two multi-tenant inference teams share NVIDIA A100 GPUs on GKE and require strict hardware memory and fault isolation so an OOM or CUDA fault in Team A's container cannot affect Team B. Should we configure GPU time-sharing (`maxSharedClientsPerGpu`) or Multi-Instance GPU (MIG) partitions (such as `nvidia.com/mig-1g.5gb`)? Start your answer with `VERDICT: USE-MULTI-INSTANCE-GPU-MIG`. Do not apply anything.
+expected_output: >-
+  VERDICT: USE-MULTI-INSTANCE-GPU-MIG. Multi-Instance GPU (MIG, e.g. `nvidia.com/mig-1g.5gb`) partitions an A100/H100 GPU into separate hardware instances with dedicated high-bandwidth memory and compute engines, providing hardware fault and memory isolation that software time-sharing (`maxSharedClientsPerGpu`) does not provide.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: USE-MULTI-INSTANCE-GPU-MIG",
+          "nvidia.com/mig",
+          "maxSharedClientsPerGpu",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

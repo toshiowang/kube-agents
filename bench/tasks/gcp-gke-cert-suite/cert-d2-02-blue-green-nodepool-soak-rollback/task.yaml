@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCDE) — D2. Cluster & Node Upgrades & APIs
+# Target skill: gke-upgrades
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d2-02-blue-green-nodepool-soak-rollback
+name: "Blue-green node pool upgrade soak duration and rollback mechanics"
+domain: upgrades
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Our stateful Cassandra node pool on GKE Standard needs an upgrade strategy that provisions a full replacement green pool, cordons and drains the blue pool, keeps the blue nodes around for a 24-hour soak window so we can roll back immediately if latency spikes, and exposes a single `gcloud` rollback command during that window. Give the exact `gcloud container node-pools update` flags to enable this and the rollback subcommand. Start your answer with `VERDICT: ENABLE-BLUE-GREEN-UPGRADE-WITH-SOAK`. Do not apply anything.
+expected_output: >-
+  VERDICT: ENABLE-BLUE-GREEN-UPGRADE-WITH-SOAK. Configure blue-green upgrades with `gcloud container node-pools update <pool> --enable-blue-green-upgrade --node-pool-soak-duration=86400s` and roll back during the soak phase using `gcloud container node-pools rollback <pool>`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ENABLE-BLUE-GREEN-UPGRADE-WITH-SOAK",
+          "--enable-blue-green-upgrade",
+          "--node-pool-soak-duration",
+          "node-pools rollback",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

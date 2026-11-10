@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCA / ACE) — D1. Autoscaling, ComputeClass & Accelerators
+# Target skill: gke-compute-classes
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d1-01-autopilot-vs-standard-sizing
+name: "GKE Autopilot vs Standard pod resource rounding and node management boundaries"
+domain: capacity
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Our platform team is migrating a Deployment to a GKE Autopilot cluster and wants to run manual `kubectl drain` commands on nodes during maintenance while setting container CPU requests to `50m` on a general-purpose workload without a custom ComputeClass. Explain why both assumptions fail on GKE Autopilot, what Autopilot does to pod resource requests below the minimum floor, and how to target specific hardware families on Autopilot. Start your answer with `VERDICT: AUTOPILOT-MANAGES-NODES-AND-ENFORCES-POD-MINIMUMS`. Do not apply anything.
+expected_output: >-
+  VERDICT: AUTOPILOT-MANAGES-NODES-AND-ENFORCES-POD-MINIMUMS. On GKE Autopilot, Google manages node provisioning, draining, and patching (operators cannot manually `kubectl drain` nodes), and Autopilot enforces minimum pod CPU/memory floors (rounding up sub-minimum requests or rejecting invalid ratios). Workloads select hardware families using `cloud.google.com/compute-class` in `nodeSelector`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: AUTOPILOT-MANAGES-NODES-AND-ENFORCES-POD-MINIMUMS",
+          "cloud.google.com/compute-class",
+          "nodeSelector",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

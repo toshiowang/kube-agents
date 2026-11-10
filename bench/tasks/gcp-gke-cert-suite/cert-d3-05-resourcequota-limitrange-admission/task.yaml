@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (CNCF CKA / GCP PCA) — D3. Workloads, OOM, Probes & HPA
+# Target skill: gke-multitenancy
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d3-05-resourcequota-limitrange-admission
+name: "Resolving ResourceQuota admission rejections with a namespace LimitRange"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  After a platform admin applied a `ResourceQuota` enforcing `requests.cpu`, `limits.cpu`, `requests.memory`, and `limits.memory` in namespace `team-alpha`, developers' Deployments that omit explicit container `resources` blocks fail admission with `Error creating: pods is forbidden: failed quota: must specify limits.cpu,limits.memory`. Which Kubernetes object should the admin add to `team-alpha` so pods omitting resource blocks receive automatic defaults? Start your answer with `VERDICT: DEPLOY-NAMESPACE-LIMITRANGE-DEFAULTS`. Do not apply anything.
+expected_output: >-
+  VERDICT: DEPLOY-NAMESPACE-LIMITRANGE-DEFAULTS. Create a `LimitRange` in namespace `team-alpha` with `type: Container`, `default` (default limits), and `defaultRequest` (default requests) so the LimitRanger admission controller injects defaults before `ResourceQuota` validation.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: DEPLOY-NAMESPACE-LIMITRANGE-DEFAULTS",
+          "LimitRange",
+          "defaultRequest",
+          "ResourceQuota",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

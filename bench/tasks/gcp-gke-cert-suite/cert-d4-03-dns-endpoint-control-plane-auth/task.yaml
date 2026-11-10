@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP ACE / PCA) — D4. Control Plane, Setup, Cost & CLI
+# Target skill: gke-basics
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d4-03-dns-endpoint-control-plane-auth
+name: "Control-plane access via GKE DNS endpoint without IP authorized networks"
+domain: chat-and-routing
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  Remote engineers without a static corporate egress IP need to run `kubectl` against our GKE cluster using IAM-authenticated control-plane DNS access rather than managing IP CIDRs in `masterAuthorizedNetworks`. Give the exact `gcloud container clusters update` flag to enable the DNS endpoint and the `gcloud container clusters get-credentials` flag engineers must pass. Start your answer with `VERDICT: ENABLE-DNS-ACCESS-AND-GET-CREDENTIALS-DNS-ENDPOINT`. Do not apply anything.
+expected_output: >-
+  VERDICT: ENABLE-DNS-ACCESS-AND-GET-CREDENTIALS-DNS-ENDPOINT. Enable DNS control-plane access with `gcloud container clusters update <cluster> --enable-dns-access` and generate the kubeconfig entry with `gcloud container clusters get-credentials <cluster> --dns-endpoint`.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ENABLE-DNS-ACCESS-AND-GET-CREDENTIALS-DNS-ENDPOINT",
+          "--enable-dns-access",
+          "--dns-endpoint",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

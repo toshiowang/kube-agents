@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (CNCF CKA / CKAD) — D3. Workloads, OOM, Probes & HPA
+# Target skill: gke-reliability
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d3-03-initcontainer-ordering-and-sidecar
+name: "Native Kubernetes sidecar containers using initContainers with restartPolicy Always"
+domain: reliability
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  A Kubernetes `Job` on GKE 1.29+ runs a batch worker alongside a Cloud SQL Auth Proxy container in `spec.containers`. When the batch worker finishes with exit code 0, the Pod never completes because the proxy container keeps running. How do you configure the proxy as a native Kubernetes sidecar so it starts before the main worker and automatically terminates when the Job container exits? Start your answer with `VERDICT: INITCONTAINER-WITH-RESTARTPOLICY-ALWAYS`. Do not apply anything.
+expected_output: >-
+  VERDICT: INITCONTAINER-WITH-RESTARTPOLICY-ALWAYS. Define the proxy under `spec.initContainers` with `restartPolicy: Always`. Kubernetes starts the native sidecar before the main Job container and terminates it automatically once all regular containers in `spec.containers` exit.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: INITCONTAINER-WITH-RESTARTPOLICY-ALWAYS",
+          "initContainers",
+          "restartPolicy: Always",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

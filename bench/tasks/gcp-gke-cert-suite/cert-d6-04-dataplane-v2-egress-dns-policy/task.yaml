@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCNE / CNCF CKS) — D6. Networking, CNI, LBs & DNS
+# Target skill: gke-networking
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d6-04-dataplane-v2-egress-dns-policy
+name: "Permitting kube-dns and NodeLocal DNSCache under a default-deny egress NetworkPolicy"
+domain: security
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  After applying a default-deny egress `NetworkPolicy` in namespace `payments`, pods time out resolving both cluster-internal Services and external FQDNs on our GKE Dataplane V2 cluster with NodeLocal DNSCache enabled. What egress rules (ports, protocols, namespace/pod selectors, and link-local IP) must be added to allow DNS lookups? Start your answer with `VERDICT: ALLOW-UDP-TCP-53-TO-KUBE-DNS-AND-NODELOCAL-DNS`. Do not apply anything.
+expected_output: >-
+  VERDICT: ALLOW-UDP-TCP-53-TO-KUBE-DNS-AND-NODELOCAL-DNS. Add an egress rule allowing `UDP` and `TCP` port `53` (and port `8053` where applicable) to `namespaceSelector` `kubernetes.io/metadata.name: kube-system` with `podSelector` `k8s-app: kube-dns` as well as the NodeLocal DNSCache link-local address.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: ALLOW-UDP-TCP-53-TO-KUBE-DNS-AND-NODELOCAL-DNS",
+          "kube-dns",
+          "kube-system",
+          "53",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

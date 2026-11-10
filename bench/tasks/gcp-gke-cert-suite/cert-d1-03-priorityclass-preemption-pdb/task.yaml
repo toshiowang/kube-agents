@@ -1,0 +1,38 @@
+# Certification Exam Domain Probe (GCP PCDE / CNCF CKA) — D1. Autoscaling, ComputeClass & Accelerators
+# Target skill: gke-workload-scaling
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d1-03-priorityclass-preemption-pdb
+name: "Non-preempting PriorityClass configuration to protect serving workloads"
+domain: capacity
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  High-priority batch jobs (`PriorityClass` value `100000`) are evicting latency-sensitive serving pods when our GKE node pool hits its autoscaler cap, even when we only want the batch jobs placed ahead of lower-priority pending pods in the scheduling queue without evicting running pods. Which `PriorityClass` field prevents live pod eviction while keeping queue priority? Start your answer with `VERDICT: SET-PREEMPTIONPOLICY-NEVER`. Do not apply anything.
+expected_output: >-
+  VERDICT: SET-PREEMPTIONPOLICY-NEVER. Set `preemptionPolicy: Never` on the `PriorityClass` (instead of the default `PreemptLowerPriority`) so high-priority batch pods are prioritized in the scheduling queue ahead of lower-priority pending pods without preempting running pods.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: SET-PREEMPTIONPOLICY-NEVER",
+          "preemptionPolicy",
+          "Never",
+          "PriorityClass",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]

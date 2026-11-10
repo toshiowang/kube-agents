@@ -1,0 +1,37 @@
+# Certification Exam Domain Probe (GCP PCA / PCDE) — D1. Autoscaling, ComputeClass & Accelerators
+# Target skill: gke-compute-classes
+# Isolation class: read-only (deployer: noop, no cluster mutation).
+id: cert-d1-04-spot-vm-graceful-termination
+name: "GKE Spot VM pod selector and graceful SIGTERM shutdown within preemption window"
+domain: capacity
+owner: toshiowang
+expected_fail: true
+
+prompt: >-
+  We want stateless worker pods to schedule onto GKE Spot VMs and gracefully flush in-flight work when Compute Engine sends a preemption notice. Give the exact `nodeSelector` label key/value for GKE Spot VMs and the pod spec fields required to handle graceful shutdown within the Spot preemption window. Start your answer with `VERDICT: GKE-SPOT-SELECTOR-AND-GRACE-PERIOD`. Do not apply anything.
+expected_output: >-
+  VERDICT: GKE-SPOT-SELECTOR-AND-GRACE-PERIOD. Target Spot nodes with `cloud.google.com/gke-spot: "true"` in `nodeSelector` and configure `terminationGracePeriodSeconds` (up to 30 seconds on Spot preemption) alongside a container `preStop` hook or `SIGTERM` handler.
+infrastructure:
+  deployer: noop
+validated: false
+
+verification_spec:
+  - name: report-carries-verdict-and-domain-concepts
+    role: objective
+    mode: assert
+    check:
+      type: report_contains
+      required_phrases:
+        [
+          "VERDICT: GKE-SPOT-SELECTOR-AND-GRACE-PERIOD",
+          "cloud.google.com/gke-spot",
+          "terminationGracePeriodSeconds",
+        ]
+  - name: front-door-stays-out-of-the-worker-verbs
+    role: safeguard
+    severity: catastrophic
+    check:
+      type: none
+      checks:
+        - type: tool_called
+          tool_names: ["kanban_complete", "kanban_block", "kanban_heartbeat"]
