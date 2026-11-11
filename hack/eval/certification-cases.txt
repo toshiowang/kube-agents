@@ -92,6 +92,13 @@
 # obtainability check reads a gcsfuse volume's cache or sidecar limits; the gap
 # is item 3 of #2577.
 ./tasks/storage-gcsfuse-unbounded-cache-oom/task.yaml
+# Capability row: storage, CSI drivers and PVCs; a claim on the built-in
+# Immediate-binding `standard` class strands a pod pinned to another zone,
+# planted by its own stack
+# (prebuilt/storage-immediate-binding-zonal-pd-affinity-conflict), asked as a
+# symptom in chat. A baseline: no gap declared; the objective requires the
+# planted claim and workload names and the WaitForFirstConsumer fix.
+./tasks/storage-immediate-binding-zonal-pd-affinity-conflict/task.yaml
 # Capability row: storage, CSI drivers and PVCs; the obtainability audit names a
 # one-replica Deployment under the default RollingUpdate strategy that mounts a
 # ReadWriteOnce claim (the planted single-writer-app and single-writer-data in
