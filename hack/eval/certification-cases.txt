@@ -31,6 +31,13 @@
 # from the nightly file on its record there: above the bar on the nightlies
 # of 2026-10-23 to 2026-11-09 (the case of #3507, for #3199).
 ./tasks/cost-rightsizing-names-dependencies/task.yaml
+# Capability row: networking fabric, load balancers and Gateway; an ingress
+# NetworkPolicy with a podSelector alone that denies a client in another
+# namespace on Dataplane V2, planted by its own stack
+# (prebuilt/netpol-cross-namespace-ingress-denied), asked as a symptom in
+# chat. A baseline: no gap declared; the objective requires the planted policy
+# and client names and the namespaceSelector fix.
+./tasks/netpol-cross-namespace-ingress-denied/task.yaml
 # Capability row: networking fabric, load balancers and Gateway; the
 # obtainability audit on an HTTPRoute whose Service maps to a numeric targetPort
 # no backing container declares or serves (the planted backend-api-svc in
