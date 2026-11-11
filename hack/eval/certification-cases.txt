@@ -114,6 +114,12 @@
 # declared gap, expected_fail: no compliance check reads the pattern; the gap
 # is #5028.
 ./tasks/workload-image-streaming-token-iam-expiry/task.yaml
+# Capability row: workloads, OOM, probes and HPA; a slow-starting container
+# under a livenessProbe that allows 15 seconds and no startupProbe, planted by
+# its own stack (prebuilt/workload-liveness-kills-slow-start-no-startupprobe),
+# asked as a symptom in chat. A baseline: no gap declared; the objective
+# requires the planted workload name and health path and the startupProbe fix.
+./tasks/workload-liveness-kills-slow-start-no-startupprobe/task.yaml
 # Capability row: workloads, OOM, probes and HPA; the obtainability audit names a
 # Deployment whose containers set no memory limit (the planted
 # memory-unbounded-worker in seeded-workloads). A baseline: no gap declared.
