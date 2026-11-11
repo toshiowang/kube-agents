@@ -110,6 +110,14 @@ np_plant() {
 
   # Created with its labels in one request; `create` stops on AlreadyExists
   # rather than adopting a namespace the pre-clear did not see.
+  # Scenario labels the stack asks for (one `key: "value"` per line, values
+  # already quoted by the module), indented under the fixed four; a plant
+  # whose condition is a namespace label, such as Pod Security admission,
+  # has no later moment to add it without a first pod admitted unlabelled.
+  local extra_labels=""
+  if [ -n "${NP_EXTRA_LABELS:-}" ]; then
+    extra_labels="$(printf '%s\n' "$NP_EXTRA_LABELS" | sed 's/^/    /')"
+  fi
   np_planted_ns=1
   kubectl create -f - <<MANIFEST
 apiVersion: v1
@@ -121,6 +129,7 @@ metadata:
     $NP_LABEL_BUILD_ID: "$NP_BUILD_ID"
     $NP_LABEL_PULL_NUMBER: "$NP_PULL_NUMBER"
     $NP_LABEL_OWNER: "$NP_STACK"
+$extra_labels
 MANIFEST
   printf '%s\n' "$NP_MANIFEST" | kubectl --namespace "$NP_NAMESPACE" create -f -
   echo "Planted $NP_STACK in $NP_NAMESPACE on $NP_HOST_CLUSTER."

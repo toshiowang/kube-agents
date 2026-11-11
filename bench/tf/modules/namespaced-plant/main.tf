@@ -46,7 +46,7 @@ resource "null_resource" "plant" {
     host_cluster  = var.host_cluster_name
     host_location = var.host_cluster_location
     host_project  = var.project_id
-    manifest      = sha256(var.manifest)
+    manifest      = sha256(join("|", [var.manifest, jsonencode(var.extra_labels)]))
     script        = filesha256(local.script)
   }
 
@@ -62,6 +62,7 @@ resource "null_resource" "plant" {
       NP_MANAGED_BY    = var.labels["managed-by"]
       NP_BUILD_ID      = var.labels["build-id"]
       NP_PULL_NUMBER   = var.labels["pull-number"]
+      NP_EXTRA_LABELS  = join("\n", [for k, v in var.extra_labels : "${k}: \"${v}\""])
       NP_MANIFEST      = var.manifest
     }
   }

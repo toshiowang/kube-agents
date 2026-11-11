@@ -71,6 +71,13 @@
 # Ignore on an inert group). A declared gap, expected_fail: no compliance check
 # reads a CA bundle's notAfter; the gap is #4960.
 ./tasks/security-expiring-node-bootstrap-and-webhook-certs/task.yaml
+# Capability row: security, Workload Identity, RBAC and CVEs; a namespace
+# enforcing the restricted Pod Security Standard refuses a Deployment whose
+# template sets no securityContext, planted by its own stack
+# (prebuilt/security-pss-restricted-refuses-unset-securitycontext),
+# asked as a symptom in chat. A baseline: no gap declared; the objective
+# requires the planted workload name and the two fields the admission names.
+./tasks/security-pss-restricted-refuses-unset-securitycontext/task.yaml
 # Capability row: security, Workload Identity, RBAC and CVEs; the compliance
 # audit on a fail-closed admission webhook whose backend Service does not exist
 # (the planted ValidatingWebhookConfiguration strict-policy-webhook, failurePolicy

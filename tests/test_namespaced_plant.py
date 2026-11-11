@@ -151,6 +151,16 @@ class NamespacedPlantTest(unittest.TestCase):
         self.assertIn(f"--namespace {_NAMESPACE} create -f -", creates[1])
         self.assertIn("kind: ConfigMap", calls[calls.index(creates[1]) + 1])
 
+    def test_extra_labels_are_written_on_the_namespace_beside_the_fixed_four(self):
+        extra = 'pod-security.kubernetes.io/enforce: "restricted"\npod-security.kubernetes.io/enforce-version: "latest"'
+        completed, calls = self._run("plant", NP_EXTRA_LABELS=extra)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        creates = self._creates(calls)
+        namespace_body = calls[calls.index(creates[0]) + 1]
+        for line in ('    pod-security.kubernetes.io/enforce: "restricted"', '    pod-security.kubernetes.io/enforce-version: "latest"', f'    created-by-stack: "{_STACK}"'):
+            self.assertIn(line, namespace_body, "each extra label is one indented line under the fixed four")
+        self.assertEqual(self._deletes(calls), [])
+
     def test_the_ownership_read_uses_ignore_not_found_and_the_name_slash_label_path(self):
         _, calls = self._run("plant")
         reads = [c for c in calls if "get namespace" in c]

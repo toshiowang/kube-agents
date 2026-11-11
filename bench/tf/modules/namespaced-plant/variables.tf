@@ -36,6 +36,10 @@ variable "namespace" {
 variable "stack" {
   type        = string
   description = "The calling stack's name, written as the namespace's created-by-stack label. The pre-clear and the destroy act only on a namespace that carries it."
+  validation {
+    condition     = length(var.stack) <= 63
+    error_message = "The stack name is written as a label value, which the API server caps at 63 bytes."
+  }
 }
 
 variable "labels" {
@@ -46,4 +50,10 @@ variable "labels" {
 variable "manifest" {
   type        = string
   description = "The namespaced objects to create after the namespace exists, one YAML document stream rendered by the root stack."
+}
+
+variable "extra_labels" {
+  type        = map(string)
+  description = "Scenario labels written on the namespace at create beside the fixed four, for a condition that is a namespace label (Pod Security admission). Empty by default."
+  default     = {}
 }
