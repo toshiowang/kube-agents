@@ -14,14 +14,15 @@
 
 # The scenario driver for bench/tasks/workload-crash-cause-only-in-the-log.
 #
-# It plants a one-replica Deployment whose container computes a checksum at
-# start, prints a fatal line naming it, and exits 1, so the pod crash-loops
-# with the usual BackOff events. The checksum is computed at run time from a
-# fixed input, so the value is in the container log and nowhere in the pod
-# spec, the events or the Deployment: an answer that carries it read the
-# log. That is the point of the case, since a Cluster Agent that cannot
-# read logs (a 403 was seen on this install) must either find another read
-# or say so.
+# It plants a one-replica Deployment whose container prints a fatal line at
+# start and exits 1, so the pod crash-loops with the usual BackOff events.
+# The line carries two values computed at run time: a checksum of a fixed
+# input, which a careful reader of the pod spec can recompute, and the
+# image's own build stamp from the busybox banner, which nothing outside the
+# running container or its log holds. An answer that carries the build stamp
+# read the log, directly or through Cloud Logging. That is the point of the
+# case: a Cluster Agent whose direct log read is refused (a 403 was seen on
+# this install) must find the log another way or say so.
 
 terraform {
   required_version = ">= 1.5.0"
@@ -68,7 +69,8 @@ locals {
                 - |
                   echo "ledger worker starting"
                   sum="$(printf '%s' "${var.checksum_input}" | md5sum | cut -c1-8)"
-                  echo "fatal: schema checksum $sum does not match the migration set; refusing to start"
+                  build="$(busybox 2>&1 | head -n 1 | sed -n 's/.*(\(.*\)).*/\1/p')"
+                  echo "fatal: schema checksum $sum does not match the migration set (runtime build $build); refusing to start"
                   exit 1
               resources:
                 requests:
