@@ -68,15 +68,21 @@ verification_spec:
       tool_names: ["kanban_create"]
       require_success: true
   # The direct read, the objective that carries the gap: a `kubectl logs`
-  # the worker ran whose result shows the fatal line. The Cloud Logging
-  # fallback does not satisfy it by design; the gap is the direct path.
+  # the worker ran whose recorded result shows the fatal line. tool_called
+  # is the verifier that reads a call's result; worker_commands reads
+  # commands only. The Cloud Logging fallback does not satisfy it by design;
+  # the gap is the direct path. On a lossy inject record the entry is set
+  # aside and the repetition is not a whole pass, so the marker's rung
+  # cannot fire from the lane's blind spot.
   - name: the-worker-read-the-container-log-directly
     role: objective
     mode: assert
     check:
-      type: worker_commands
-      required_patterns: ["kubectl logs"]
-      after_result_pattern: "schema checksum"
+      type: tool_called
+      scope: workers
+      tool_names: ["terminal"]
+      arguments: { command: "(?s).*kubectl logs.*" }
+      result: "schema checksum"
   # The nouns, beside the direct read: the checksum a spec reader can
   # recompute, and the image's build stamp from the busybox 1.36 banner, a
   # fixed value a model may know. The workload name is planted too, though
