@@ -114,6 +114,12 @@
 # declared gap, expected_fail: no compliance check reads the pattern; the gap
 # is #5028.
 ./tasks/workload-image-streaming-token-iam-expiry/task.yaml
+# Capability row: control plane, setup, cost and CLI (chat and routing); the
+# slow-start liveness shape asked with no cluster in the prompt, planted by
+# its own stack (prebuilt/workload-crashloop-routed-without-cluster-name).
+# A baseline: no gap declared; the objective is the route (a card filed with
+# no cluster named) plus the planted workload and probe path.
+./tasks/workload-crashloop-routed-without-cluster-name/task.yaml
 # Capability row: workloads, OOM, probes and HPA; the obtainability audit names a
 # Deployment whose containers set no memory limit (the planted
 # memory-unbounded-worker in seeded-workloads). A baseline: no gap declared.
