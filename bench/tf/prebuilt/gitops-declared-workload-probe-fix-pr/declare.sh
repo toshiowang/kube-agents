@@ -37,14 +37,13 @@ declare_token() {
   gh auth token
 }
 
-declare_api() { # <method> <path> [json-body]
-  local method="$1" path="$2" body="${3:-}"
+declare_api() { # <method> <path> [json-body]; an empty path is the repository itself
+  local method="$1" path="$2" body="${3:-}" url="$DECLARE_API/repos/$DECLARE_REPO"
+  if [ -n "$path" ]; then url="$url/$path"; fi
   if [ -n "$body" ]; then
-    curl -fsS -X "$method" -H "Authorization: Bearer $DECLARE_TOKEN" -H "Accept: application/vnd.github+json" \
-      "$DECLARE_API/repos/$DECLARE_REPO/$path" -d "$body"
+    curl -fsS -X "$method" -H "Authorization: Bearer $DECLARE_TOKEN" -H "Accept: application/vnd.github+json" "$url" -d "$body"
   else
-    curl -fsS -X "$method" -H "Authorization: Bearer $DECLARE_TOKEN" -H "Accept: application/vnd.github+json" \
-      "$DECLARE_API/repos/$DECLARE_REPO/$path"
+    curl -fsS -X "$method" -H "Authorization: Bearer $DECLARE_TOKEN" -H "Accept: application/vnd.github+json" "$url"
   fi
 }
 
