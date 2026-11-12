@@ -58,6 +58,13 @@
 # limit). A declared gap, expected_fail: no audit reads a container's OOMKilled
 # last termination or restart count; the gap is #2579.
 ./tasks/observability-gmp-kube-state-metrics-oom/task.yaml
+# Capability row: workloads, OOM, probes and HPA; a ResourceQuota that refuses
+# a Deployment with no resources block where no LimitRange supplies defaults,
+# planted by its own stack (prebuilt/quota-requires-limits-no-limitrange),
+# asked as a symptom in chat. A baseline: no gap declared; the objective
+# requires the planted workload and quota names and the LimitRange fix. The
+# shape holds on a Standard host; Autopilot admission writes requests.
+./tasks/quota-requires-limits-no-limitrange/task.yaml
 # Capability row: security, Workload Identity, RBAC and CVEs; the compliance
 # audit's default-sa-automount check on a Deployment that runs under the
 # default ServiceAccount with its token mounted (the planted
