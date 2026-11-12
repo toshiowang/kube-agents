@@ -31,6 +31,12 @@
 # from the nightly file on its record there: above the bar on the nightlies
 # of 2026-10-23 to 2026-11-09 (the case of #3507, for #3199).
 ./tasks/cost-rightsizing-names-dependencies/task.yaml
+# Capability row: control plane, setup, cost and CLI; a fleet-wide read with
+# no plant: control-plane authorized networks off on the drift-outlier role's
+# cluster while its peers have it on, asked as "is it on everywhere?" in chat.
+# A baseline: no gap declared; the objective requires the outlier's own name
+# on a line that says the setting is off.
+./tasks/fleet-authorized-networks-odd-cluster-out/task.yaml
 # Capability row: networking fabric, load balancers and Gateway; the
 # obtainability audit on an HTTPRoute whose Service maps to a numeric targetPort
 # no backing container declares or serves (the planted backend-api-svc in
