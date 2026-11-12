@@ -101,6 +101,13 @@
 # three-replica Deployment that no PodDisruptionBudget selects (the planted
 # stateless-ingest-service in seeded-upgrades). A baseline: no gap declared.
 ./tasks/upgrade-missing-pdb-drain-outage-baseline/task.yaml
+# Capability row: cluster and node upgrades; a PodDisruptionBudget with
+# maxUnavailable 0 over a one-replica Deployment that will stall a pool
+# drain, planted by its own stack
+# (prebuilt/upgrade-pdb-zero-unavailable-blocks-drain), asked as "can we
+# upgrade tonight?" in chat. A baseline: no gap declared; the objective
+# requires the planted budget and workload names and the stall verdict.
+./tasks/upgrade-pdb-zero-unavailable-blocks-drain/task.yaml
 # Capability row: workloads, OOM, probes and HPA; the obtainability audit on a
 # Deployment whose HorizontalPodAutoscaler scales down with no stabilization
 # window and whose containers have no preStop hook (the planted web-api-server
