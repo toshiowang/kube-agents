@@ -114,6 +114,12 @@
 # declared gap, expected_fail: no compliance check reads the pattern; the gap
 # is #5028.
 ./tasks/workload-image-streaming-token-iam-expiry/task.yaml
+# Capability row: workloads, OOM, probes and HPA; a crash loop whose cause is
+# printed only in the container log (a checksum computed at start), planted by
+# its own stack (prebuilt/workload-crash-cause-only-in-the-log), asked as a
+# symptom in chat. A baseline: no gap declared; the objective requires the
+# planted workload name and the log-only checksum.
+./tasks/workload-crash-cause-only-in-the-log/task.yaml
 # Capability row: workloads, OOM, probes and HPA; the obtainability audit names a
 # Deployment whose containers set no memory limit (the planted
 # memory-unbounded-worker in seeded-workloads). A baseline: no gap declared.
