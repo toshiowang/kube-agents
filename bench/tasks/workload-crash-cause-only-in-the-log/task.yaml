@@ -1,14 +1,20 @@
 # Workloads, OOM, probes and HPA (Validated Capabilities): a crash loop whose
 # cause is in the container log and nowhere else. The container prints a
 # fatal line with a checksum and the image's own build stamp, then exits 1;
-# the events carry only BackOff, the spec carries the computation, not the
-# values, and the build stamp is held by nothing but the running container
-# and its log. An answer that states it read the log, directly or through
-# Cloud Logging. Built from the exam probe's workload domain to test one read
-# the first eight cases never needed: the direct pod log read answered 403 on
-# this install (the worker's kubectl identity lacks pods/log), and the
-# question is whether the product reaches the log another way. A baseline
-# until a run shows it cannot; then the gap is the finding.
+# the events carry only BackOff. A DECLARED GAP: on a GKE host the Cluster
+# Agent's direct log read, `kubectl logs`, is refused (the worker's kubectl
+# identity lacks pods/log; the in-cluster role that grants it binds the
+# Kubernetes service accounts the worker does not use), and the product
+# reaches the log through Cloud Logging only some of the time. The objective
+# that carries the gap is the direct read: a `kubectl logs` the worker ran
+# whose result shows the fatal line. It fails every repetition while the
+# grant is missing and flips when the identity the worker uses can read
+# pods/log (an IAM grant of container.pods.getLogs, or a route through the
+# Kubernetes service account that holds the role). The noun objective stays
+# beside it: the checksum is recomputable from the spec and the busybox 1.36
+# banner date is a fixed value a model may know, so the nouns alone do not
+# prove the read; the direct-read objective does. Gap issue: to be filed on
+# the human's word; its number goes here and in the roster block.
 #
 # Safeguard values are the API server's defaults on a Standard host
 # (`kubectl create --dry-run=server`, 2026-11-12). The dry run on an
@@ -18,6 +24,7 @@ name: "A crash loop whose cause is printed only in the container log"
 domain: cluster-debugging
 suite: certification
 owner: toshiowang
+expected_fail: true
 fixtures: []
 prompt: >-
   The worker in the 'eval-ledger-worker' namespace of GKE cluster
@@ -57,10 +64,20 @@ verification_spec:
       type: tool_called
       tool_names: ["kanban_create"]
       require_success: true
-  # The log-only nouns: the checksum a spec reader can recompute, and the
-  # image's build stamp, which only the running container or its log holds
-  # (the busybox 1.36 banner). The workload name is planted too, though it
-  # is also a substring of the namespace.
+  # The direct read, the objective that carries the gap: a `kubectl logs`
+  # the worker ran whose result shows the fatal line. The Cloud Logging
+  # fallback does not satisfy it by design; the gap is the direct path.
+  - name: the-worker-read-the-container-log-directly
+    role: objective
+    mode: assert
+    check:
+      type: worker_commands
+      required_patterns: ["kubectl logs"]
+      after_result_pattern: "schema checksum"
+  # The nouns, beside the direct read: the checksum a spec reader can
+  # recompute, and the image's build stamp from the busybox 1.36 banner, a
+  # fixed value a model may know. The workload name is planted too, though
+  # it is also a substring of the namespace.
   - name: report-carries-the-checksum-from-the-log
     role: objective
     mode: assert

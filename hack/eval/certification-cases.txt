@@ -101,6 +101,15 @@
 # three-replica Deployment that no PodDisruptionBudget selects (the planted
 # stateless-ingest-service in seeded-upgrades). A baseline: no gap declared.
 ./tasks/upgrade-missing-pdb-drain-outage-baseline/task.yaml
+# Capability row: workloads, OOM, probes and HPA; a crash loop whose cause is
+# printed only in the container log, planted by its own stack
+# (prebuilt/workload-crash-cause-only-in-the-log), asked as a symptom in chat.
+# A declared gap, expected_fail: the Cluster Agent's direct log read is
+# refused on a GKE host (the worker's kubectl identity lacks pods/log) and the
+# Cloud Logging fallback is taken only some of the time; the objective that
+# flips is a `kubectl logs` the worker ran whose result shows the fatal line;
+# the gap issue is to be filed on the human's word and its number goes here.
+./tasks/workload-crash-cause-only-in-the-log/task.yaml
 # Capability row: workloads, OOM, probes and HPA; the obtainability audit on a
 # Deployment whose HorizontalPodAutoscaler scales down with no stabilization
 # window and whose containers have no preStop hook (the planted web-api-server
@@ -114,12 +123,6 @@
 # declared gap, expected_fail: no compliance check reads the pattern; the gap
 # is #5028.
 ./tasks/workload-image-streaming-token-iam-expiry/task.yaml
-# Capability row: workloads, OOM, probes and HPA; a crash loop whose cause is
-# printed only in the container log (a checksum computed at start), planted by
-# its own stack (prebuilt/workload-crash-cause-only-in-the-log), asked as a
-# symptom in chat. A baseline: no gap declared; the objective requires the
-# planted workload name and the log-only checksum.
-./tasks/workload-crash-cause-only-in-the-log/task.yaml
 # Capability row: workloads, OOM, probes and HPA; the obtainability audit names a
 # Deployment whose containers set no memory limit (the planted
 # memory-unbounded-worker in seeded-workloads). A baseline: no gap declared.
