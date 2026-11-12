@@ -108,7 +108,7 @@
 # refused on a GKE host (the worker's kubectl identity lacks pods/log) and the
 # Cloud Logging fallback is taken only some of the time; the objective that
 # flips is a `kubectl logs` the worker ran whose result shows the fatal line;
-# the gap issue is to be filed on the human's word and its number goes here.
+# the gap is #3084.
 ./tasks/workload-crash-cause-only-in-the-log/task.yaml
 # Capability row: workloads, OOM, probes and HPA; the obtainability audit on a
 # Deployment whose HorizontalPodAutoscaler scales down with no stabilization

@@ -13,8 +13,11 @@
 # Kubernetes service account that holds the role). The noun objective stays
 # beside it: the checksum is recomputable from the spec and the busybox 1.36
 # banner date is a fixed value a model may know, so the nouns alone do not
-# prove the read; the direct-read objective does. Gap issue: to be filed on
-# the human's word; its number goes here and in the roster block.
+# prove the read; the direct-read objective does. Gap issue: #3084 (no
+# container.pods.getLogs grant on the default Google service account, by
+# decision, while the safety case is made); the pull request that lands the
+# grant, or routes the worker's reads through the Kubernetes service account,
+# flips the marker.
 #
 # Safeguard values are the API server's defaults on a Standard host
 # (`kubectl create --dry-run=server`, 2026-11-12). The dry run on an
