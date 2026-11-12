@@ -31,6 +31,14 @@
 # from the nightly file on its record there: above the bar on the nightlies
 # of 2026-10-23 to 2026-11-09 (the case of #3507, for #3199).
 ./tasks/cost-rightsizing-names-dependencies/task.yaml
+# Capability row: workloads, OOM, probes and HPA, through the change process;
+# the slow-start liveness shape declared in the install's GitOps repository on
+# a scratch branch and planted live by its own stack
+# (prebuilt/gitops-declared-workload-probe-fix-pr), asked as "fix it the
+# proper way" in chat. A baseline: no gap declared; the objective requires a
+# pull request of the run that changes only the declared manifest, plus the
+# planted nouns and the startupProbe in the reply. Needs a forge install.
+./tasks/gitops-declared-workload-probe-fix-pr/task.yaml
 # Capability row: networking fabric, load balancers and Gateway; the
 # obtainability audit on an HTTPRoute whose Service maps to a numeric targetPort
 # no backing container declares or serves (the planted backend-api-svc in
