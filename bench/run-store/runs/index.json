@@ -409,6 +409,14 @@
    "runs": 114
   },
   {
+   "build": "2120668072581795840",
+   "cases": 38,
+   "commit": "15db24677b84a3ef359aabb0bb6fc0876bd20773",
+   "job": "ci-kube-agents-eval-nightly",
+   "night": "2026-11-12",
+   "runs": 114
+  },
+  {
    "build": "2110551280941273088",
    "cases": 3,
    "commit": "0ec08289b48000dd8c835511a87aead793d46fe4",
@@ -745,11 +753,27 @@
    "runs": 117
   },
   {
+   "build": "2120668072720207872",
+   "cases": 39,
+   "commit": "15db24677b84a3ef359aabb0bb6fc0876bd20773",
+   "job": "ci-kube-agents-eval-nightly-main-b",
+   "night": "2026-11-12",
+   "runs": 117
+  },
+  {
    "build": "2120305680022769664",
    "cases": 41,
    "commit": "d4baea1d7976461f51258aaf27f7b92986d61653",
    "job": "ci-kube-agents-eval-nightly-main-c",
    "night": "2026-11-11",
+   "runs": 123
+  },
+  {
+   "build": "2120668072946700288",
+   "cases": 41,
+   "commit": "15db24677b84a3ef359aabb0bb6fc0876bd20773",
+   "job": "ci-kube-agents-eval-nightly-main-c",
+   "night": "2026-11-12",
    "runs": 123
   },
   {
@@ -761,11 +785,27 @@
    "runs": 102
   },
   {
+   "build": "2120668073131249664",
+   "cases": 35,
+   "commit": "15db24677b84a3ef359aabb0bb6fc0876bd20773",
+   "job": "ci-kube-agents-eval-nightly-main-d",
+   "night": "2026-11-12",
+   "runs": 105
+  },
+  {
    "build": "2120305680169570304",
    "cases": 39,
    "commit": "d4baea1d7976461f51258aaf27f7b92986d61653",
    "job": "ci-kube-agents-eval-nightly-main-e",
    "night": "2026-11-11",
+   "runs": 117
+  },
+  {
+   "build": "2120668073252884480",
+   "cases": 39,
+   "commit": "15db24677b84a3ef359aabb0bb6fc0876bd20773",
+   "job": "ci-kube-agents-eval-nightly-main-e",
+   "night": "2026-11-12",
    "runs": 117
   },
   {
@@ -1041,15 +1081,31 @@
    "runs": 15
   },
   {
+   "build": "2120668073470988288",
+   "cases": 5,
+   "commit": "15db24677b84a3ef359aabb0bb6fc0876bd20773",
+   "job": "ci-kube-agents-eval-nightly-writers-b",
+   "night": "2026-11-12",
+   "runs": 15
+  },
+  {
    "build": "2120305680366702592",
    "cases": 5,
    "commit": "d4baea1d7976461f51258aaf27f7b92986d61653",
    "job": "ci-kube-agents-eval-nightly-writers-c",
    "night": "2026-11-11",
    "runs": 15
+  },
+  {
+   "build": "2120668073538097152",
+   "cases": 5,
+   "commit": "15db24677b84a3ef359aabb0bb6fc0876bd20773",
+   "job": "ci-kube-agents-eval-nightly-writers-c",
+   "night": "2026-11-12",
+   "runs": 15
   }
  ],
- "generated_at": "2026-11-11T16:33Z",
+ "generated_at": "2026-11-12T12:03Z",
  "nights": {
   "2026-09-17": {
    "ci-kube-agents-eval-nightly": {
@@ -2464,7 +2520,79 @@
     "pass": 15,
     "runs": 15
    }
+  },
+  "2026-11-12": {
+   "ci-kube-agents-eval-nightly": {
+    "cases": 38,
+    "fail": 4,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 2,
+    "pass": 108,
+    "runs": 114
+   },
+   "ci-kube-agents-eval-nightly-main-b": {
+    "cases": 39,
+    "fail": 9,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 108,
+    "runs": 117
+   },
+   "ci-kube-agents-eval-nightly-main-c": {
+    "cases": 41,
+    "fail": 7,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 1,
+    "pass": 115,
+    "runs": 123
+   },
+   "ci-kube-agents-eval-nightly-main-d": {
+    "cases": 35,
+    "fail": 4,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 3,
+    "pass": 98,
+    "runs": 105
+   },
+   "ci-kube-agents-eval-nightly-main-e": {
+    "cases": 39,
+    "fail": 14,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 103,
+    "runs": 117
+   },
+   "ci-kube-agents-eval-nightly-writers-b": {
+    "cases": 5,
+    "fail": 0,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 15,
+    "runs": 15
+   },
+   "ci-kube-agents-eval-nightly-writers-c": {
+    "cases": 5,
+    "fail": 0,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 15,
+    "runs": 15
+   }
   }
  },
- "rows": 15969
+ "rows": 16575
 }
