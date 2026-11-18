@@ -457,6 +457,14 @@
    "runs": 114
   },
   {
+   "build": "2122842392154345472",
+   "cases": 39,
+   "commit": "ac3e3999240f82a1e473456a3cf3ba761427071e",
+   "job": "ci-kube-agents-eval-nightly",
+   "night": "2026-11-18",
+   "runs": 117
+  },
+  {
    "build": "2110551280941273088",
    "cases": 3,
    "commit": "0ec08289b48000dd8c835511a87aead793d46fe4",
@@ -841,6 +849,14 @@
    "runs": 120
   },
   {
+   "build": "2122842392234037248",
+   "cases": 41,
+   "commit": "ac3e3999240f82a1e473456a3cf3ba761427071e",
+   "job": "ci-kube-agents-eval-nightly-main-b",
+   "night": "2026-11-18",
+   "runs": 123
+  },
+  {
    "build": "2120305680022769664",
    "cases": 41,
    "commit": "d4baea1d7976461f51258aaf27f7b92986d61653",
@@ -894,6 +910,14 @@
    "commit": "0d9629fc42172ed5603c719b455cf5eae3340899",
    "job": "ci-kube-agents-eval-nightly-main-c",
    "night": "2026-11-17",
+   "runs": 120
+  },
+  {
+   "build": "2122842392322117632",
+   "cases": 40,
+   "commit": "ac3e3999240f82a1e473456a3cf3ba761427071e",
+   "job": "ci-kube-agents-eval-nightly-main-c",
+   "night": "2026-11-18",
    "runs": 120
   },
   {
@@ -953,6 +977,14 @@
    "runs": 120
   },
   {
+   "build": "2122842392439558144",
+   "cases": 41,
+   "commit": "ac3e3999240f82a1e473456a3cf3ba761427071e",
+   "job": "ci-kube-agents-eval-nightly-main-d",
+   "night": "2026-11-18",
+   "runs": 123
+  },
+  {
    "build": "2120305680169570304",
    "cases": 39,
    "commit": "d4baea1d7976461f51258aaf27f7b92986d61653",
@@ -1006,6 +1038,14 @@
    "commit": "0d9629fc42172ed5603c719b455cf5eae3340899",
    "job": "ci-kube-agents-eval-nightly-main-e",
    "night": "2026-11-17",
+   "runs": 111
+  },
+  {
+   "build": "2122842392510861312",
+   "cases": 37,
+   "commit": "ac3e3999240f82a1e473456a3cf3ba761427071e",
+   "job": "ci-kube-agents-eval-nightly-main-e",
+   "night": "2026-11-18",
    "runs": 111
   },
   {
@@ -1321,6 +1361,14 @@
    "runs": 18
   },
   {
+   "build": "2122842392594747392",
+   "cases": 6,
+   "commit": "ac3e3999240f82a1e473456a3cf3ba761427071e",
+   "job": "ci-kube-agents-eval-nightly-writers",
+   "night": "2026-11-18",
+   "runs": 18
+  },
+  {
    "build": "2120668073470988288",
    "cases": 5,
    "commit": "15db24677b84a3ef359aabb0bb6fc0876bd20773",
@@ -1358,6 +1406,14 @@
    "commit": "0d9629fc42172ed5603c719b455cf5eae3340899",
    "job": "ci-kube-agents-eval-nightly-writers-b",
    "night": "2026-11-17",
+   "runs": 18
+  },
+  {
+   "build": "2122842392674439168",
+   "cases": 6,
+   "commit": "ac3e3999240f82a1e473456a3cf3ba761427071e",
+   "job": "ci-kube-agents-eval-nightly-writers-b",
+   "night": "2026-11-18",
    "runs": 18
   },
   {
@@ -1407,9 +1463,17 @@
    "job": "ci-kube-agents-eval-nightly-writers-c",
    "night": "2026-11-16",
    "runs": 18
+  },
+  {
+   "build": "2122842392800268288",
+   "cases": 6,
+   "commit": "ac3e3999240f82a1e473456a3cf3ba761427071e",
+   "job": "ci-kube-agents-eval-nightly-writers-c",
+   "night": "2026-11-18",
+   "runs": 18
   }
  ],
- "generated_at": "2026-11-17T11:59Z",
+ "generated_at": "2026-11-18T12:03Z",
  "nights": {
   "2026-09-17": {
    "ci-kube-agents-eval-nightly": {
@@ -3286,7 +3350,89 @@
     "pass": 13,
     "runs": 18
    }
+  },
+  "2026-11-18": {
+   "ci-kube-agents-eval-nightly": {
+    "cases": 39,
+    "fail": 16,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 2,
+    "pass": 99,
+    "runs": 117
+   },
+   "ci-kube-agents-eval-nightly-main-b": {
+    "cases": 41,
+    "fail": 11,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 1,
+    "pass": 111,
+    "runs": 123
+   },
+   "ci-kube-agents-eval-nightly-main-c": {
+    "cases": 40,
+    "fail": 17,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 103,
+    "runs": 120
+   },
+   "ci-kube-agents-eval-nightly-main-d": {
+    "cases": 41,
+    "fail": 14,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 1,
+    "pass": 108,
+    "runs": 123
+   },
+   "ci-kube-agents-eval-nightly-main-e": {
+    "cases": 37,
+    "fail": 7,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 104,
+    "runs": 111
+   },
+   "ci-kube-agents-eval-nightly-writers": {
+    "cases": 6,
+    "fail": 0,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 18,
+    "runs": 18
+   },
+   "ci-kube-agents-eval-nightly-writers-b": {
+    "cases": 6,
+    "fail": 1,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 1,
+    "pass": 16,
+    "runs": 18
+   },
+   "ci-kube-agents-eval-nightly-writers-c": {
+    "cases": 6,
+    "fail": 0,
+    "models": [
+     "gemini-4-argon-kubeagents-mcp"
+    ],
+    "other": 0,
+    "pass": 18,
+    "runs": 18
+   }
   }
  },
- "rows": 19728
+ "rows": 20376
 }
